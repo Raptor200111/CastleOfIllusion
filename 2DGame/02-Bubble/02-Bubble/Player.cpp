@@ -4,22 +4,18 @@
 #include "Player.h"
 #include "Game.h"
 
-
-#define JUMP_ANGLE_STEP 4
-#define JUMP_HEIGHT 96
-#define FALL_STEP 4
-
-
-enum PlayerStates
-{
-	STAND, WALK, JUMP, FALL, DODGE, BUTT_FALL, BUTT_JUMP, FALL_TO_STAND
-};
+#define FALL_STEP 2
+#define WALK_SPEED 2
+#define GRAVITY 0.5f
 
 
 void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
 	bJumping = false;
+	buttJumping = false;
 	velocity = 0.f;
+	playerState = STAND;
+
 	spritesheet.loadFromFile("images/Mickey_Mouse.png", TEXTURE_PIXEL_FORMAT_RGBA);	
 	sprite = Sprite::createSprite(sizePlayer, glm::vec2(0.066, 0.098), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(4);
@@ -68,56 +64,59 @@ void Player::update(int deltaTime)
 	sprite->update(deltaTime);
 	if (Game::instance().getKey(GLFW_KEY_LEFT))
 	{
-		if (sprite->animation() != WALK)
-			sprite->changeAnimation(WALK);
-		posPlayer.x -= 2;
+		playerState = WALK;
+		posPlayer.x -= WALK_SPEED;
 		if (map->collisionMoveLeft(posPlayer, sizePlayer))
 		{
-			posPlayer.x += 2;
+			posPlayer.x += WALK_SPEED;
 			sprite->changeAnimation(STAND);
 		}
 	}
-	else if (Game::instance().getKey(GLFW_KEY_RIGHT))
+	if (Game::instance().getKey(GLFW_KEY_RIGHT))
 	{
-		if (sprite->animation() != WALK)
-			sprite->changeAnimation(WALK);
-		posPlayer.x += 2;
+		playerState = WALK;
+		posPlayer.x += WALK_SPEED;
 		if (map->collisionMoveRight(posPlayer, sizePlayer))
 		{
-			posPlayer.x -= 2;
-			sprite->changeAnimation(STAND);
+			posPlayer.x -= WALK_SPEED;
+			playerState = STAND;
 		}
 	}
-	else if (Game::instance().getKey(GLFW_KEY_DOWN))
+	if (Game::instance().getKey(GLFW_KEY_DOWN) && bJumping == false)
 	{
-		if (sprite->animation() != DODGE)
-			sprite->changeAnimation(DODGE);
+		playerState = DODGE;
+		//ToDo: Change collision size;
 	}
 	else
 	{
-		if (sprite->animation() != STAND)
-			sprite->changeAnimation(STAND);
+		playerState = STAND;
 	}
 
 	if (bJumping)
 	{
-		velocity += 0.5f;
+		velocity += GRAVITY;
 		posPlayer.y += int(velocity);
+
+		if (Game::instance().getKey(GLFW_KEY_DOWN))
+		{
+			playerState = PlayerStates::BUTT_FALL;
+			buttJumping = true;
+		}
 
 		if (velocity < 0)
 		{
-			if (sprite->animation() != JUMP)
-				sprite->changeAnimation(JUMP);
+			if (!buttJumping)
+				playerState = JUMP;
 
 			if (map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y))
 			{
-
+				velocity = 0;
 			}
 		}
 		if (velocity > 0)
 		{
-			if (sprite->animation() != FALL)
-				sprite->changeAnimation(FALL);
+			if (!buttJumping)
+				playerState = FALL;
 
 			if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
 			{ 
@@ -128,10 +127,13 @@ void Player::update(int deltaTime)
 	}
 	else
 	{
-		posPlayer.y += FALL_STEP;
+		velocity += GRAVITY;
+		posPlayer.y += int(velocity);
+		buttJumping = false;
+
 		if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
 		{
-			//posPlayer.y -= FALL_STEP;
+			velocity = 0.f;
 			if (Game::instance().getKey(GLFW_KEY_UP))
 			{
 				bJumping = true;
@@ -141,6 +143,8 @@ void Player::update(int deltaTime)
 		}
 	}
 
+	if (sprite->animation() != playerState)
+		sprite->changeAnimation(playerState);
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 }
 
