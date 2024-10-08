@@ -88,11 +88,14 @@ void Player::update(int deltaTime)
 			sprite->changeAnimation(STAND);
 		}
 	}
+	else if (Game::instance().getKey(GLFW_KEY_DOWN))
+	{
+		if (sprite->animation() != DODGE)
+			sprite->changeAnimation(DODGE);
+	}
 	else
 	{
-		if (sprite->animation() == WALK)
-			sprite->changeAnimation(STAND);
-		else if (sprite->animation() == WALK)
+		if (sprite->animation() != STAND)
 			sprite->changeAnimation(STAND);
 	}
 
@@ -118,13 +121,6 @@ void Player::update(int deltaTime)
 
 			if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
 			{ 
-				for (int i = 0; i < int(abs(velocity)); i++)
-				{
-					posPlayer.y--;
-					if (!map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
-						break;
-
-				}
 				velocity = 0;
 				bJumping = false;
 			}
@@ -132,10 +128,10 @@ void Player::update(int deltaTime)
 	}
 	else
 	{
-		
 		posPlayer.y += FALL_STEP;
 		if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
 		{
+			//posPlayer.y -= FALL_STEP;
 			if (Game::instance().getKey(GLFW_KEY_UP))
 			{
 				bJumping = true;
