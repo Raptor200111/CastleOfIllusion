@@ -35,7 +35,7 @@ private:
 	TileMap *map;
 	float velocity;
 
-	PlayerStates playerState = PlayerStates::STAND;
+	PlayerStates playerState;
 
 };
 

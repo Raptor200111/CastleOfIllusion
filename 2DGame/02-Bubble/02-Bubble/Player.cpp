@@ -18,7 +18,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
 	spritesheet.loadFromFile("images/Mickey_Mouse.png", TEXTURE_PIXEL_FORMAT_RGBA);	
 	sprite = Sprite::createSprite(sizePlayer, glm::vec2(0.066, 0.098), &spritesheet, &shaderProgram);
-	sprite->setNumberAnimations(4);
+	sprite->setNumberAnimations(8);
 
 	sprite->setAnimationSpeed(STAND, 8);
 	sprite->addKeyframe(STAND, glm::vec2(0.f, 0.f)); //ToDo:Hay que girar el Sprite ya que no tenemos animacion left
@@ -35,7 +35,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
 
 	sprite->setAnimationSpeed(DODGE, 8);
-	sprite->addKeyframe(DODGE, glm::vec2(0.066f * 0, 0.098 * 1)); //ToDo:Hay que girar el Sprite ya que no tenemos animacion left
+	sprite->addKeyframe(DODGE, glm::vec2(0, 0.098 * 1)); //ToDo:Hay que girar el Sprite ya que no tenemos animacion left
 	sprite->addKeyframe(DODGE, glm::vec2(0.066f * 1, 0.098 * 1));
 
 	sprite->setAnimationSpeed(JUMP, 8);
@@ -62,19 +62,23 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 void Player::update(int deltaTime)
 {
 	sprite->update(deltaTime);
+
+	bool otherState = false;
 	if (Game::instance().getKey(GLFW_KEY_LEFT))
 	{
 		playerState = WALK;
+		otherState = true;
 		posPlayer.x -= WALK_SPEED;
 		if (map->collisionMoveLeft(posPlayer, sizePlayer))
 		{
 			posPlayer.x += WALK_SPEED;
-			sprite->changeAnimation(STAND);
+			playerState = STAND;
 		}
 	}
 	if (Game::instance().getKey(GLFW_KEY_RIGHT))
 	{
 		playerState = WALK;
+		otherState = true;
 		posPlayer.x += WALK_SPEED;
 		if (map->collisionMoveRight(posPlayer, sizePlayer))
 		{
@@ -82,24 +86,21 @@ void Player::update(int deltaTime)
 			playerState = STAND;
 		}
 	}
-	if (Game::instance().getKey(GLFW_KEY_DOWN) && bJumping == false)
+	if (Game::instance().getKey(GLFW_KEY_DOWN) && !bJumping)
 	{
 		playerState = DODGE;
-		//ToDo: Change collision size;
-	}
-	else
-	{
-		playerState = STAND;
+		otherState = true;
 	}
 
 	if (bJumping)
 	{
+		otherState = true;
 		velocity += GRAVITY;
 		posPlayer.y += int(velocity);
 
 		if (Game::instance().getKey(GLFW_KEY_DOWN))
 		{
-			playerState = PlayerStates::BUTT_FALL;
+			playerState = BUTT_FALL;
 			buttJumping = true;
 		}
 
@@ -141,6 +142,11 @@ void Player::update(int deltaTime)
 				startY = posPlayer.y;
 			}
 		}
+	}
+
+	if (!otherState)
+	{
+		playerState = STAND;
 	}
 
 	if (sprite->animation() != playerState)
