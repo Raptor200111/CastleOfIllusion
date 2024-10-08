@@ -4,6 +4,7 @@
 
 #include "Sprite.h"
 #include "TileMap.h"
+#include <cmath>
 
 
 // Player is basically a Sprite that represents the player. As such it has
@@ -23,12 +24,12 @@ public:
 	
 private:
 	bool bJumping;
-	glm::ivec2 tileMapDispl, posPlayer;
+	glm::ivec2 tileMapDispl, posPlayer, sizePlayer = glm::ivec2(32, 48);
 	int jumpAngle, startY;
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
-
+	float velocity;
 };
 
 

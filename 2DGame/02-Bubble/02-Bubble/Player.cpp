@@ -10,34 +10,52 @@
 #define FALL_STEP 4
 
 
-enum PlayerAnims
+enum PlayerStates
 {
-	STAND_LEFT, STAND_RIGHT, MOVE_LEFT, MOVE_RIGHT, JUMP, FALL, DODGE, BUTT_FALL
+	STAND, WALK, JUMP, FALL, DODGE, BUTT_FALL, BUTT_JUMP, FALL_TO_STAND
 };
 
 
 void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
 	bJumping = false;
-	spritesheet.loadFromFile("images/bub.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.25, 0.25), &spritesheet, &shaderProgram);
+	velocity = 0.f;
+	spritesheet.loadFromFile("images/Mickey_Mouse.png", TEXTURE_PIXEL_FORMAT_RGBA);	
+	sprite = Sprite::createSprite(sizePlayer, glm::vec2(0.066, 0.098), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(4);
 
-	sprite->setAnimationSpeed(STAND_LEFT, 8);
-	sprite->addKeyframe(STAND_LEFT, glm::vec2(0.f, 0.f));
+	sprite->setAnimationSpeed(STAND, 8);
+	sprite->addKeyframe(STAND, glm::vec2(0.f, 0.f)); //ToDo:Hay que girar el Sprite ya que no tenemos animacion left
+	sprite->addKeyframe(STAND, glm::vec2(0.066f, 0.f));
 
-	sprite->setAnimationSpeed(STAND_RIGHT, 8);
-	sprite->addKeyframe(STAND_RIGHT, glm::vec2(0.25f, 0.f));
+	sprite->setAnimationSpeed(WALK, 8);
+	sprite->addKeyframe(WALK, glm::vec2(0.066f * 2, 0.f)); //ToDo:Hay que girar el Sprite ya que no tenemos animacion left
+	sprite->addKeyframe(WALK, glm::vec2(0.066f * 3, 0.f));
+	sprite->addKeyframe(WALK, glm::vec2(0.066f * 4, 0.f));
+	sprite->addKeyframe(WALK, glm::vec2(0.066f * 5, 0.f));
+	sprite->addKeyframe(WALK, glm::vec2(0.066f * 6, 0.f));
+	sprite->addKeyframe(WALK, glm::vec2(0.066f * 7, 0.f));
+	sprite->addKeyframe(WALK, glm::vec2(0.066f * 8, 0.f));
 
-	sprite->setAnimationSpeed(MOVE_LEFT, 8);
-	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.f, 0.f));
-	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.f, 0.25f));
-	sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.f, 0.5f));
 
-	sprite->setAnimationSpeed(MOVE_RIGHT, 8);
-	sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.25, 0.f));
-	sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.25, 0.25f));
-	sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.25, 0.5f));
+	sprite->setAnimationSpeed(DODGE, 8);
+	sprite->addKeyframe(DODGE, glm::vec2(0.066f * 0, 0.098 * 1)); //ToDo:Hay que girar el Sprite ya que no tenemos animacion left
+	sprite->addKeyframe(DODGE, glm::vec2(0.066f * 1, 0.098 * 1));
+
+	sprite->setAnimationSpeed(JUMP, 8);
+	sprite->addKeyframe(JUMP, glm::vec2(0.066f * 2, 0.098 * 1)); //ToDo:Hay que girar el Sprite ya que no tenemos animacion left
+
+	sprite->setAnimationSpeed(FALL, 8);
+	sprite->addKeyframe(FALL, glm::vec2(0.066f * 3, 0.098 * 1)); //ToDo:Hay que girar el Sprite ya que no tenemos animacion left
+
+	sprite->setAnimationSpeed(FALL_TO_STAND, 8);
+	sprite->addKeyframe(FALL_TO_STAND, glm::vec2(0.066f * 4, 0.098 * 1));
+
+	sprite->setAnimationSpeed(BUTT_FALL, 8);
+	sprite->addKeyframe(BUTT_FALL, glm::vec2(0.066f * 5, 0.098 * 1));
+
+	sprite->setAnimationSpeed(BUTT_JUMP, 8);
+	sprite->addKeyframe(BUTT_JUMP, glm::vec2(0.066f * 6, 0.098 * 1));
 
 	sprite->changeAnimation(0);
 	tileMapDispl = tileMapPos;
@@ -50,63 +68,78 @@ void Player::update(int deltaTime)
 	sprite->update(deltaTime);
 	if (Game::instance().getKey(GLFW_KEY_LEFT))
 	{
-		if (sprite->animation() != MOVE_LEFT)
-			sprite->changeAnimation(MOVE_LEFT);
+		if (sprite->animation() != WALK)
+			sprite->changeAnimation(WALK);
 		posPlayer.x -= 2;
-		if (map->collisionMoveLeft(posPlayer, glm::ivec2(32, 32)))
+		if (map->collisionMoveLeft(posPlayer, sizePlayer))
 		{
 			posPlayer.x += 2;
-			sprite->changeAnimation(STAND_LEFT);
+			sprite->changeAnimation(STAND);
 		}
 	}
 	else if (Game::instance().getKey(GLFW_KEY_RIGHT))
 	{
-		if (sprite->animation() != MOVE_RIGHT)
-			sprite->changeAnimation(MOVE_RIGHT);
+		if (sprite->animation() != WALK)
+			sprite->changeAnimation(WALK);
 		posPlayer.x += 2;
-		if (map->collisionMoveRight(posPlayer, glm::ivec2(32, 32)))
+		if (map->collisionMoveRight(posPlayer, sizePlayer))
 		{
 			posPlayer.x -= 2;
-			sprite->changeAnimation(STAND_RIGHT);
+			sprite->changeAnimation(STAND);
 		}
 	}
 	else
 	{
-		if (sprite->animation() == MOVE_LEFT)
-			sprite->changeAnimation(STAND_LEFT);
-		else if (sprite->animation() == MOVE_RIGHT)
-			sprite->changeAnimation(STAND_RIGHT);
+		if (sprite->animation() == WALK)
+			sprite->changeAnimation(STAND);
+		else if (sprite->animation() == WALK)
+			sprite->changeAnimation(STAND);
 	}
 
 	if (bJumping)
 	{
-		jumpAngle += JUMP_ANGLE_STEP;
-		if (jumpAngle == 180)
+		velocity += 0.5f;
+		posPlayer.y += int(velocity);
+
+		if (velocity < 0)
 		{
-			bJumping = false;
-			posPlayer.y = startY;
-		}
-		else
-		{
-			posPlayer.y = int(startY - 96 * sin(3.14159f * jumpAngle / 180.f));
-			if (jumpAngle > 90)
-				bJumping = !map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y);
-			else if (jumpAngle < 90)
+			if (sprite->animation() != JUMP)
+				sprite->changeAnimation(JUMP);
+
+			if (map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y))
 			{
-				// Check if there's a collision above the player
-				bJumping = !map->collisionMoveUp(posPlayer, glm::ivec2(32, 32), &posPlayer.y);
+
+			}
+		}
+		if (velocity > 0)
+		{
+			if (sprite->animation() != FALL)
+				sprite->changeAnimation(FALL);
+
+			if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
+			{ 
+				for (int i = 0; i < int(abs(velocity)); i++)
+				{
+					posPlayer.y--;
+					if (!map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
+						break;
+
+				}
+				velocity = 0;
+				bJumping = false;
 			}
 		}
 	}
 	else
 	{
+		
 		posPlayer.y += FALL_STEP;
-		if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y))
+		if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
 		{
 			if (Game::instance().getKey(GLFW_KEY_UP))
 			{
 				bJumping = true;
-				jumpAngle = 0;
+				velocity = -10.f;
 				startY = posPlayer.y;
 			}
 		}
