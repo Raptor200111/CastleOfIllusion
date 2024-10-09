@@ -69,6 +69,7 @@ void Player::update(int deltaTime)
 		playerState = WALK;
 		otherState = true;
 		posPlayer.x -= WALK_SPEED;
+		sprite->setLeft(true);
 		if (map->collisionMoveLeft(posPlayer, sizePlayer))
 		{
 			posPlayer.x += WALK_SPEED;
@@ -80,6 +81,7 @@ void Player::update(int deltaTime)
 		playerState = WALK;
 		otherState = true;
 		posPlayer.x += WALK_SPEED;
+		sprite->setLeft(false);
 		if (map->collisionMoveRight(posPlayer, sizePlayer))
 		{
 			posPlayer.x -= WALK_SPEED;
