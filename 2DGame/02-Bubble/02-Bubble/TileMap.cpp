@@ -85,6 +85,19 @@ bool TileMap::loadLevel(const string &levelFile)
 			fin.get(tile);
 			if(tile == ' ')
 				map[j*mapSize.x+i] = 0;
+			else if (tile <= '9' && tile >= '0')
+			{
+				int blockType = tile - '0';
+				auto it = blocksPosByType.find(blockType);
+				if (it != blocksPosByType.end()) {
+					it->second.push_back(glm::ivec2(i, j));  // Add item to existing vector
+				}
+				else {
+					std::vector<glm::ivec2> auxItem = { glm::ivec2(i, j) };  // Initialize vector with the item
+					blocksPosByType.emplace(blockType, auxItem);  // Use emplace to insert new type and item list
+				}
+				map[j * mapSize.x + i] = 0;
+			}
 			else
 				map[j * mapSize.x + i] = tile - 96;//int('0');
 		}
@@ -160,7 +173,8 @@ bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) c
 	y1 = (pos.y + size.y - 1) / tileSize;
 	for(int y=y0; y<=y1; y++)
 	{
-		if(map[y*mapSize.x+x] != 0)
+		int actCharPos = map[y * mapSize.x + x];
+		if (actCharPos != 0 && (10 < actCharPos || actCharPos < 8))
 			return true;
 	}
 	
@@ -176,8 +190,11 @@ bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) 
 	y1 = (pos.y + size.y - 1) / tileSize;
 	for(int y=y0; y<=y1; y++)
 	{
-		if(map[y*mapSize.x+x] != 0)
+		int actCharPos = map[y * mapSize.x + x];
+		if (actCharPos != 0 && (10 < actCharPos || actCharPos < 8))
+		{
 			return true;
+		}
 	}
 	
 	return false;
@@ -192,7 +209,8 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 	y = (pos.y + size.y - 1) / tileSize;
 	for(int x=x0; x<=x1; x++)
 	{
-		if(map[y*mapSize.x+x] != 0)
+		int actCharPos = map[y * mapSize.x + x];
+		if (actCharPos != 0 && (10 < actCharPos || actCharPos < 8))//if(map[y*mapSize.x+x] != 0)
 		{
 			if(*posY + size.y > tileSize * y)
 			{
@@ -215,7 +233,8 @@ bool TileMap::collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, int
 
 	for (int x = x0; x <= x1; x++)
 	{
-		if (map[y * mapSize.x + x] != 0)
+		int actCharPos = map[y * mapSize.x + x];
+		if (actCharPos != 0 && (10 < actCharPos || actCharPos < 8))
 		{
 			if (*posY < tileSize * (y + 1))
 			{
@@ -229,32 +248,25 @@ bool TileMap::collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, int
 }
 
 
+bool TileMap::collisionStairs(const glm::ivec2& pos, const glm::ivec2& size) const
+{
+	int x0, x1, y0, y1;
 
+	x0 = pos.x / tileSize;
+	x1 = (pos.x + size.x - 1) / tileSize;
+	y0 = pos.y / tileSize;
+	y1 = (pos.y + size.y - 1) / tileSize;
 
+	for (int x = x0; x <= x1; ++x)
+	{
+		for (int y = y0; y <= y1; ++y)
+		{
+			if (map[y * mapSize.x + x] == 8)  // Check if the tile is a stair (tile = 8)
+			{
+				return true;
+			}
+		}
+	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	return false;
+}

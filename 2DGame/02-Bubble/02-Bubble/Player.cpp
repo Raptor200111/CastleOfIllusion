@@ -13,6 +13,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
 	bJumping = false;
 	buttJumping = false;
+	bClimbing = false;
 	velocity = 0.f;
 	playerState = STAND;
 
@@ -53,6 +54,9 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	sprite->setAnimationSpeed(BUTT_JUMP, 8);
 	sprite->addKeyframe(BUTT_JUMP, glm::vec2(0.066f * 6, 0.098 * 1));
 
+	sprite->setAnimationSpeed(CLIMB, 8);
+	sprite->addKeyframe(CLIMB, glm::vec2(0.066f * 12, 0.098 * 0));
+
 	sprite->changeAnimation(0);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
@@ -62,6 +66,9 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 void Player::update(int deltaTime)
 {
 	sprite->update(deltaTime);
+
+	bClimbing = map->collisionStairs(posPlayer, sizePlayer);
+
 	if (Game::instance().getKey(GLFW_KEY_LEFT))
 	{
 		playerState = WALK;
@@ -91,54 +98,71 @@ void Player::update(int deltaTime)
 	{
 		playerState = STAND;
 	}
-
-	if (bJumping)
+	if (bClimbing)
 	{
-		velocity += GRAVITY;
-		posPlayer.y += int(velocity);
+		playerState = DODGE;  // Use a new state for climbing
+		//sprite->changeAnimation(CLIMB);
+		velocity = 0;  // Disable gravity while on stairs
+		if (Game::instance().getKey(GLFW_KEY_UP))
+		{
+			posPlayer.y -= WALK_SPEED;  // Move up the stairs
 
+		}
 		if (Game::instance().getKey(GLFW_KEY_DOWN))
 		{
-			playerState = PlayerStates::BUTT_FALL;
-			buttJumping = true;
-		}
-
-		if (velocity < 0)
-		{
-			if (!buttJumping)
-				playerState = JUMP;
-
-			if (map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y))
-			{
-				velocity = 0;
-			}
-		}
-		if (velocity > 0)
-		{
-			if (!buttJumping)
-				playerState = FALL;
-
-			if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
-			{ 
-				velocity = 0;
-				bJumping = false;
-			}
+			posPlayer.y += WALK_SPEED;  // Move down the stairs
 		}
 	}
 	else
 	{
-		velocity += GRAVITY;
-		posPlayer.y += int(velocity);
-		buttJumping = false;
-
-		if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
+		if (bJumping)
 		{
-			velocity = 0.f;
-			if (Game::instance().getKey(GLFW_KEY_UP))
+			velocity += GRAVITY;
+			posPlayer.y += int(velocity);
+
+			if (Game::instance().getKey(GLFW_KEY_DOWN))
 			{
-				bJumping = true;
-				velocity = -10.f;
-				startY = posPlayer.y;
+				playerState = PlayerStates::BUTT_FALL;
+				buttJumping = true;
+			}
+
+			if (velocity < 0)
+			{
+				if (!buttJumping)
+					playerState = JUMP;
+
+				if (map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y))
+				{
+					velocity = 0;
+				}
+			}
+			if (velocity > 0)
+			{
+				if (!buttJumping)
+					playerState = FALL;
+
+				if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
+				{
+					velocity = 0;
+					bJumping = false;
+				}
+			}
+		}
+		else
+		{
+			velocity += GRAVITY;
+			posPlayer.y += int(velocity);
+			buttJumping = false;
+
+			if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
+			{
+				velocity = 0.f;
+				if (Game::instance().getKey(GLFW_KEY_UP))
+				{
+					bJumping = true;
+					velocity = -10.f;
+					startY = posPlayer.y;
+				}
 			}
 		}
 	}
@@ -162,6 +186,11 @@ void Player::setPosition(const glm::vec2& pos)
 {
 	posPlayer = pos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
+}
+
+glm::ivec2 Player::getPlayerPos() const
+{
+	return posPlayer;
 }
 
 
