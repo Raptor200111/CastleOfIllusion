@@ -49,6 +49,19 @@ void Scene::update(int deltaTime)
 void Scene::render()
 {
 	glm::mat4 modelview;
+	glm::ivec2 cam = player->getPlayerPos();
+	float halfWidth = SCREEN_WIDTH / 2;
+	float halfHeight = SCREEN_HEIGHT / 2;
+
+	double left = cam.x - halfWidth;
+	double right = halfWidth + cam.x;
+	double bottom = cam.y - halfHeight;//t + 300;
+	double top = halfHeight + cam.y;// +300;
+
+	projection = glm::ortho(left, right, top, bottom);
+
+	//projection = glm::ortho(camX, camX + float(SCREEN_WIDTH), camY + float(SCREEN_HEIGHT), camY);
+
 
 	texProgram.use();
 	texProgram.setUniformMatrix4f("projection", projection);

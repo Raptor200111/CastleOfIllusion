@@ -25,7 +25,9 @@ public:
 	
 	void setTileMap(TileMap *tileMap);
 	void setPosition(const glm::vec2 &pos);
-	
+
+	glm::ivec2 getPlayerPos() const;
+
 private:
 	bool bJumping, buttJumping, bClimbing;
 	glm::ivec2 tileMapDispl, posPlayer, sizePlayer = glm::ivec2(32, 48);
