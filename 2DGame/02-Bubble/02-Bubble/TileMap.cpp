@@ -85,6 +85,19 @@ bool TileMap::loadLevel(const string &levelFile)
 			fin.get(tile);
 			if(tile == ' ')
 				map[j*mapSize.x+i] = 0;
+			else if (tile <= '9' && tile >= '0')
+			{
+				int blockType = tile - '0';
+				auto it = blocksPosByType.find(blockType);
+				if (it != blocksPosByType.end()) {
+					it->second.push_back(glm::ivec2(i, j));  // Add item to existing vector
+				}
+				else {
+					std::vector<glm::ivec2> auxItem = { glm::ivec2(i, j) };  // Initialize vector with the item
+					blocksPosByType.emplace(blockType, auxItem);  // Use emplace to insert new type and item list
+				}
+				map[j * mapSize.x + i] = 0;
+			}
 			else
 				map[j * mapSize.x + i] = tile - 96;//int('0');
 		}
@@ -257,31 +270,3 @@ bool TileMap::collisionStairs(const glm::ivec2& pos, const glm::ivec2& size) con
 
 	return false;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

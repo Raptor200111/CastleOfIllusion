@@ -16,6 +16,7 @@ Scene::Scene()
 {
 	map = NULL;
 	player = NULL;
+	blocksByType = std::map<int, std::vector<Block*>>(); 
 }
 
 Scene::~Scene()
@@ -24,6 +25,11 @@ Scene::~Scene()
 		delete map;
 	if(player != NULL)
 		delete player;
+	for (auto blockTypes : blocksByType) {
+		for (auto block : blockTypes.second) {
+			delete block;
+		}
+	}
 }
 
 
@@ -31,11 +37,33 @@ void Scene::init()
 {
 	initShaders();
 //	map = TileMap::createTileMap("levels/level01.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-	map = TileMap::createTileMap("levels/prova.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	map = TileMap::createTileMap("levels/levelMatrix.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
+	player->setPosition(glm::vec2((INIT_PLAYER_X_TILES) * map->getTileSize(), (INIT_PLAYER_Y_TILES) * map->getTileSize()));
 	player->setTileMap(map);
+
+	std::map<int, std::vector<glm::ivec2>> blocksPosByType = map->getBlocksPos();
+
+	for (const auto& blockType: blocksPosByType)
+	{
+		for (const auto& blockPos : blockType.second) {
+			Block* block = new Block();
+			block->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, blockType.first);
+			block->setPosition(glm::vec2((blockPos.x) * map->getTileSize(), (blockPos.y) * map->getTileSize()));
+			block->setTileMap(map);
+
+			auto it = blocksByType.find(blockType.first);
+			if (it == blocksByType.end()) {
+				std::vector<Block*> auxItem = { block };  // Initialize vector with the item
+				blocksByType.emplace(blockType.first, auxItem);
+			}
+			else {
+				it->second.push_back(block);
+			}
+		}
+	}
+
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH), float(SCREEN_HEIGHT), 0.f);
 	currentTime = 0.0f;
 }
@@ -57,10 +85,32 @@ void Scene::render()
 	double right = halfWidth + cam.x;
 	double bottom = cam.y - halfHeight;//t + 300;
 	double top = halfHeight + cam.y;// +300;
+	
+	glm::ivec2 mapSize = map->getMapSize();
+	int tileSize = map->getTileSize();
+
+	if (left < 0)
+	{
+		left = 0;
+		right = left + SCREEN_WIDTH;
+	}
+	if (bottom < 0)
+	{
+		bottom = 0;
+		top = bottom + SCREEN_HEIGHT;
+	}
+	if (top > (mapSize.y+2)*tileSize)//49 * 16)
+	{
+		top = (mapSize.y + 2) * tileSize;
+		bottom = top - SCREEN_HEIGHT;
+	}
+	if (right > (mapSize.x+4)*tileSize)
+	{
+		right = (mapSize.x + 4) * tileSize;
+		left = right - SCREEN_WIDTH;
+	}
 
 	projection = glm::ortho(left, right, top, bottom);
-
-	//projection = glm::ortho(camX, camX + float(SCREEN_WIDTH), camY + float(SCREEN_HEIGHT), camY);
 
 
 	texProgram.use();
@@ -71,6 +121,12 @@ void Scene::render()
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 	map->render();
 	player->render();
+	for (const auto& blockTypes : blocksByType)
+	{
+		for (auto block : blockTypes.second) {
+			block->render();
+		}
+	}
 }
 
 void Scene::initShaders()
