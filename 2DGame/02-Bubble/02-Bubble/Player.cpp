@@ -14,6 +14,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	bJumping = false;
 	buttJumping = false;
 	bClimbing = false;
+	bTouchBlock = false;
 	velocity = 0.f;
 	playerState = STAND;
 
@@ -78,8 +79,13 @@ void Player::update(int deltaTime)
 			posPlayer.x += WALK_SPEED;
 			sprite->changeAnimation(STAND);
 		}
+		else if (map->collisionBlockLeft(posPlayer, sizePlayer))
+		{
+			posPlayer.x += WALK_SPEED;
+			sprite->changeAnimation(DODGE);
+		}
 	}
-	if (Game::instance().getKey(GLFW_KEY_RIGHT))
+	else if (Game::instance().getKey(GLFW_KEY_RIGHT))
 	{
 		playerState = WALK;
 		posPlayer.x += WALK_SPEED;
@@ -88,8 +94,13 @@ void Player::update(int deltaTime)
 			posPlayer.x -= WALK_SPEED;
 			playerState = STAND;
 		}
+		else if (map->collisionBlockRight(posPlayer, sizePlayer))
+		{
+			posPlayer.x -= WALK_SPEED;
+			playerState = DODGE;
+		}
 	}
-	if (Game::instance().getKey(GLFW_KEY_DOWN) && bJumping == false)
+	else if (Game::instance().getKey(GLFW_KEY_DOWN) && bJumping == false)
 	{
 		playerState = DODGE;
 		//ToDo: Change collision size;
@@ -100,7 +111,7 @@ void Player::update(int deltaTime)
 	}
 	if (bClimbing)
 	{
-		playerState = DODGE;  // Use a new state for climbing
+		playerState = CLIMB;
 		//sprite->changeAnimation(CLIMB);
 		velocity = 0;  // Disable gravity while on stairs
 		if (Game::instance().getKey(GLFW_KEY_UP))
