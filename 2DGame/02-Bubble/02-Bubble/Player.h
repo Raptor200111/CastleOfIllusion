@@ -29,8 +29,8 @@ public:
 	glm::ivec2 getPlayerPos() const;
 
 private:
-	bool bJumping, buttJumping, bClimbing;
-	glm::ivec2 tileMapDispl, posPlayer, sizePlayer = glm::ivec2(32, 48);
+	bool bJumping, buttJumping, bClimbing, bTouchBlock;
+	glm::ivec2 tileMapDispl, posPlayer, sizePlayer = glm::ivec2(32/2, 48);
 	int jumpAngle, startY;
 	Texture spritesheet;
 	Sprite *sprite;

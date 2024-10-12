@@ -8,7 +8,6 @@
 #include <map>
 #include <vector>
 
-
 // Class Tilemap is capable of loading a tile map from a text file in a very
 // simple format (see level01.txt for an example). With this information
 // it builds a single VBO that contains all tiles. As a result the render
@@ -40,7 +39,9 @@ public:
 	bool collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const;
 
 	bool collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, int* posY) const;
-	bool TileMap::collisionStairs(const glm::ivec2& pos, const glm::ivec2& size) const;
+	bool collisionStairs(const glm::ivec2& pos, const glm::ivec2& size) const;
+	bool collisionBlockLeft(const glm::ivec2& pos, const glm::ivec2& size) const;
+	bool collisionBlockRight(const glm::ivec2& pos, const glm::ivec2& size) const;
 
 	
 private:
@@ -58,6 +59,7 @@ private:
 	Texture tilesheet;
 	glm::vec2 tileTexSize;
 	int *map;
+	int* blockMap;
 	std::map<int, std::vector<glm::ivec2>> blocksPosByType;
 
 };
