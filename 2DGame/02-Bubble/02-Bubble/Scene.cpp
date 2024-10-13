@@ -22,6 +22,7 @@ Scene::Scene()
 	menuQuad = NULL;
 	blocksByType = std::map<int, std::vector<Block*>>();
 	enemyTree = NULL;
+	enemyBug = NULL;
 }
 
 Scene::~Scene()
@@ -41,6 +42,8 @@ Scene::~Scene()
 	}
 	if (enemyTree != NULL)
 		delete enemyTree;
+	if (enemyBug != NULL)
+		delete enemyBug;
 }
 
 
@@ -70,8 +73,18 @@ void Scene::initLevel()
 	cout << player->getPlayerPos().x << " " << player->getPlayerPos().y << "\n";
 	isInsideEnemyTreeZone = false;
 	EnemyZone zone1 = { 4.0f * map->getTileSize(), 22.0f * map->getTileSize(), 20.0f, 7.0f};
+	EnemyZone zone2 = { 26.0f * map->getTileSize(), 38.0f * map->getTileSize(), 37.0f, 6.0f };
+	EnemyZone zone3 = { 39.0f * map->getTileSize(), 46.0f * map->getTileSize(), 45.0f, 7.0f };
+	EnemyZone zone4 = { 54.0f * map->getTileSize(), 66.0f * map->getTileSize(), 65.0f, 6.0f };
 	enemyTreeZones.push_back(zone1);
+	enemyTreeZones.push_back(zone2);
+	enemyTreeZones.push_back(zone3);
+	enemyTreeZones.push_back(zone4);
 
+	enemyBug = new EnemyBug();
+	enemyBug->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, false);
+	enemyBug->setPosition(glm::vec2((18.0f)*map->getTileSize(), (8.0f)*map->getTileSize()));
+	enemyBug->setTileMap(map);
 
 	bgTexture.loadFromFile("images/rocks.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	bgQuad = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1.f, 1.f), &bgTexture, &texProgram);
@@ -110,11 +123,22 @@ void Scene::updateLevel(int deltaTime)
 	if (isInsideEnemyTreeZone) {
 		enemyTree->update(deltaTime);
 	}
+	glm::ivec2 posEnemyBug = enemyBug->getEnemyBugPos();
+
+	//change to enemyZone
+	if (19.f*map->getTileSize() > posEnemyBug.x && posEnemyBug.x > 3.f * map->getTileSize()) {
+		enemyBug->update(deltaTime);
+	}
+	else {
+		enemyBug->setPosition(glm::vec2((18.0f) * map->getTileSize(), (8.0f) * map->getTileSize()));
+		enemyBug->setTileMap(map);
+	}
 	player->update(deltaTime);
-	//if collision player with enemy
-	//		if ATTACK BUTT enemy die
-	//		else player "die"--star
-	
+	//therefore i need posPlayer, sizePlayer, isAttacking, posEnemy, sizeEnemy
+	// if collision (posPlayer, sizePlayer,posEnemy, sizeEnemy)
+	//		if isAttacking ==> enemy die
+	//		else		   ==> player "die"; --star;
+
 }
 
 void Scene::scrolling()
@@ -188,6 +212,7 @@ void Scene::renderLevel()
 	if (isInsideEnemyTreeZone) {
 		enemyTree->render();
 	}
+	enemyBug->render();
 	for (const auto& blockTypes : blocksByType)
 	{
 		for (auto block : blockTypes.second) {
@@ -237,7 +262,7 @@ bool Scene::insideEnemyTreeZone(glm::ivec2& posPlayer)
 		/*if ((posPlayer.y + SCREEN_HEIGHT / 2) > enemyTreeZone.enemyY0
 			&& enemyTreeZone.enemyY0 > (posPlayer.y - SCREEN_HEIGHT / 2)
 			&& */
-		if (enemyTreeZone.x1 > posPlayer.x && posPlayer.x > enemyTreeZone.x0)
+		if (enemyTreeZone.x1 > posPlayer.x && posPlayer.x >= enemyTreeZone.x0)
 		{
 			if (!isInsideEnemyTreeZone) {
 				enemyTree = new EnemyTree();

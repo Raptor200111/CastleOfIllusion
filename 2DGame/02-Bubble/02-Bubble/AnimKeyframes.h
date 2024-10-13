@@ -17,6 +17,10 @@ struct AnimKeyframes
 {
 	float millisecsPerKeyframe;
 	vector<glm::vec2> keyframeDispl;
+
+	//liliu
+	vector<glm::vec2> quadSizes;
+	vector<glm::vec2> spriteSheetSizes;
 };
 
 

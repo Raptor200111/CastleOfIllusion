@@ -28,8 +28,13 @@ void EnemyTree::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram,
 
 	sprite->setAnimationSpeed(DIE_RIGHT, 8);
 	sprite->addKeyframe(DIE_RIGHT, glm::vec2(0.75f, 0.f));
-
-	sprite->changeAnimation(0);
+	
+	if (right) {
+		sprite->changeAnimation(WALK_RIGHT);
+	}
+	else {
+		sprite->changeAnimation(WALK_LEFT);
+	}
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemyTree.x), float(tileMapDispl.y + posEnemyTree.y)));
 

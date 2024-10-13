@@ -8,6 +8,7 @@
 #include "Player.h"
 #include "Block.h"
 #include "EnemyTree.h"
+#include "EnemyBug.h"
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.
 
@@ -49,7 +50,12 @@ private:
 	Cam camDimensions;
 	bool isInsideEnemyTreeZone;
 	EnemyTree* enemyTree;
+	EnemyBug* enemyBug;
 	vector<EnemyZone> enemyTreeZones;
+
+	//
+	Sprite* infoQuad;   // Single textured quad
+	Texture infoTexture;
 
 	ShaderProgram texProgram;
 	float currentTime;
