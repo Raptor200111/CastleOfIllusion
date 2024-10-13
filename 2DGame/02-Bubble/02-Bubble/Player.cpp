@@ -56,7 +56,10 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	sprite->addKeyframe(BUTT_JUMP, glm::vec2(0.066f * 6, 0.098 * 1));
 
 	sprite->setAnimationSpeed(CLIMB, 8);
-	sprite->addKeyframe(CLIMB, glm::vec2(0.066f * 12, 0.098 * 0));
+	sprite->addKeyframe(CLIMB, glm::vec2(0.066f * 12, 0.098 * 1));
+
+	sprite->setAnimationSpeed(TOUCH_BLOCK, 8);
+	sprite->addKeyframe(TOUCH_BLOCK, glm::vec2(0.066f * 12, 0.098 * 1));
 
 	sprite->changeAnimation(0);
 	tileMapDispl = tileMapPos;
@@ -69,37 +72,42 @@ void Player::update(int deltaTime)
 	sprite->update(deltaTime);
 
 	bClimbing = map->collisionStairs(posPlayer, sizePlayer);
-
+	bool newbTouchBlock = false;
 	if (Game::instance().getKey(GLFW_KEY_LEFT))
 	{
 		playerState = WALK;
-		posPlayer.x -= WALK_SPEED;
-		if (map->collisionMoveLeft(posPlayer, sizePlayer))
+		posPlayer.x -= WALK_SPEED;		
+		if (map->collisionBlockLeft(posPlayer, sizePlayer))
+		{
+			newbTouchBlock = true;
+			posPlayer.x += WALK_SPEED;
+			sprite->changeAnimation(DODGE);
+		}
+		else if (map->collisionMoveLeft(posPlayer, sizePlayer))
 		{
 			posPlayer.x += WALK_SPEED;
 			sprite->changeAnimation(STAND);
 		}
-		else if (map->collisionBlockLeft(posPlayer, sizePlayer))
-		{
-			posPlayer.x += WALK_SPEED;
-			sprite->changeAnimation(DODGE);
-		}
+		
 	}
 	else if (Game::instance().getKey(GLFW_KEY_RIGHT))
 	{
 		playerState = WALK;
 		posPlayer.x += WALK_SPEED;
-		if (map->collisionMoveRight(posPlayer, sizePlayer))
+		if (map->collisionBlockRight(posPlayer, sizePlayer))
+		{
+			newbTouchBlock = true;
+			posPlayer.x -= WALK_SPEED;
+			playerState = DODGE;
+		}
+		else if (map->collisionMoveRight(posPlayer, sizePlayer))
 		{
 			posPlayer.x -= WALK_SPEED;
 			playerState = STAND;
 		}
-		else if (map->collisionBlockRight(posPlayer, sizePlayer))
-		{
-			posPlayer.x -= WALK_SPEED;
-			playerState = DODGE;
-		}
+		 
 	}
+
 	else if (Game::instance().getKey(GLFW_KEY_DOWN) && bJumping == false)
 	{
 		playerState = DODGE;
@@ -107,8 +115,11 @@ void Player::update(int deltaTime)
 	}
 	else
 	{
+		if (bTouchBlock)
+			newbTouchBlock = true;
 		playerState = STAND;
 	}
+	
 	if (bClimbing)
 	{
 		playerState = CLIMB;
@@ -173,10 +184,22 @@ void Player::update(int deltaTime)
 					bJumping = true;
 					velocity = -10.f;
 					startY = posPlayer.y;
+					newbTouchBlock = false;
 				}
 			}
 		}
 	}
+
+	if (newbTouchBlock != bTouchBlock) {
+		if (newbTouchBlock) {
+			cout << "Tocado\n";
+			playerState = TOUCH_BLOCK;
+		}
+		else {
+			cout << "Dejo de Tocar\n";
+		}
+	}
+	bTouchBlock = newbTouchBlock;
 
 	if (sprite->animation() != playerState)
 		sprite->changeAnimation(playerState);
