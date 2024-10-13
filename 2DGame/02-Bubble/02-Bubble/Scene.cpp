@@ -8,8 +8,10 @@
 #define SCREEN_X 32
 #define SCREEN_Y 16
 
-#define INIT_PLAYER_X_TILES 4+20
-#define INIT_PLAYER_Y_TILES 20
+#define INIT_PLAYER_X_TILES 2// 4+20
+#define INIT_PLAYER_Y_TILES 8 //20
+
+//pos enemy1 x=2+18, y= 8-1
 
 
 Scene::Scene()
@@ -19,6 +21,7 @@ Scene::Scene()
 	bgQuad = NULL;
 	menuQuad = NULL;
 	blocksByType = std::map<int, std::vector<Block*>>();
+	enemyTree = NULL;
 }
 
 Scene::~Scene()
@@ -36,6 +39,8 @@ Scene::~Scene()
 			delete block;
 		}
 	}
+	if (enemyTree != NULL)
+		delete enemyTree;
 }
 
 
@@ -61,6 +66,12 @@ void Scene::initLevel()
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	player->setPosition(glm::vec2((INIT_PLAYER_X_TILES)*map->getTileSize(), (INIT_PLAYER_Y_TILES)*map->getTileSize()));
 	player->setTileMap(map);
+
+	cout << player->getPlayerPos().x << " " << player->getPlayerPos().y << "\n";
+	isInsideEnemyTreeZone = false;
+	EnemyZone zone1 = { 4.0f * map->getTileSize(), 22.0f * map->getTileSize(), 20.0f, 7.0f};
+	enemyTreeZones.push_back(zone1);
+
 
 	bgTexture.loadFromFile("images/rocks.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	bgQuad = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1.f, 1.f), &bgTexture, &texProgram);
@@ -94,7 +105,16 @@ void Scene::update(int deltaTime)
 
 void Scene::updateLevel(int deltaTime)
 { 
+	
+	isInsideEnemyTreeZone = insideEnemyTreeZone(player->getPlayerPos());
+	if (isInsideEnemyTreeZone) {
+		enemyTree->update(deltaTime);
+	}
 	player->update(deltaTime);
+	//if collision player with enemy
+	//		if ATTACK BUTT enemy die
+	//		else player "die"--star
+	
 }
 
 void Scene::scrolling()
@@ -165,6 +185,9 @@ void Scene::renderLevel()
 	//level
 	map->render();
 	player->render();
+	if (isInsideEnemyTreeZone) {
+		enemyTree->render();
+	}
 	for (const auto& blockTypes : blocksByType)
 	{
 		for (auto block : blockTypes.second) {
@@ -202,4 +225,37 @@ void Scene::initShaders()
 	texProgram.bindFragmentOutput("outColor");
 	vShader.free();
 	fShader.free();
+}
+
+
+//if player inside enemyZone and enemy not exists return true
+//							 and enemy exists if inside parameters return true
+//
+bool Scene::insideEnemyTreeZone(glm::ivec2& posPlayer)
+{
+	for (const auto& enemyTreeZone : enemyTreeZones) {
+		/*if ((posPlayer.y + SCREEN_HEIGHT / 2) > enemyTreeZone.enemyY0
+			&& enemyTreeZone.enemyY0 > (posPlayer.y - SCREEN_HEIGHT / 2)
+			&& */
+		if (enemyTreeZone.x1 > posPlayer.x && posPlayer.x > enemyTreeZone.x0)
+		{
+			if (!isInsideEnemyTreeZone) {
+				enemyTree = new EnemyTree();
+				bool right = posPlayer.x > enemyTreeZone.enemyX0*map->getTileSize();
+				enemyTree->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, right);
+				enemyTree->setPosition(glm::vec2(enemyTreeZone.enemyX0 * map->getTileSize(), (enemyTreeZone.enemyY0) * map->getTileSize()));
+				enemyTree->setTileMap(map);
+				return true;
+			}
+			else {
+				glm::ivec2 posEnemyTree = enemyTree->getEnemyTreePos();
+				if (enemyTreeZone.x1 > posEnemyTree.x && posEnemyTree.x > enemyTreeZone.x0) {
+					return true;
+				}
+			
+			}
+		}
+	}
+	enemyTree = NULL;
+	return false;
 }
