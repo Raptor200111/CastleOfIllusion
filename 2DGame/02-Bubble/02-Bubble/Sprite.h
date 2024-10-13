@@ -35,6 +35,12 @@ public:
 	
 	void setPosition(const glm::vec2 &pos);
 
+	//liliu
+	void addKeyframeDiffSize(int animId, const glm::vec2& frame, const glm::vec2& quadSize, const glm::vec2& sizeInSpritesheet);
+	void updateDiffSize(int deltaTime);
+	void changeAnimationDiffSize(int animId);
+	void updateVertexData(const glm::vec2& quadSize, const glm::vec2& sizeInSpritesheet);
+
 private:
 	Texture *texture;
 	ShaderProgram *shaderProgram;
@@ -47,6 +53,9 @@ private:
 	glm::vec2 texCoordDispl;
 	vector<AnimKeyframes> animations;
 
+	//liliu
+	glm::vec2 currentQuadSize;
+	glm::vec2 currentSpriteSheetSize;
 };
 
 
