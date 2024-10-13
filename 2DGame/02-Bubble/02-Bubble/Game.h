@@ -12,7 +12,11 @@
 
 // Game is a singleton (a class with a single instance) that represents our whole application
 
-
+enum GameState {
+	MENU,
+	INSTRUCTIONS,
+	PLAY
+};
 class Game
 {
 
@@ -45,6 +49,8 @@ private:
 	bool keys[GLFW_KEY_LAST+1]; // Store key states so that 
 							    // we can have access at any time
 	Scene scene;
+	GameState currentState;
+
 
 };
 
