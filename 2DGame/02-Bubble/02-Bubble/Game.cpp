@@ -6,12 +6,17 @@
 void Game::init()
 {
 	bPlay = true;
+	currentState = MENU;
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	scene.init();
 }
 
 bool Game::update(int deltaTime)
 {
+	if (currentState ==  PLAY)
+	{
+		scene.updateLevel(deltaTime);
+	}
 	scene.update(deltaTime);
 
 	return bPlay;
@@ -20,13 +25,20 @@ bool Game::update(int deltaTime)
 void Game::render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	scene.render();
+	if (currentState == MENU) {
+		scene.renderMenu();
+	}
+	else{
+		scene.renderLevel();
+	}
 }
 
 void Game::keyPressed(int key)
 {
 	if(key == GLFW_KEY_ESCAPE) // Escape code
 		bPlay = false;
+	else if (currentState == MENU && key == GLFW_KEY_Z) // Escape code
+		currentState = PLAY;
 	keys[key] = true;
 }
 

@@ -20,19 +20,30 @@ public:
 	~Scene();
 
 	void init();
+	void initMenu();
+	void initLevel();
 	void update(int deltaTime);
-	void render();
-
+	void renderMenu();
+	void renderLevel();
+	void updateLevel(int deltaTime);
 private:
 	void initShaders();
+	void scrolling();
 
-private:
-	TileMap *map;
-	Player *player;
+	Sprite* menuQuad;   // Single textured quad
+	Texture menuTexture;
+
+	Sprite* bgQuad;
+	Texture bgTexture;
+	TileMap* map;
+	Player* player;
+	std::map<int, std::vector<Block*>> blocksByType;
+
 	ShaderProgram texProgram;
 	float currentTime;
 	glm::mat4 projection;
-	std::map<int, std::vector<Block*>> blocksByType;  // List of items in the scene
+
+
 };
 
 

@@ -16,15 +16,21 @@ Scene::Scene()
 {
 	map = NULL;
 	player = NULL;
-	blocksByType = std::map<int, std::vector<Block*>>(); 
+	bgQuad = NULL;
+	menuQuad = NULL;
+	blocksByType = std::map<int, std::vector<Block*>>();
 }
 
 Scene::~Scene()
 {
-	if(map != NULL)
+	if (map != NULL)
 		delete map;
-	if(player != NULL)
+	if (player != NULL)
 		delete player;
+	if (bgQuad != NULL)
+		delete bgQuad;
+	if (menuQuad != NULL)
+		delete menuQuad;
 	for (auto blockTypes : blocksByType) {
 		for (auto block : blockTypes.second) {
 			delete block;
@@ -36,16 +42,32 @@ Scene::~Scene()
 void Scene::init()
 {
 	initShaders();
-//	map = TileMap::createTileMap("levels/level01.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	initMenu();
+	initLevel();
+	projection = glm::ortho(0.f, float(SCREEN_WIDTH), float(SCREEN_HEIGHT), 0.f);
+	currentTime = 0.0f;
+}
+
+void Scene::initMenu()
+{
+	menuTexture.loadFromFile("images/portada.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	menuQuad = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1.f, 1.f), &menuTexture, &texProgram);
+}
+
+void Scene::initLevel()
+{
 	map = TileMap::createTileMap("levels/levelMatrix.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	player->setPosition(glm::vec2((INIT_PLAYER_X_TILES) * map->getTileSize(), (INIT_PLAYER_Y_TILES) * map->getTileSize()));
+	player->setPosition(glm::vec2((INIT_PLAYER_X_TILES)*map->getTileSize(), (INIT_PLAYER_Y_TILES)*map->getTileSize()));
 	player->setTileMap(map);
+
+	bgTexture.loadFromFile("images/rocks.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	bgQuad = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1.f, 1.f), &bgTexture, &texProgram);
 
 	std::map<int, std::vector<glm::ivec2>> blocksPosByType = map->getBlocksPos();
 
-	for (const auto& blockType: blocksPosByType)
+	for (const auto& blockType : blocksPosByType)
 	{
 		for (const auto& blockPos : blockType.second) {
 			Block* block = new Block();
@@ -63,20 +85,20 @@ void Scene::init()
 			}
 		}
 	}
-
-	projection = glm::ortho(0.f, float(SCREEN_WIDTH), float(SCREEN_HEIGHT), 0.f);
-	currentTime = 0.0f;
 }
 
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
+}
+
+void Scene::updateLevel(int deltaTime)
+{ 
 	player->update(deltaTime);
 }
 
-void Scene::render()
+void Scene::scrolling()
 {
-	glm::mat4 modelview;
 	glm::ivec2 cam = player->getPlayerPos();
 	float halfWidth = SCREEN_WIDTH / 2;
 	float halfHeight = SCREEN_HEIGHT / 2;
@@ -85,7 +107,7 @@ void Scene::render()
 	double right = halfWidth + cam.x;
 	double bottom = cam.y - halfHeight;//t + 300;
 	double top = halfHeight + cam.y;// +300;
-	
+
 	glm::ivec2 mapSize = map->getMapSize();
 	int tileSize = map->getTileSize();
 
@@ -99,26 +121,48 @@ void Scene::render()
 		bottom = 0;
 		top = bottom + SCREEN_HEIGHT;
 	}
-	if (top > (mapSize.y+2)*tileSize)//49 * 16)
+	if (top > (mapSize.y + 2) * tileSize)//49 * 16)
 	{
 		top = (mapSize.y + 2) * tileSize;
 		bottom = top - SCREEN_HEIGHT;
 	}
-	if (right > (mapSize.x+4)*tileSize)
+	if (right > (mapSize.x + 4) * tileSize)
 	{
 		right = (mapSize.x + 4) * tileSize;
 		left = right - SCREEN_WIDTH;
 	}
 
 	projection = glm::ortho(left, right, top, bottom);
+}
+void Scene::renderMenu()
+{
 
-
+	glm::mat4 modelview;
 	texProgram.use();
 	texProgram.setUniformMatrix4f("projection", projection);
 	texProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
 	modelview = glm::mat4(1.0f);
 	texProgram.setUniformMatrix4f("modelview", modelview);
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
+	
+	//menu
+	menuTexture.use();
+	menuQuad->render();
+}
+
+void Scene::renderLevel()
+{
+	scrolling();
+	glm::mat4 modelview;
+	texProgram.use();
+	texProgram.setUniformMatrix4f("projection", projection);
+	texProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+	modelview = glm::mat4(1.0f);
+	texProgram.setUniformMatrix4f("modelview", modelview);
+	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
+
+
+	//level
 	map->render();
 	player->render();
 	for (const auto& blockTypes : blocksByType)
@@ -128,6 +172,7 @@ void Scene::render()
 		}
 	}
 }
+
 
 void Scene::initShaders()
 {
@@ -158,6 +203,3 @@ void Scene::initShaders()
 	vShader.free();
 	fShader.free();
 }
-
-
-
