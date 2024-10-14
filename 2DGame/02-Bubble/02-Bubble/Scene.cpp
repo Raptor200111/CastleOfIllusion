@@ -70,7 +70,7 @@ void Scene::initLevel()
 	player->setPosition(glm::vec2((INIT_PLAYER_X_TILES)*map->getTileSize(), (INIT_PLAYER_Y_TILES)*map->getTileSize()));
 	player->setTileMap(map);
 
-	cout << player->getPlayerPos().x << " " << player->getPlayerPos().y << "\n";
+	cout << player->getPosition().x << " " << player->getPosition().y << "\n";
 	isInsideEnemyTreeZone = false;
 	EnemyZone zone1 = { 4.0f * map->getTileSize(), 22.0f * map->getTileSize(), 20.0f, 7.0f};
 	EnemyZone zone2 = { 26.0f * map->getTileSize(), 38.0f * map->getTileSize(), 37.0f, 6.0f };
@@ -117,9 +117,8 @@ void Scene::update(int deltaTime)
 }
 
 void Scene::updateLevel(int deltaTime)
-{ 
-	
-	isInsideEnemyTreeZone = insideEnemyTreeZone(player->getPlayerPos());
+{
+	isInsideEnemyTreeZone = insideEnemyTreeZone(glm::ivec2(player->getPosition()));
 	if (isInsideEnemyTreeZone) {
 		enemyTree->update(deltaTime);
 	}
@@ -143,7 +142,7 @@ void Scene::updateLevel(int deltaTime)
 
 void Scene::scrolling()
 {
-	glm::ivec2 cam = player->getPlayerPos();
+	glm::ivec2 cam = player->getPosition();
 	float halfWidth = SCREEN_WIDTH / 2;
 	float halfHeight = SCREEN_HEIGHT / 2;
 

@@ -58,8 +58,8 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	sprite->setAnimationSpeed(CLIMB, 8);
 	sprite->addKeyframe(CLIMB, glm::vec2(0.066f * 12, 0.098 * 1));
 
-	sprite->setAnimationSpeed(TOUCH_BLOCK, 8);
-	sprite->addKeyframe(TOUCH_BLOCK, glm::vec2(0.066f * 12, 0.098 * 1));
+	//sprite->setAnimationSpeed(TOUCH_BLOCK, 8);
+	//sprite->addKeyframe(TOUCH_BLOCK, glm::vec2(0.066f * 12, 0.098 * 1));
 
 	sprite->changeAnimation(0);
 	tileMapDispl = tileMapPos;
@@ -72,8 +72,9 @@ void Player::update(int deltaTime)
 	sprite->update(deltaTime);
 
 	bool otherState = false;
-  bClimbing = map->collisionStairs(posPlayer, sizePlayer);
-	bool newbTouchBlock = false;
+	bClimbing = map->collisionStairs(posPlayer, sizePlayer); //Check
+	bool newbTouchBlock = false; //Why?
+
 	if (Game::instance().getKey(GLFW_KEY_LEFT))
 	{
 		playerState = WALK;
@@ -83,9 +84,9 @@ void Player::update(int deltaTime)
 		
 		if (map->collisionBlockLeft(posPlayer, sizePlayer))
 		{
-			newbTouchBlock = true;
+			newbTouchBlock = true; // WHY ?
 			posPlayer.x += WALK_SPEED;
-			sprite->changeAnimation(DODGE);
+			playerState = STAND;
 		}
 		else if (map->collisionMoveLeft(posPlayer, sizePlayer))
 		{
@@ -94,19 +95,18 @@ void Player::update(int deltaTime)
 		}
 		
 	}
-  
 	else if (Game::instance().getKey(GLFW_KEY_RIGHT))
 	{
 		playerState = WALK;
 		otherState = true;
 		posPlayer.x += WALK_SPEED;
-    sprite->setLeft(false);
+		sprite->setLeft(false);
 
 		if (map->collisionBlockRight(posPlayer, sizePlayer))
 		{
 			newbTouchBlock = true;
 			posPlayer.x -= WALK_SPEED;
-			playerState = DODGE;
+			playerState = STAND;
 		}
 		else if (map->collisionMoveRight(posPlayer, sizePlayer))
 		{
@@ -122,7 +122,7 @@ void Player::update(int deltaTime)
 	}
 	else
 	{
-		if (bTouchBlock)
+		if (bTouchBlock) //Again, Why?
 			newbTouchBlock = true;
 		playerState = STAND;
 	}
@@ -130,9 +130,9 @@ void Player::update(int deltaTime)
 	if (bClimbing)
 	{
 		otherState = true;
-		playerState = CLIMB;
-		//sprite->changeAnimation(CLIMB);
+		playerState = CLIMB_IDLE;
 		velocity = 0;  // Disable gravity while on stairs
+
 		if (Game::instance().getKey(GLFW_KEY_UP))
 		{
 			posPlayer.y -= WALK_SPEED;  // Move up the stairs
@@ -149,10 +149,18 @@ void Player::update(int deltaTime)
 			velocity += GRAVITY;
 			posPlayer.y += int(velocity);
 
-			if (Game::instance().getKey(GLFW_KEY_DOWN))
+			if (Game::instance().getKey(GLFW_KEY_DOWN) || buttJumping == true)
 			{
 				playerState = BUTT_FALL;
-			  buttJumping = true;
+				buttJumping = true;
+				otherState = true;
+
+				if (map->collisionBlockDown(posPlayer, sizePlayer, &posPlayer.y)) {
+					playerState = BUTT_JUMP;
+					velocity = -15.f;
+					//Se tiene que destrozar el objeto (creo)
+					//booleano de butt_jump
+				}
 			}
 
 			if (velocity < 0)
@@ -185,28 +193,28 @@ void Player::update(int deltaTime)
 
 			if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
 			{
-				velocity = 0.f;
 				if (Game::instance().getKey(GLFW_KEY_UP))
 				{
 					bJumping = true;
 					velocity = -10.f;
-					startY = posPlayer.y;
 					newbTouchBlock = false;
 				}
+				else
+					velocity = 0.f;
 			}
 		}
 	}
 
-	if (newbTouchBlock != bTouchBlock) {
+	if (newbTouchBlock != bTouchBlock) { //From here to...
 		if (newbTouchBlock) {
 			cout << "Tocado\n";
-			playerState = TOUCH_BLOCK;
+			//playerState = TOUCH_BLOCK;
 		}
 		else {
 			cout << "Dejo de Tocar\n";
 		}
 	}
-	bTouchBlock = newbTouchBlock;
+	bTouchBlock = newbTouchBlock; //...here, why?
 
 	if (!otherState)
 	{
@@ -234,13 +242,12 @@ void Player::setPosition(const glm::vec2& pos)
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 }
 
-glm::vec4 Player::getPositionAndSize()
-{
-	return glm::vec4(posPlayer.x, posPlayer.y, sizePlayer.x, sizePlayer.y);
-}
-
-glm::ivec2 Player::getPlayerPos() const //ToDo: change
+glm::vec2 Player::getPosition()
 {
 	return posPlayer;
 }
 
+glm::vec2 Player::getSize()
+{
+	return sizePlayer;
+}
