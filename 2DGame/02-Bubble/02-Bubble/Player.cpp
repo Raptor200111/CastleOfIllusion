@@ -20,7 +20,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
 	spritesheet.loadFromFile("images/Mickey_Mouse.png", TEXTURE_PIXEL_FORMAT_RGBA);	
 	sprite = Sprite::createSprite(sizePlayer, glm::vec2(0.066, 0.098), &spritesheet, &shaderProgram);
-	sprite->setNumberAnimations(4);
+	sprite->setNumberAnimations(8);
 
 	sprite->setAnimationSpeed(STAND, 8);
 	sprite->addKeyframe(STAND, glm::vec2(0.f, 0.f)); //ToDo:Hay que girar el Sprite ya que no tenemos animacion left
@@ -37,7 +37,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
 
 	sprite->setAnimationSpeed(DODGE, 8);
-	sprite->addKeyframe(DODGE, glm::vec2(0.066f * 0, 0.098 * 1)); //ToDo:Hay que girar el Sprite ya que no tenemos animacion left
+	sprite->addKeyframe(DODGE, glm::vec2(0, 0.098 * 1)); //ToDo:Hay que girar el Sprite ya que no tenemos animacion left
 	sprite->addKeyframe(DODGE, glm::vec2(0.066f * 1, 0.098 * 1));
 
 	sprite->setAnimationSpeed(JUMP, 8);
@@ -71,12 +71,16 @@ void Player::update(int deltaTime)
 {
 	sprite->update(deltaTime);
 
-	bClimbing = map->collisionStairs(posPlayer, sizePlayer);
+	bool otherState = false;
+  bClimbing = map->collisionStairs(posPlayer, sizePlayer);
 	bool newbTouchBlock = false;
 	if (Game::instance().getKey(GLFW_KEY_LEFT))
 	{
 		playerState = WALK;
-		posPlayer.x -= WALK_SPEED;		
+		otherState = true;
+		posPlayer.x -= WALK_SPEED;
+		sprite->setLeft(true);
+		
 		if (map->collisionBlockLeft(posPlayer, sizePlayer))
 		{
 			newbTouchBlock = true;
@@ -86,14 +90,18 @@ void Player::update(int deltaTime)
 		else if (map->collisionMoveLeft(posPlayer, sizePlayer))
 		{
 			posPlayer.x += WALK_SPEED;
-			sprite->changeAnimation(STAND);
+			playerState = STAND;
 		}
 		
 	}
+  
 	else if (Game::instance().getKey(GLFW_KEY_RIGHT))
 	{
 		playerState = WALK;
+		otherState = true;
 		posPlayer.x += WALK_SPEED;
+    sprite->setLeft(false);
+
 		if (map->collisionBlockRight(posPlayer, sizePlayer))
 		{
 			newbTouchBlock = true;
@@ -107,11 +115,10 @@ void Player::update(int deltaTime)
 		}
 		 
 	}
-
-	else if (Game::instance().getKey(GLFW_KEY_DOWN) && bJumping == false)
+	else if (Game::instance().getKey(GLFW_KEY_DOWN) && !bJumping)
 	{
 		playerState = DODGE;
-		//ToDo: Change collision size;
+		otherState = true;
 	}
 	else
 	{
@@ -122,13 +129,13 @@ void Player::update(int deltaTime)
 	
 	if (bClimbing)
 	{
+		otherState = true;
 		playerState = CLIMB;
 		//sprite->changeAnimation(CLIMB);
 		velocity = 0;  // Disable gravity while on stairs
 		if (Game::instance().getKey(GLFW_KEY_UP))
 		{
 			posPlayer.y -= WALK_SPEED;  // Move up the stairs
-
 		}
 		if (Game::instance().getKey(GLFW_KEY_DOWN))
 		{
@@ -144,8 +151,8 @@ void Player::update(int deltaTime)
 
 			if (Game::instance().getKey(GLFW_KEY_DOWN))
 			{
-				playerState = PlayerStates::BUTT_FALL;
-				buttJumping = true;
+				playerState = BUTT_FALL;
+			  buttJumping = true;
 			}
 
 			if (velocity < 0)
@@ -201,6 +208,11 @@ void Player::update(int deltaTime)
 	}
 	bTouchBlock = newbTouchBlock;
 
+	if (!otherState)
+	{
+		playerState = STAND;
+	}
+
 	if (sprite->animation() != playerState)
 		sprite->changeAnimation(playerState);
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
@@ -222,11 +234,13 @@ void Player::setPosition(const glm::vec2& pos)
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 }
 
-glm::ivec2 Player::getPlayerPos() const
+glm::vec4 Player::getPositionAndSize()
+{
+	return glm::vec4(posPlayer.x, posPlayer.y, sizePlayer.x, sizePlayer.y);
+}
+
+glm::ivec2 Player::getPlayerPos() const //ToDo: change
 {
 	return posPlayer;
 }
-
-
-
 

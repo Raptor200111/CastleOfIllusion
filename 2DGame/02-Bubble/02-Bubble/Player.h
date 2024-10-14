@@ -19,15 +19,21 @@ class Player
 {
 
 public:
+	static Player& instance()
+	{
+		static Player P;
+
+		return P;
+	}
 	void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram);
 	void update(int deltaTime);
 	void render();
 	
 	void setTileMap(TileMap *tileMap);
 	void setPosition(const glm::vec2 &pos);
-
+	glm::vec4 getPositionAndSize();
 	glm::ivec2 getPlayerPos() const;
-
+  
 private:
 	bool bJumping, buttJumping, bClimbing, bTouchBlock;
 	glm::ivec2 tileMapDispl, posPlayer, sizePlayer = glm::ivec2(24, 32);
@@ -37,7 +43,7 @@ private:
 	TileMap *map;
 	float velocity;
 
-	PlayerStates playerState = PlayerStates::STAND;
+	PlayerStates playerState;
 
 };
 

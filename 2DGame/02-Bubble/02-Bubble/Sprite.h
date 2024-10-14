@@ -34,13 +34,12 @@ public:
 	int animation() const;
 	
 	void setPosition(const glm::vec2 &pos);
-
-	//liliu
+	void setLeft(bool left);
 	void addKeyframeDiffSize(int animId, const glm::vec2& frame, const glm::vec2& quadSize, const glm::vec2& sizeInSpritesheet);
 	void updateDiffSize(int deltaTime);
 	void changeAnimationDiffSize(int animId);
 	void updateVertexData(const glm::vec2& quadSize, const glm::vec2& sizeInSpritesheet);
-
+  
 private:
 	Texture *texture;
 	ShaderProgram *shaderProgram;
@@ -48,15 +47,14 @@ private:
 	GLuint vbo;
 	GLint posLocation, texCoordLocation;
 	glm::vec2 position;
+	glm::vec2 size;
 	int currentAnimation, currentKeyframe;
 	float timeAnimation;
 	glm::vec2 texCoordDispl;
 	vector<AnimKeyframes> animations;
-
-	//liliu
+	bool left;
 	glm::vec2 currentQuadSize;
 	glm::vec2 currentSpriteSheetSize;
-};
 
 
 #endif // _SPRITE_INCLUDE
