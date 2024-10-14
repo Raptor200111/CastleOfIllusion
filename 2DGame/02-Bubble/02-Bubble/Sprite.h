@@ -17,11 +17,11 @@ class Sprite
 {
 
 private:
-	Sprite(const glm::vec2 &quadSize, const glm::vec2 &sizeInSpritesheet, Texture *spritesheet, ShaderProgram *program);
+	Sprite(const glm::vec2& quadSize, const glm::vec2& sizeInSpritesheet, Texture* spritesheet, ShaderProgram* program);
 
 public:
 	// Textured quads can only be created inside an OpenGL context
-	static Sprite *createSprite(const glm::vec2 &quadSize, const glm::vec2 &sizeInSpritesheet, Texture *spritesheet, ShaderProgram *program);
+	static Sprite* createSprite(const glm::vec2& quadSize, const glm::vec2& sizeInSpritesheet, Texture* spritesheet, ShaderProgram* program);
 
 	void update(int deltaTime);
 	void render() const;
@@ -29,20 +29,20 @@ public:
 
 	void setNumberAnimations(int nAnimations);
 	void setAnimationSpeed(int animId, int keyframesPerSec);
-	void addKeyframe(int animId, const glm::vec2 &frame);
+	void addKeyframe(int animId, const glm::vec2& frame);
 	void changeAnimation(int animId);
 	int animation() const;
-	
-	void setPosition(const glm::vec2 &pos);
+
+	void setPosition(const glm::vec2& pos);
 	void setLeft(bool left);
 	void addKeyframeDiffSize(int animId, const glm::vec2& frame, const glm::vec2& quadSize, const glm::vec2& sizeInSpritesheet);
 	void updateDiffSize(int deltaTime);
 	void changeAnimationDiffSize(int animId);
 	void updateVertexData(const glm::vec2& quadSize, const glm::vec2& sizeInSpritesheet);
-  
+
 private:
-	Texture *texture;
-	ShaderProgram *shaderProgram;
+	Texture* texture;
+	ShaderProgram* shaderProgram;
 	GLuint vao;
 	GLuint vbo;
 	GLint posLocation, texCoordLocation;
@@ -55,7 +55,6 @@ private:
 	bool left;
 	glm::vec2 currentQuadSize;
 	glm::vec2 currentSpriteSheetSize;
-
+};
 
 #endif // _SPRITE_INCLUDE
-
