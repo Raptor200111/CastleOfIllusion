@@ -32,7 +32,6 @@ public:
 	void updateLevel(int deltaTime);
 private:
 	void initShaders();
-	void scrolling();
 	bool insideEnemyTreeZone(glm::ivec2& posPlayer);
 
 	Sprite* menuQuad;   // Single textured quad
@@ -61,7 +60,7 @@ private:
 	void initZoneEnemyTree();
 	void initZoneEnemyBug();
 	void updateCamera();
-	float zoomLevel;        // For zooming in and out
+	float zoomLevel = 2.25f;  // Default zoom (no zoom)
 	glm::vec2 cameraPosition;    // For storing the camera's position
 
 };

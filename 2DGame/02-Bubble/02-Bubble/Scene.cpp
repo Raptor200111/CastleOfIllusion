@@ -20,16 +20,16 @@ Scene::Scene()
 	blocksByType = std::map<int, std::vector<Block*>>();
 	enemyTree = NULL;
 	enemyBug = NULL;
-
-	zoomLevel = 1.0f;  // Default zoom (no zoom)
 }
 
 Scene::~Scene()
 {
 	if (map != NULL)
 		delete map;
+	/*
 	if (player != NULL)
 		delete player;
+		*/
 	if (bgQuad != NULL)
 		delete bgQuad;
 	if (menuQuad != NULL)
@@ -191,18 +191,20 @@ void Scene::renderMenu()
 void Scene::updateCamera()
 {
 	glm::vec2 playerPos = player->getPlayerPos();
+	float zoomScreenWidth = SCREEN_WIDTH / zoomLevel;
+	float zoomScreenHeight = SCREEN_HEIGHT / zoomLevel;
 
 	// Calculate the desired camera position based on player's position
-	float halfScreenWidth = SCREEN_WIDTH / 2.0f;
-	float halfScreenHeight = SCREEN_HEIGHT / 2.0f;
+	float halfScreenWidth = zoomScreenWidth / 2.0f;
+	float halfScreenHeight = zoomScreenHeight / 2.0f;
 
 	// Center camera on player but with some offset leading the player when moving right
 	cameraPosition.x = playerPos.x - halfScreenWidth + 100; // Adjust the '100' for horizontal leading effect
 	cameraPosition.y = playerPos.y - halfScreenHeight;
 
 	// Constrain the camera within the map boundaries
-	float maxCameraX = map->getMapSize().x*map->getTileSize() - SCREEN_WIDTH;
-	float maxCameraY = map->getMapSize().y * map->getTileSize() - SCREEN_HEIGHT;
+	float maxCameraX = map->getMapSize().x*map->getTileSize() - zoomScreenWidth;
+	float maxCameraY = map->getMapSize().y * map->getTileSize() - zoomScreenHeight;
 
 	if (cameraPosition.x < 0) cameraPosition.x = 0;
 	if (cameraPosition.y < 0) cameraPosition.y = 0;
@@ -210,12 +212,12 @@ void Scene::updateCamera()
 	if (cameraPosition.y > maxCameraY) cameraPosition.y = maxCameraY;
 
 	// Update projection matrix to account for camera movement
-	projection = glm::ortho(cameraPosition.x, cameraPosition.x + SCREEN_WIDTH, cameraPosition.y + SCREEN_HEIGHT, cameraPosition.y);
+	projection = glm::ortho(cameraPosition.x, cameraPosition.x + zoomScreenWidth, 
+							cameraPosition.y + zoomScreenHeight, cameraPosition.y);
 }
 
 void Scene::renderLevel()
 {
-	//scrolling();
 	glm::mat4 modelview;
 
 	texProgram.use();
