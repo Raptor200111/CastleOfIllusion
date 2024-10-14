@@ -17,3 +17,9 @@ struct ZoneEnemy
 	Zone limit;
 	glm::ivec2 initPos;
 };
+
+struct PosSizeObject
+{
+	glm::ivec2 posObject;
+	glm::ivec2 sizeObject;
+};

@@ -20,6 +20,7 @@ Scene::Scene()
 	blocksByType = std::map<int, std::vector<Block*>>();
 	enemyTree = NULL;
 	enemyBug = NULL;
+	zoomLevel = 2.25f;
 }
 
 Scene::~Scene()
@@ -167,6 +168,14 @@ void Scene::updateLevel(int deltaTime)
 	// if collision (posPlayer, sizePlayer,posEnemy, sizeEnemy)
 	//		if isAttacking ==> enemy die
 	//		else		   ==> player "die"; --star;
+
+	if (isInsideEnemyTreeZone) {
+		PosSizeObject treePosSize = {enemyTree->getEnemyTreePos(), enemyTree->getEnemyTreeSize()};
+		if (player->checkCollisionObject(treePosSize)) {
+			cout << "COLLISION TREE";
+		}
+
+	}
 
 	updateCamera();
 

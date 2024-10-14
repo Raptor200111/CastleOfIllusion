@@ -3,7 +3,6 @@
 #include "Sprite.h"
 #include "TileMap.h"
 #include <cmath>
-#include "Defs.h"
 
 enum EnemyBugStates
 {
