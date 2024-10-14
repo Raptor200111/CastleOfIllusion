@@ -3,12 +3,11 @@
 #define WALK_SPEED 1
 #define GRAVITY 0.5f
 
-void EnemyBug::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, bool right)
+void EnemyBug::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram,const Zone& limit)
 {
 	velocity = 0.f;
 	initPos = tileMapPos;
-	enemyBugState = BUG_WALK_RIGHT;
-	this->right = right;
+	this->limit = limit;
 	spritesheet.loadFromFile("images/bug1.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(sizeEnemyBug, glm::vec2(0.25f, 0.5f), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(5);
@@ -40,30 +39,78 @@ void EnemyBug::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, 
 	sizeSpriteSheet = glm::vec2(sizeEnemyBug.x / totalSizeSpriteSheet.x, sizeEnemyBug.y / totalSizeSpriteSheet.y);
 	sprite->setAnimationSpeed(BUG_DIE, 8);
 	sprite->addKeyframeDiffSize(BUG_DIE, glm::vec2(1.f-sizeSpriteSheet.x, 0.f), sizeEnemyBug, sizeSpriteSheet);
-	
-	if (right) {
-		sprite->changeAnimationDiffSize(BUG_WALK_RIGHT);
-	}
-	else {
-		sprite->changeAnimationDiffSize(BUG_WALK_LEFT);
-	}
+
+	sprite->changeAnimationDiffSize(BUG_WALK_RIGHT);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemyBug.x), float(tileMapDispl.y + posEnemyBug.y)));
 
 }
-void EnemyBug::update(int deltaTime)
+void EnemyBug::update(int deltaTime, const glm::ivec2& posPlayer)
 {
 	sprite->updateDiffSize(deltaTime);
-	if (right)
-	{
-		enemyBugState = BUG_WALK_RIGHT;
-		posEnemyBug.x += WALK_SPEED;
-	}
-	else {
-		enemyBugState = BUG_DIE;
-		posEnemyBug.x -= WALK_SPEED;
 
+	int min_x_attack = posEnemyBug.x - attackDistance;
+	int max_x_attack = posEnemyBug.x + attackDistance;
+	if (attaking) {
+		if (right) {
+			posEnemyBug.x += WALK_SPEED*2;
+		}
+		else {
+			posEnemyBug.x -= WALK_SPEED*2;
+		}
 	}
+	//bug -->   pl
+	else {
+		if (right)
+		{
+			enemyBugState = BUG_WALK_RIGHT;
+			posEnemyBug.x += WALK_SPEED;
+			if (posPlayer.x < max_x_attack) {
+				attaking = true;
+				enemyBugState = BUG_ROLL_RIGHT;
+				posEnemyBug.x += WALK_SPEED;
+			}
+		}
+		// pl  <--  bug
+		else {
+			enemyBugState = BUG_WALK_LEFT;
+			posEnemyBug.x -= WALK_SPEED;
+			//|<-p-b
+			if (posPlayer.x > min_x_attack) {
+				attaking = true;
+				enemyBugState = BUG_ROLL_LEFT;
+				posEnemyBug.x += WALK_SPEED;
+			}
+		}
+	}
+	if (right && posEnemyBug.x > limit.max_x) {
+		/*if (attaking) {
+			enemyBugState = BUG_ROLL_LEFT;
+			posEnemyBug.x -= WALK_SPEED*2;
+			right = false;
+		}
+		else {*/
+		attaking = false;
+			enemyBugState = BUG_WALK_LEFT;
+			posEnemyBug.x -= WALK_SPEED;
+			right = false;
+		//}
+	}
+	else if(!right && posEnemyBug.x < limit.min_x){
+		/*if (attaking) {
+			enemyBugState = BUG_ROLL_RIGHT;
+			posEnemyBug.x += WALK_SPEED*2;
+			right = true;
+		}
+		else {*/
+		attaking = false;
+			enemyBugState = BUG_WALK_RIGHT;
+			posEnemyBug.x += WALK_SPEED;
+			right = true;
+		//}
+	}
+
+
 	velocity += GRAVITY;
 	posEnemyBug.y += int(velocity);
 	if (map->collisionMoveDown(posEnemyBug, sizeEnemyBug, &posEnemyBug.y))

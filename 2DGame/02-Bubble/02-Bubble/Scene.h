@@ -12,9 +12,6 @@
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.
 
-struct EnemyZone {
-	float x0, x1, enemyX0, enemyY0;
-};
 struct Cam {
 	float left, right, bottom, top;
 };
@@ -51,8 +48,8 @@ private:
 	bool isInsideEnemyTreeZone;
 	EnemyTree* enemyTree;
 	EnemyBug* enemyBug;
-	vector<EnemyZone> enemyTreeZones;
-
+	vector<ZoneEnemy> enemyTreeZones;
+	vector<ZoneEnemy> enemyBugZones;
 	//
 	Sprite* infoQuad;   // Single textured quad
 	Texture infoTexture;
@@ -61,6 +58,11 @@ private:
 	float currentTime;
 	glm::mat4 projection;
 
+	void initZoneEnemyTree();
+	void initZoneEnemyBug();
+	void updateCamera();
+	float zoomLevel;        // For zooming in and out
+	glm::vec2 cameraPosition;    // For storing the camera's position
 
 };
 
