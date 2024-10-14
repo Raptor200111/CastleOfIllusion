@@ -257,3 +257,14 @@ glm::ivec2 Player::getPlayerPos() const //ToDo: change
 	return posPlayer;
 }
 
+bool Player::checkCollisionObject(const PosSizeObject& object)
+{
+	glm::ivec2 pos1 = posPlayer;
+	glm::ivec2 size1 = pos1 + sizePlayer;
+	glm::ivec2 pos2 = object.posObject;
+	glm::ivec2 size2 = pos2 + object.sizeObject;
+
+	if (size1.x < pos2.x || size2.x < pos1.x) return false;
+	if (size1.y < pos2.y || size2.y < pos1.y) return false;
+	return true;
+}

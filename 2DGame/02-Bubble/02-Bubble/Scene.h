@@ -60,7 +60,7 @@ private:
 	void initZoneEnemyTree();
 	void initZoneEnemyBug();
 	void updateCamera();
-	float zoomLevel = 2.25f;  // Default zoom (no zoom)
+	float zoomLevel;  // Default zoom (no zoom)
 	glm::vec2 cameraPosition;    // For storing the camera's position
 
 };
