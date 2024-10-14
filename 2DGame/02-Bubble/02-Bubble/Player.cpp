@@ -13,6 +13,8 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
 	bJumping = false;
 	buttJumping = false;
+	bClimbing = false;
+	bTouchBlock = false;
 	velocity = 0.f;
 	playerState = STAND;
 
@@ -53,6 +55,12 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	sprite->setAnimationSpeed(BUTT_JUMP, 8);
 	sprite->addKeyframe(BUTT_JUMP, glm::vec2(0.066f * 6, 0.098 * 1));
 
+	sprite->setAnimationSpeed(CLIMB, 8);
+	sprite->addKeyframe(CLIMB, glm::vec2(0.066f * 12, 0.098 * 1));
+
+	sprite->setAnimationSpeed(TOUCH_BLOCK, 8);
+	sprite->addKeyframe(TOUCH_BLOCK, glm::vec2(0.066f * 12, 0.098 * 1));
+
 	sprite->changeAnimation(0);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
@@ -64,87 +72,141 @@ void Player::update(int deltaTime)
 	sprite->update(deltaTime);
 
 	bool otherState = false;
+  bClimbing = map->collisionStairs(posPlayer, sizePlayer);
+	bool newbTouchBlock = false;
 	if (Game::instance().getKey(GLFW_KEY_LEFT))
 	{
 		playerState = WALK;
 		otherState = true;
 		posPlayer.x -= WALK_SPEED;
 		sprite->setLeft(true);
-		if (map->collisionMoveLeft(posPlayer, sizePlayer))
+		
+		if (map->collisionBlockLeft(posPlayer, sizePlayer))
+		{
+			newbTouchBlock = true;
+			posPlayer.x += WALK_SPEED;
+			sprite->changeAnimation(DODGE);
+		}
+		else if (map->collisionMoveLeft(posPlayer, sizePlayer))
 		{
 			posPlayer.x += WALK_SPEED;
 			playerState = STAND;
 		}
+		
 	}
-	if (Game::instance().getKey(GLFW_KEY_RIGHT))
+  
+	else if (Game::instance().getKey(GLFW_KEY_RIGHT))
 	{
 		playerState = WALK;
 		otherState = true;
 		posPlayer.x += WALK_SPEED;
-		sprite->setLeft(false);
-		if (map->collisionMoveRight(posPlayer, sizePlayer))
+    sprite->setLeft(false);
+
+		if (map->collisionBlockRight(posPlayer, sizePlayer))
+		{
+			newbTouchBlock = true;
+			posPlayer.x -= WALK_SPEED;
+			playerState = DODGE;
+		}
+		else if (map->collisionMoveRight(posPlayer, sizePlayer))
 		{
 			posPlayer.x -= WALK_SPEED;
 			playerState = STAND;
 		}
+		 
 	}
-	if (Game::instance().getKey(GLFW_KEY_DOWN) && !bJumping)
+	else if (Game::instance().getKey(GLFW_KEY_DOWN) && !bJumping)
 	{
 		playerState = DODGE;
 		otherState = true;
 	}
-
-	if (bJumping)
+	else
+	{
+		if (bTouchBlock)
+			newbTouchBlock = true;
+		playerState = STAND;
+	}
+	
+	if (bClimbing)
 	{
 		otherState = true;
-		velocity += GRAVITY;
-		posPlayer.y += int(velocity);
-
+		playerState = CLIMB;
+		//sprite->changeAnimation(CLIMB);
+		velocity = 0;  // Disable gravity while on stairs
+		if (Game::instance().getKey(GLFW_KEY_UP))
+		{
+			posPlayer.y -= WALK_SPEED;  // Move up the stairs
+		}
 		if (Game::instance().getKey(GLFW_KEY_DOWN))
 		{
-			playerState = BUTT_FALL;
-			buttJumping = true;
-		}
-
-		if (velocity < 0)
-		{
-			if (!buttJumping)
-				playerState = JUMP;
-
-			if (map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y))
-			{
-				velocity = 0;
-			}
-		}
-		if (velocity > 0)
-		{
-			if (!buttJumping)
-				playerState = FALL;
-
-			if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
-			{ 
-				velocity = 0;
-				bJumping = false;
-			}
+			posPlayer.y += WALK_SPEED;  // Move down the stairs
 		}
 	}
 	else
 	{
-		velocity += GRAVITY;
-		posPlayer.y += int(velocity);
-		buttJumping = false;
-
-		if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
+		if (bJumping)
 		{
-			velocity = 0.f;
-			if (Game::instance().getKey(GLFW_KEY_UP))
+			velocity += GRAVITY;
+			posPlayer.y += int(velocity);
+
+			if (Game::instance().getKey(GLFW_KEY_DOWN))
 			{
-				bJumping = true;
-				velocity = -10.f;
-				startY = posPlayer.y;
+				playerState = BUTT_FALL;
+			  buttJumping = true;
+			}
+
+			if (velocity < 0)
+			{
+				if (!buttJumping)
+					playerState = JUMP;
+
+				if (map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y))
+				{
+					velocity = 0;
+				}
+			}
+			if (velocity > 0)
+			{
+				if (!buttJumping)
+					playerState = FALL;
+
+				if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
+				{
+					velocity = 0;
+					bJumping = false;
+				}
+			}
+		}
+		else
+		{
+			velocity += GRAVITY;
+			posPlayer.y += int(velocity);
+			buttJumping = false;
+
+			if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
+			{
+				velocity = 0.f;
+				if (Game::instance().getKey(GLFW_KEY_UP))
+				{
+					bJumping = true;
+					velocity = -10.f;
+					startY = posPlayer.y;
+					newbTouchBlock = false;
+				}
 			}
 		}
 	}
+
+	if (newbTouchBlock != bTouchBlock) {
+		if (newbTouchBlock) {
+			cout << "Tocado\n";
+			playerState = TOUCH_BLOCK;
+		}
+		else {
+			cout << "Dejo de Tocar\n";
+		}
+	}
+	bTouchBlock = newbTouchBlock;
 
 	if (!otherState)
 	{
@@ -176,3 +238,9 @@ glm::vec4 Player::getPositionAndSize()
 {
 	return glm::vec4(posPlayer.x, posPlayer.y, sizePlayer.x, sizePlayer.y);
 }
+
+glm::ivec2 Player::getPlayerPos() const //ToDo: change
+{
+	return posPlayer;
+}
+

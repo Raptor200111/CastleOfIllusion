@@ -1,0 +1,53 @@
+TILEMAP
+95 48 							-- Size of tile map in tiles
+16 16							-- Tile size & block size
+images/tilemap.png 	-- Tilesheet
+4 6 								-- Number of tiles in tilesheet
+e                                                                                             e
+e                                                                                            ee
+e                                                                                            ef
+e                                                                                            ef
+e                                                    3                       3kkkkkkkk       ee
+e                                                   kkkkkkl                  1eefffefe       ef
+e                                                  ke    epl                kkeffeffffkk     ef
+e                                                        efpl               efeeffeffefe     ee
+e                    3           3kkkl                   effpl   3          eeffeeffeffe     ef
+e            kkkkkkkkk          3kefepl      3           eeffpl 33          efeefeefffee     ee
+ekkkkkkkkkkkkefeffeeee    kkkkkkkeffepl     31kkkkkkkkkhkefefepkkkkkkkk kkkkeeffeefffffekkkkkee
+efefefefeffeeeefefeefe    efefeffeefefefkkkkkkeefefefeehefefefefefeeffe efefefeeeeefeefffefefef
+febbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbhbbbbbbbbbbbbbbb bbbbbbbbbbbbbbbbbbbbbbe
+ed                                   bdbcd           dch  bcfefffd     hbdbfeffefee        bcff
+e                                                      h    bfeed      h   bccdfefd           a
+e            aaaaaa                                    h     efe       h       bcd            a
+e            effefe                                    h     eee       h                      a
+e       aaa  efeffe                                    h     efe       h                      a
+e   1   efe  eefefe              3aaaag                      eee  3                          ef
+e   aa  efe  feffee           aaaaeeeefg             3       afffa13       3                eff
+e133ee33fff33efeefeaaa1       efefefefefg    7       aaa    efeefaaaaahaaaaa              aaffe
+faaaeeaaeeeaafefefeffeaaa     efeffefffefaaaaaa      efe    efefffefeehefffeaaaaaaaaaaaafffefee
+eeeeeeeeeeeeeeeeeeeeeeeeeaaaaaaaaaaaaaaaaaaaaaeaaaaaabbbaaaabbbbbbbbbbheeffefefdcdbcdbcdbcdbcbe
+efdbcceeecdccbeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeebbbbbbbbbbbbbbbbbhefdbcdcd               b
+bd  33dcd     bdcdcdcfffefefefeffeeffbbbbbbbbbbbcdbccdbcdcffefedbddbfehcd                     b
+e                    cfefefefefffeeffefefeffed                      h             aaaaa       a
+e                     bfefefefeeeffeefffeffee                       h             eefee       a
+e                      efefefefefefffefffeffd                                    1efefeaa     a
+e                      befefefeeeffeeffeeffe                                      efefefe     a
+e                       bccdcbcdbcdbccdccdcd                                      eefefee     a
+e            3                                                                    efefefe     a
+e33         3aaaag                    3             3                3      3     efefefeaaaaaf
+e113      aaafefffg      3            33     3     33aaaa            aaaaaaaaaaaaefefefefefefef
+eaaaaahaaafefefeeffaaaaaaaaaaaaaaaaaaaaaaaaaaaa   aafeffe     aaa    efefefefefefefefefefeeffee
+ffffefheeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+fffefehcfefefefebbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+eefccd  bccdbfeecdbd                                                                          e
+efd          bcd                                                                              e
+ef                                                                                            e
+e                                                                                             e
+e                                                                                             e
+e                                                                                             e
+e                                                                                             e
+e                                                                                             e
+e                                                                                             e
+e                                                                                             e
+e                  33                                                                         e
+fkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk

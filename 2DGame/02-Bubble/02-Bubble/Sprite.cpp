@@ -104,6 +104,69 @@ void Sprite::changeAnimation(int animId)
 	}
 }
 
+//Added
+void Sprite::updateDiffSize(int deltaTime)
+{
+	if (currentAnimation >= 0)
+	{
+		timeAnimation += deltaTime;
+		while (timeAnimation > animations[currentAnimation].millisecsPerKeyframe)
+		{
+			timeAnimation -= animations[currentAnimation].millisecsPerKeyframe;
+			currentKeyframe = (currentKeyframe + 1) % animations[currentAnimation].keyframeDispl.size();
+
+			//changed
+			updateVertexData(animations[currentAnimation].quadSizes[currentKeyframe], animations[currentAnimation].spriteSheetSizes[currentKeyframe]);
+
+		}
+		texCoordDispl = animations[currentAnimation].keyframeDispl[currentKeyframe];
+	}
+}
+
+void Sprite::addKeyframeDiffSize(int animId, const glm::vec2& displacement, const glm::vec2& quadSize, const glm::vec2& sizeInSpritesheet)
+{
+	if (animId < int(animations.size()))
+	{
+		animations[animId].keyframeDispl.push_back(displacement);
+		
+		//changed
+		animations[animId].quadSizes.push_back(quadSize);  
+		animations[animId].spriteSheetSizes.push_back(sizeInSpritesheet);  
+
+	}
+}
+
+void Sprite::changeAnimationDiffSize(int animId)
+{
+	if (animId < int(animations.size()))
+	{
+		currentAnimation = animId;
+		currentKeyframe = 0;
+		timeAnimation = 0.f;
+		texCoordDispl = animations[animId].keyframeDispl[0];
+		
+		//changed
+		currentQuadSize = animations[animId].quadSizes[0];  
+		currentSpriteSheetSize = animations[animId].spriteSheetSizes[0];
+		updateVertexData(currentQuadSize, currentSpriteSheetSize);
+	}
+}
+
+void Sprite::updateVertexData(const glm::vec2& quadSize, const glm::vec2& sizeInSpritesheet)
+{
+	float vertices[24] = {
+		0.f, 0.f, 0.f, 0.f,
+		quadSize.x, 0.f, sizeInSpritesheet.x, 0.f,
+		quadSize.x, quadSize.y, sizeInSpritesheet.x, sizeInSpritesheet.y,
+		0.f, 0.f, 0.f, 0.f,
+		quadSize.x, quadSize.y, sizeInSpritesheet.x, sizeInSpritesheet.y,
+		0.f, quadSize.y, 0.f, sizeInSpritesheet.y };
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), vertices, GL_STATIC_DRAW);
+
+}
+
 int Sprite::animation() const
 {
 	return currentAnimation;

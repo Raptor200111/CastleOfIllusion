@@ -1,0 +1,41 @@
+TILEMAP
+72 36 							-- Size of tile map in tiles
+16 16							-- Tile size & block size
+images/tilemap.png 	-- Tilesheet
+4 6 								-- Number of tiles in tilesheet
+e                                                                     ee
+e                                                                     ef
+f                                                      kkkkkkkk       ee
+e                            kkkkkkl                   eefffefe       ef
+f                           ke    epl                kkeffeffffkk     ef
+f                                 efpl               efeeffeffefe     ee
+e          kkkl                   effpl              eeffeeffeffe     ef
+f         kefepl                  eeffpl             efeefeefffee     ee
+fllllllllleeffepl      kkkkkkkkkhkefefepkkkkkkkk kkkkeeffeefffffekkkkkee
+eeefefeffefefefepkkkkkkeefefefeehefefefefefeeffehefefefeeeeeeefeefffefef
+e      bdcdcdbefeefcccdcdccdccfehdbffefeffeddbdchfffeffefefedbccdbccfffe
+a             bdbcd           dch  bcfefffd     hbdbfeffefee        bcff
+a                               h    bfeed      h   bccdfefd           a
+a                               h     efe       h       bcd            a
+a                               h     eee       h                      a
+a                               h     efe       h                      a
+a          aaaag                      eee                             ef
+a      aaaaeeeefg                     afffa                          eff
+a      efefefefefg            aaa    efeefaaaaahaaaaa              aaffe
+f      efeffefffefaaaaaa      efe    efefffefeehefffeaaaaaaaaaaaafffefee
+bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbheeffefefdcdbcdbcdbcdbcbe
+bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbhefdbcdcd               b
+bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbhcd                     b
+a                                              h         aaaaa         a
+a                                              h         eefee         a
+a                                                        efefeaa       a
+a                                                        efefefe       a
+a                        aaaa                            eefefee       a
+aaaaaaaaaaaaaaaaaa    aafeffe      aaa       aaaaaaaaaaaaefefefeaaaaaaaa
+bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+a                                                                      a
+a                                                                      a
+a                                                                      a
+a                                                                      a
+a                                                                      a
+bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
