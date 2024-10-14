@@ -70,9 +70,10 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 void Player::update(int deltaTime)
 {
 	sprite->update(deltaTime);
+	bool oldbClimbing = bClimbing;
 
-	bClimbing = map->collisionStairs(posPlayer, sizePlayer);
 	bool newbTouchBlock = false;
+	bool right = false;
 	if (Game::instance().getKey(GLFW_KEY_LEFT))
 	{
 		playerState = WALK;
@@ -94,6 +95,7 @@ void Player::update(int deltaTime)
 	{
 		playerState = WALK;
 		posPlayer.x += WALK_SPEED;
+		right = true;
 		if (map->collisionBlockRight(posPlayer, sizePlayer))
 		{
 			newbTouchBlock = true;
@@ -117,9 +119,11 @@ void Player::update(int deltaTime)
 	{
 		if (bTouchBlock)
 			newbTouchBlock = true;
+		
 		playerState = STAND;
 	}
 	
+	bClimbing = map->collisionStairs(posPlayer, sizePlayer);
 	if (bClimbing)
 	{
 		playerState = CLIMB;
@@ -197,6 +201,16 @@ void Player::update(int deltaTime)
 		}
 		else {
 			cout << "Dejo de Tocar\n";
+		}
+	}
+
+	if (oldbClimbing != bClimbing) {
+		if (bClimbing) {
+			cout << "Collision stairs\n";
+			playerState = CLIMB;
+		}
+		else {
+			cout << "NOO Collision stairs\n";
 		}
 	}
 	bTouchBlock = newbTouchBlock;

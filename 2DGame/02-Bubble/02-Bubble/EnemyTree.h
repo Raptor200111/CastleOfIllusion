@@ -3,6 +3,7 @@
 #include "Sprite.h"
 #include "TileMap.h"
 #include <cmath>
+#include "Defs.h"
 
 enum EnemyTreeStates
 {
@@ -27,7 +28,7 @@ private:
 	TileMap* map;
 	float velocity;
 	bool right;
-
+	
 	EnemyTreeStates enemyTreeState = EnemyTreeStates::WALK_RIGHT;
 
 };

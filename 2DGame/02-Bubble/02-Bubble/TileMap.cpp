@@ -221,6 +221,9 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 	for(int x=x0; x<=x1; x++)
 	{
 		int actCharPos = map[y * mapSize.x + x];
+		/*if (56.f >= x1 && x0 >= 54.f) {
+			cout << x << " " << y << " " << actCharPos << "\n";
+		}*/
 		if ((actCharPos != 0 && (10 < actCharPos || actCharPos < 8)) || (blockMap[y * mapSize.x + x] != 0))
 		{
 			if(*posY + size.y > tileSize * y)
@@ -263,17 +266,39 @@ bool TileMap::collisionStairs(const glm::ivec2& pos, const glm::ivec2& size) con
 {
 	int x0, x1, y0, y1;
 
-	x0 = pos.x / tileSize;
+	x0 = pos.x / float(tileSize);
 	x1 = (pos.x + size.x - 1) / tileSize;
 	y0 = pos.y / tileSize;
-	y1 = (pos.y + size.y - 1) / tileSize;
+	float yNext = (pos.y + size.y - 1) / float(tileSize);
+	y1 = std::round(yNext); // (pos.y + size.y - 1) / tileSize;
+	bool topStairs, bottomStairs, intersection;
+	topStairs = bottomStairs = intersection = false;
 
-	for (int x = x0; x <= x1; ++x)
+	for (int y = y0; y <= y1; ++y)
 	{
-		for (int y = y0; y <= y1; ++y)
+		for (int x = x0; x <= x1; ++x)
 		{
-			if (map[y * mapSize.x + x] == 8)  // Check if the tile is a stair (tile = 8)
+			int tileType = map[y * mapSize.x + x];
+			
+			if (56.f >= x && x >= 54.f && y == 10) {
+				//cout << x << " " << y << " " << tileType << "\n";
+				int xñl = x;
+			}
+			
+			if (tileType == 8)  // Stair tile
 			{
+				if (y == y1)
+					topStairs = true;
+				// Player's bottom part is touching the top of the stairs
+
+				else if (y == y0)
+					bottomStairs = true;
+				// Player's top part is touching the bottom of the stairs
+
+				else
+					intersection = true;
+					// Player is intersecting with the stairs
+
 				return true;
 			}
 		}

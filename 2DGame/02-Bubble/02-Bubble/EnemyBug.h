@@ -3,6 +3,7 @@
 #include "Sprite.h"
 #include "TileMap.h"
 #include <cmath>
+#include "Defs.h"
 
 enum EnemyBugStates
 {
@@ -12,8 +13,8 @@ enum EnemyBugStates
 class EnemyBug
 {
 public:
-	void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, bool right);
-	void update(int deltaTime);
+	void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, const Zone& limit);
+	void update(int deltaTime, const glm::ivec2& posPlayer);
 	void render();
 
 	void setTileMap(TileMap* tileMap);
@@ -22,11 +23,14 @@ public:
 	glm::ivec2 getEnemyBugPos() const { return posEnemyBug; }
 private:
 	glm::ivec2 tileMapDispl, posEnemyBug, sizeEnemyBug = glm::ivec2(24, 32), initPos;
+	Zone limit;
 	Texture spritesheet;
 	Sprite* sprite;
 	TileMap* map;
 	float velocity;
 	bool right;
+	int attackDistance = 5*16;//5*mapTileSize
+	bool attaking = false;
 
 	EnemyBugStates enemyBugState = EnemyBugStates::BUG_WALK_RIGHT;
 };
