@@ -69,7 +69,9 @@ void Scene::initLevel()
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	player->setPosition(glm::vec2((INIT_PLAYER_X_TILES)*map->getTileSize(), (INIT_PLAYER_Y_TILES)*map->getTileSize()));
 	player->setTileMap(map);
-	cout << player->getPlayerPos().x/16.f << " " << player->getPlayerPos().y / 16.f << "\n";
+
+	cout << player->getPosition().x << " " << player->getPosition().y << "\n";
+
 	isInsideEnemyTreeZone = false;
 
 	initZoneEnemyTree();
@@ -149,9 +151,8 @@ void Scene::update(int deltaTime)
 }
 
 void Scene::updateLevel(int deltaTime)
-{ 
-	
-	isInsideEnemyTreeZone = insideEnemyTreeZone(player->getPlayerPos());
+{
+	isInsideEnemyTreeZone = insideEnemyTreeZone(glm::ivec2(player->getPosition()));
 	if (isInsideEnemyTreeZone) {
 		enemyTree->update(deltaTime);
 	}
@@ -174,7 +175,6 @@ void Scene::updateLevel(int deltaTime)
 		if (player->checkCollisionObject(treePosSize)) {
 			cout << "COLLISION TREE";
 		}
-
 	}
 
 	updateCamera();
@@ -199,7 +199,7 @@ void Scene::renderMenu()
 
 void Scene::updateCamera()
 {
-	glm::vec2 playerPos = player->getPlayerPos();
+	glm::vec2 playerPos = player->getPosition();
 	float zoomScreenWidth = SCREEN_WIDTH / zoomLevel;
 	float zoomScreenHeight = SCREEN_HEIGHT / zoomLevel;
 

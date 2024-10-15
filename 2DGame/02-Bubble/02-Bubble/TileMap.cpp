@@ -340,3 +340,25 @@ bool TileMap::collisionBlockRight(const glm::ivec2 & pos, const glm::ivec2 & siz
 
 	return false;
 }
+
+bool TileMap::collisionBlockDown(const glm::ivec2& pos, const glm::ivec2& size, int* posY) const
+{
+	int x0, x1, y;
+
+	x0 = pos.x / tileSize;
+	x1 = (pos.x + size.x - 1) / tileSize;
+	y = (pos.y + size.y - 1) / tileSize;
+	for (int x = x0; x <= x1; x++)
+	{
+		if (blockMap[y * mapSize.x + x] != 0)
+		{
+			if (*posY + size.y > tileSize * y)
+			{
+				*posY = tileSize * y - size.y;
+				return true;
+			}
+		}
+	}
+
+	return false;
+}

@@ -12,7 +12,7 @@
 
 enum PlayerStates
 {
-	STAND, WALK, JUMP, FALL, DODGE, BUTT_FALL, BUTT_JUMP, FALL_TO_STAND, CLIMB, TOUCH_BLOCK
+	STAND, WALK, JUMP, FALL, DODGE, BUTT_FALL, BUTT_JUMP, FALL_TO_STAND, CLIMB_IDLE, CLIMB
 };
 
 class Player
@@ -31,15 +31,15 @@ public:
 	
 	void setTileMap(TileMap *tileMap);
 	void setPosition(const glm::vec2 &pos);
-	glm::vec4 getPositionAndSize();
-	glm::ivec2 getPlayerPos() const;
+	glm::vec2 getPosition();
+	glm::vec2 getSize();
+
   
 	bool checkCollisionObject(const PosSizeObject& object);
 
 private:
-	bool bJumping, buttJumping, bClimbing, bTouchBlock;
+	bool bJumping, buttFalling, buttJumping, bClimbing, bTouchBlock;
 	glm::ivec2 tileMapDispl, posPlayer, sizePlayer = glm::ivec2(24, 32);
-	int jumpAngle, startY;
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
