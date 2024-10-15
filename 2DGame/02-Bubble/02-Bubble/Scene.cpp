@@ -199,7 +199,7 @@ void Scene::renderMenu()
 
 void Scene::updateCamera()
 {
-	glm::vec2 playerPos = player->getPlayerPos();
+	glm::vec2 playerPos = player->getPosition();
 	float zoomScreenWidth = SCREEN_WIDTH / zoomLevel;
 	float zoomScreenHeight = SCREEN_HEIGHT / zoomLevel;
 
