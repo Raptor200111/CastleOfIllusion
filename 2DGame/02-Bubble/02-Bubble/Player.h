@@ -36,7 +36,7 @@ public:
 
   
 private:
-	bool bJumping, buttJumping, bClimbing, bTouchBlock;
+	bool bJumping, buttFalling, buttJumping, bClimbing, bTouchBlock;
 	glm::ivec2 tileMapDispl, posPlayer, sizePlayer = glm::ivec2(24, 32);
 	Texture spritesheet;
 	Sprite *sprite;

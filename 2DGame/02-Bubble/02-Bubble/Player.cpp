@@ -12,9 +12,10 @@
 void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
 	bJumping = false;
-	buttJumping = false;
+	buttFalling = false;
 	bClimbing = false;
 	bTouchBlock = false;
+	buttJumping = false;
 	velocity = 0.f;
 	playerState = STAND;
 
@@ -75,7 +76,7 @@ void Player::update(int deltaTime)
 	bClimbing = map->collisionStairs(posPlayer, sizePlayer); //Check
 	bool newbTouchBlock = false; //Why?
 
-	if (Game::instance().getKey(GLFW_KEY_LEFT))
+	if (Game::instance().getKey(GLFW_KEY_A))
 	{
 		playerState = WALK;
 		otherState = true;
@@ -95,7 +96,7 @@ void Player::update(int deltaTime)
 		}
 		
 	}
-	else if (Game::instance().getKey(GLFW_KEY_RIGHT))
+	else if (Game::instance().getKey(GLFW_KEY_D))
 	{
 		playerState = WALK;
 		otherState = true;
@@ -115,7 +116,7 @@ void Player::update(int deltaTime)
 		}
 		 
 	}
-	else if (Game::instance().getKey(GLFW_KEY_DOWN) && !bJumping)
+	else if (Game::instance().getKey(GLFW_KEY_S) && !bJumping)
 	{
 		playerState = DODGE;
 		otherState = true;
@@ -133,11 +134,11 @@ void Player::update(int deltaTime)
 		playerState = CLIMB_IDLE;
 		velocity = 0;  // Disable gravity while on stairs
 
-		if (Game::instance().getKey(GLFW_KEY_UP))
+		if (Game::instance().getKey(GLFW_KEY_W))
 		{
 			posPlayer.y -= WALK_SPEED;  // Move up the stairs
 		}
-		if (Game::instance().getKey(GLFW_KEY_DOWN))
+		if (Game::instance().getKey(GLFW_KEY_S))
 		{
 			posPlayer.y += WALK_SPEED;  // Move down the stairs
 		}
@@ -148,24 +149,28 @@ void Player::update(int deltaTime)
 		{
 			velocity += GRAVITY;
 			posPlayer.y += int(velocity);
+			otherState = true;
 
-			if (Game::instance().getKey(GLFW_KEY_DOWN) || buttJumping == true)
+			if (Game::instance().getKey(GLFW_KEY_S) || buttFalling == true)
 			{
 				playerState = BUTT_FALL;
-				buttJumping = true;
+				buttFalling = true;
 				otherState = true;
 
-				if (map->collisionBlockDown(posPlayer, sizePlayer, &posPlayer.y)) {
-					playerState = BUTT_JUMP;
+				if (!buttJumping && map->collisionBlockDown(posPlayer, sizePlayer, &posPlayer.y)) {
 					velocity = -15.f;
+					buttJumping = true;
 					//Se tiene que destrozar el objeto (creo)
 					//booleano de butt_jump
 				}
+
+				if (buttJumping)
+					playerState = BUTT_JUMP;
 			}
 
 			if (velocity < 0)
 			{
-				if (!buttJumping)
+				if (!buttFalling)
 					playerState = JUMP;
 
 				if (map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y))
@@ -175,7 +180,7 @@ void Player::update(int deltaTime)
 			}
 			if (velocity > 0)
 			{
-				if (!buttJumping)
+				if (!buttFalling)
 					playerState = FALL;
 
 				if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
@@ -189,15 +194,17 @@ void Player::update(int deltaTime)
 		{
 			velocity += GRAVITY;
 			posPlayer.y += int(velocity);
+			buttFalling = false;
 			buttJumping = false;
 
 			if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
 			{
-				if (Game::instance().getKey(GLFW_KEY_UP))
+				if (Game::instance().getKey(GLFW_KEY_W))
 				{
 					bJumping = true;
 					velocity = -10.f;
 					newbTouchBlock = false;
+					otherState = true;
 				}
 				else
 					velocity = 0.f;
