@@ -71,6 +71,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 void Player::update(int deltaTime)
 {
 	sprite->update(deltaTime);
+	bool oldbClimbing = bClimbing;
 
 	bool otherState = false;
 	bClimbing = map->collisionStairs(posPlayer, sizePlayer); //Check
@@ -125,9 +126,11 @@ void Player::update(int deltaTime)
 	{
 		if (bTouchBlock) //Again, Why?
 			newbTouchBlock = true;
+		
 		playerState = STAND;
 	}
 	
+	bClimbing = map->collisionStairs(posPlayer, sizePlayer);
 	if (bClimbing)
 	{
 		otherState = true;
@@ -221,7 +224,17 @@ void Player::update(int deltaTime)
 			cout << "Dejo de Tocar\n";
 		}
 	}
-	bTouchBlock = newbTouchBlock; //...here, why?
+
+	if (oldbClimbing != bClimbing) {
+		if (bClimbing) {
+			cout << "Collision stairs\n";
+			playerState = CLIMB;
+		}
+		else {
+			cout << "NOO Collision stairs\n";
+		}
+	}
+	bTouchBlock = newbTouchBlock;
 
 	if (!otherState)
 	{
@@ -254,7 +267,21 @@ glm::vec2 Player::getPosition()
 	return posPlayer;
 }
 
+
 glm::vec2 Player::getSize()
 {
 	return sizePlayer;
 }
+
+bool Player::checkCollisionObject(const PosSizeObject& object)
+{
+	glm::ivec2 pos1 = posPlayer;
+	glm::ivec2 size1 = pos1 + sizePlayer;
+	glm::ivec2 pos2 = object.posObject;
+	glm::ivec2 size2 = pos2 + object.sizeObject;
+
+	if (size1.x < pos2.x || size2.x < pos1.x) return false;
+	if (size1.y < pos2.y || size2.y < pos1.y) return false;
+	return true;
+}
+

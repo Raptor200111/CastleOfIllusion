@@ -35,6 +35,8 @@ public:
 	glm::vec2 getSize();
 
   
+	bool checkCollisionObject(const PosSizeObject& object);
+
 private:
 	bool bJumping, buttFalling, buttJumping, bClimbing, bTouchBlock;
 	glm::ivec2 tileMapDispl, posPlayer, sizePlayer = glm::ivec2(24, 32);

@@ -20,6 +20,8 @@ public:
 	void setPosition(const glm::vec2& pos);
 
 	glm::ivec2 getEnemyTreePos() const { return posEnemyTree; }
+	glm::ivec2 getEnemyTreeSize() const { return sizeEnemyTree; }
+
 private:
 	glm::ivec2 tileMapDispl, posEnemyTree, sizeEnemyTree = glm::ivec2(24, 32), initPos;
 	Texture spritesheet;
@@ -27,7 +29,7 @@ private:
 	TileMap* map;
 	float velocity;
 	bool right;
-
+	
 	EnemyTreeStates enemyTreeState = EnemyTreeStates::WALK_RIGHT;
 
 };

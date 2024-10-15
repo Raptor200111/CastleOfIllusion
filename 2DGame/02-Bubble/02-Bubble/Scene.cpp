@@ -8,11 +8,8 @@
 #define SCREEN_X 32
 #define SCREEN_Y 16
 
-#define INIT_PLAYER_X_TILES 2// 4+20
-#define INIT_PLAYER_Y_TILES 8 //20
-
-//pos enemy1 x=2+18, y= 8-1
-
+#define INIT_PLAYER_X_TILES 2//+35+36// 4+20
+#define INIT_PLAYER_Y_TILES 8//+8+2 //20
 
 Scene::Scene()
 {
@@ -23,14 +20,17 @@ Scene::Scene()
 	blocksByType = std::map<int, std::vector<Block*>>();
 	enemyTree = NULL;
 	enemyBug = NULL;
+	zoomLevel = 2.25f;
 }
 
 Scene::~Scene()
 {
 	if (map != NULL)
 		delete map;
+	/*
 	if (player != NULL)
 		delete player;
+		*/
 	if (bgQuad != NULL)
 		delete bgQuad;
 	if (menuQuad != NULL)
@@ -71,23 +71,14 @@ void Scene::initLevel()
 	player->setTileMap(map);
 
 	cout << player->getPosition().x << " " << player->getPosition().y << "\n";
+
 	isInsideEnemyTreeZone = false;
-	EnemyZone zone1 = { 4.0f * map->getTileSize(), 22.0f * map->getTileSize(), 20.0f, 7.0f};
-	EnemyZone zone2 = { 26.0f * map->getTileSize(), 38.0f * map->getTileSize(), 37.0f, 6.0f };
-	EnemyZone zone3 = { 39.0f * map->getTileSize(), 46.0f * map->getTileSize(), 45.0f, 7.0f };
-	EnemyZone zone4 = { 54.0f * map->getTileSize(), 66.0f * map->getTileSize(), 65.0f, 6.0f };
-	enemyTreeZones.push_back(zone1);
-	enemyTreeZones.push_back(zone2);
-	enemyTreeZones.push_back(zone3);
-	enemyTreeZones.push_back(zone4);
 
-	enemyBug = new EnemyBug();
-	enemyBug->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, false);
-	enemyBug->setPosition(glm::vec2((18.0f)*map->getTileSize(), (8.0f)*map->getTileSize()));
-	enemyBug->setTileMap(map);
+	initZoneEnemyTree();
+	initZoneEnemyBug();
 
-	bgTexture.loadFromFile("images/rocks.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	bgQuad = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1.f, 1.f), &bgTexture, &texProgram);
+	bgTexture.loadFromFile("images/portada.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	bgQuad = Sprite::createSprite(glm::vec2(map->getMapSize()*map->getTileSize()), glm::vec2(1.f, 1.f), &bgTexture, &texProgram);
 
 	std::map<int, std::vector<glm::ivec2>> blocksPosByType = map->getBlocksPos();
 
@@ -111,6 +102,49 @@ void Scene::initLevel()
 	}
 }
 
+void Scene::initZoneEnemyTree()
+{
+	ZoneEnemy zone1, zone2, zone3, zone4;
+	zone1.limit = { 4.0f * map->getTileSize(), 22.0f * map->getTileSize(), 0, 0 };
+	zone1.initPos = glm::ivec2(20.0f, 7.0f);
+
+	zone2.limit = { 26.0f * map->getTileSize(), 38.0f * map->getTileSize(), 0, 0 };
+	zone2.initPos = glm::ivec2(37.0f, 6.0f);
+
+	zone3.limit = { 39.0f * map->getTileSize(), 46.0f * map->getTileSize(), 0, 0 };
+	zone3.initPos = glm::ivec2(45.0f, 7.0f);
+
+	zone4.limit = { 54.0f * map->getTileSize(), 66.0f * map->getTileSize(), 0, 0 };
+	zone4.initPos = glm::ivec2(65.0f, 6.0f);
+	enemyTreeZones.push_back(zone1);
+	enemyTreeZones.push_back(zone2);
+	enemyTreeZones.push_back(zone3);
+	enemyTreeZones.push_back(zone4);
+}
+void Scene::initZoneEnemyBug()
+{
+	ZoneEnemy zoneBug1, zoneBug2, zoneBug3, zoneBug4, zoneBug5;
+	zoneBug1.limit = { 34.0f * map->getTileSize(), 46.0f * map->getTileSize(), 17, 20 };
+	zoneBug1.initPos = glm::ivec2(35.0f, 17.0f);
+
+	zoneBug2.limit = { 76.0f * map->getTileSize(), 89.0f * map->getTileSize(), 20, 20 };
+	zoneBug2.initPos = glm::ivec2(88.0f, 20.0f);
+
+	zoneBug3.limit = { 69.0f * map->getTileSize(), 81.0f * map->getTileSize(), 31, 31 };
+	zoneBug3.initPos = glm::ivec2(80.0f, 31.0f);
+
+	zoneBug4.limit = { 26.0f * map->getTileSize(), 37.0f * map->getTileSize(), 32, 32 };
+	zoneBug4.initPos = glm::ivec2(26.0f, 32.0f);
+
+	zoneBug5.limit = { 14.0f * map->getTileSize(), 24.0f * map->getTileSize(), 30, 32 };
+	zoneBug5.initPos = glm::ivec2(14.0f, 30.0f);
+	enemyTreeZones.push_back(zoneBug1);
+	enemyTreeZones.push_back(zoneBug2);
+	enemyTreeZones.push_back(zoneBug3);
+	enemyTreeZones.push_back(zoneBug4);
+	enemyTreeZones.push_back(zoneBug5);
+}
+
 void Scene::update(int deltaTime)
 {
 	currentTime += deltaTime;
@@ -122,61 +156,31 @@ void Scene::updateLevel(int deltaTime)
 	if (isInsideEnemyTreeZone) {
 		enemyTree->update(deltaTime);
 	}
-	glm::ivec2 posEnemyBug = enemyBug->getEnemyBugPos();
 
 	//change to enemyZone
-	if (19.f*map->getTileSize() > posEnemyBug.x && posEnemyBug.x > 3.f * map->getTileSize()) {
-		enemyBug->update(deltaTime);
+	/*
+	if (enemyBug != NULL) {
+		glm::ivec2 posEnemyBug = enemyBug->getEnemyBugPos();
+		enemyBug->update(deltaTime, player->getPlayerPos());
 	}
-	else {
-		enemyBug->setPosition(glm::vec2((18.0f) * map->getTileSize(), (8.0f) * map->getTileSize()));
-		enemyBug->setTileMap(map);
-	}
+	*/
 	player->update(deltaTime);
 	//therefore i need posPlayer, sizePlayer, isAttacking, posEnemy, sizeEnemy
 	// if collision (posPlayer, sizePlayer,posEnemy, sizeEnemy)
 	//		if isAttacking ==> enemy die
 	//		else		   ==> player "die"; --star;
 
+	if (isInsideEnemyTreeZone) {
+		PosSizeObject treePosSize = {enemyTree->getEnemyTreePos(), enemyTree->getEnemyTreeSize()};
+		if (player->checkCollisionObject(treePosSize)) {
+			cout << "COLLISION TREE";
+		}
+	}
+
+	updateCamera();
+
 }
 
-void Scene::scrolling()
-{
-	glm::ivec2 cam = player->getPosition();
-	float halfWidth = SCREEN_WIDTH / 2;
-	float halfHeight = SCREEN_HEIGHT / 2;
-
-	double left = cam.x - halfWidth;
-	double right = halfWidth + cam.x;
-	double bottom = cam.y - halfHeight;//t + 300;
-	double top = halfHeight + cam.y;// +300;
-
-	glm::ivec2 mapSize = map->getMapSize();
-	int tileSize = map->getTileSize();
-
-	if (left < 0)
-	{
-		left = 0;
-		right = left + SCREEN_WIDTH;
-	}
-	if (bottom < 0)
-	{
-		bottom = 0;
-		top = bottom + SCREEN_HEIGHT;
-	}
-	if (top > (mapSize.y + 2) * tileSize)//49 * 16)
-	{
-		top = (mapSize.y + 2) * tileSize;
-		bottom = top - SCREEN_HEIGHT;
-	}
-	if (right > (mapSize.x + 4) * tileSize)
-	{
-		right = (mapSize.x + 4) * tileSize;
-		left = right - SCREEN_WIDTH;
-	}
-
-	projection = glm::ortho(left, right, top, bottom);
-}
 void Scene::renderMenu()
 {
 
@@ -193,25 +197,56 @@ void Scene::renderMenu()
 	menuQuad->render();
 }
 
+void Scene::updateCamera()
+{
+	glm::vec2 playerPos = player->getPlayerPos();
+	float zoomScreenWidth = SCREEN_WIDTH / zoomLevel;
+	float zoomScreenHeight = SCREEN_HEIGHT / zoomLevel;
+
+	// Calculate the desired camera position based on player's position
+	float halfScreenWidth = zoomScreenWidth / 2.0f;
+	float halfScreenHeight = zoomScreenHeight / 2.0f;
+
+	// Center camera on player but with some offset leading the player when moving right
+	cameraPosition.x = playerPos.x - halfScreenWidth + 100; // Adjust the '100' for horizontal leading effect
+	cameraPosition.y = playerPos.y - halfScreenHeight;
+
+	// Constrain the camera within the map boundaries
+	float maxCameraX = map->getMapSize().x*map->getTileSize() - zoomScreenWidth;
+	float maxCameraY = map->getMapSize().y * map->getTileSize() - zoomScreenHeight;
+
+	if (cameraPosition.x < 0) cameraPosition.x = 0;
+	if (cameraPosition.y < 0) cameraPosition.y = 0;
+	if (cameraPosition.x > maxCameraX) cameraPosition.x = maxCameraX;
+	if (cameraPosition.y > maxCameraY) cameraPosition.y = maxCameraY;
+
+	// Update projection matrix to account for camera movement
+	projection = glm::ortho(cameraPosition.x, cameraPosition.x + zoomScreenWidth, 
+							cameraPosition.y + zoomScreenHeight, cameraPosition.y);
+}
+
 void Scene::renderLevel()
 {
-	scrolling();
 	glm::mat4 modelview;
+
 	texProgram.use();
-	texProgram.setUniformMatrix4f("projection", projection);
+	texProgram.setUniformMatrix4f("projection", projection); // Projection is now affected by camera
 	texProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
 	modelview = glm::mat4(1.0f);
 	texProgram.setUniformMatrix4f("modelview", modelview);
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 
-
 	//level
+	bgTexture.use();
+	bgQuad->render();
 	map->render();
 	player->render();
 	if (isInsideEnemyTreeZone) {
 		enemyTree->render();
 	}
-	enemyBug->render();
+	if(enemyBug != NULL)
+		enemyBug->render();
+
 	for (const auto& blockTypes : blocksByType)
 	{
 		for (auto block : blockTypes.second) {
@@ -252,34 +287,31 @@ void Scene::initShaders()
 }
 
 
-//if player inside enemyZone and enemy not exists return true
-//							 and enemy exists if inside parameters return true
-//
 bool Scene::insideEnemyTreeZone(glm::ivec2& posPlayer)
 {
 	for (const auto& enemyTreeZone : enemyTreeZones) {
 		/*if ((posPlayer.y + SCREEN_HEIGHT / 2) > enemyTreeZone.enemyY0
 			&& enemyTreeZone.enemyY0 > (posPlayer.y - SCREEN_HEIGHT / 2)
 			&& */
-		if (enemyTreeZone.x1 > posPlayer.x && posPlayer.x >= enemyTreeZone.x0)
+		if (enemyTreeZone.limit.max_x > posPlayer.x && posPlayer.x >= enemyTreeZone.limit.min_x)
 		{
 			if (!isInsideEnemyTreeZone) {
 				enemyTree = new EnemyTree();
-				bool right = posPlayer.x > enemyTreeZone.enemyX0*map->getTileSize();
+				bool right = posPlayer.x > enemyTreeZone.initPos.x*map->getTileSize();
 				enemyTree->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, right);
-				enemyTree->setPosition(glm::vec2(enemyTreeZone.enemyX0 * map->getTileSize(), (enemyTreeZone.enemyY0) * map->getTileSize()));
+				enemyTree->setPosition(glm::vec2(enemyTreeZone.initPos.x * map->getTileSize(), (enemyTreeZone.initPos.y) * map->getTileSize()));
 				enemyTree->setTileMap(map);
 				return true;
 			}
 			else {
 				glm::ivec2 posEnemyTree = enemyTree->getEnemyTreePos();
-				if (enemyTreeZone.x1 > posEnemyTree.x && posEnemyTree.x > enemyTreeZone.x0) {
+				if (enemyTreeZone.limit.max_x > posEnemyTree.x && posEnemyTree.x > enemyTreeZone.limit.min_x) {
 					return true;
 				}
 			
 			}
 		}
 	}
-	enemyTree = NULL;
+	this->enemyTree = NULL;
 	return false;
 }
