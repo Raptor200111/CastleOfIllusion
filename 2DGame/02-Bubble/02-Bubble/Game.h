@@ -4,6 +4,8 @@
 
 #include <GLFW/glfw3.h>
 #include "Scene.h"
+#include "MenuScene.h"
+#include "LevelScene.h"
 
 
 #define SCREEN_WIDTH 640 
@@ -48,8 +50,10 @@ private:
 	bool bPlay; // Continue to play game?
 	bool keys[GLFW_KEY_LAST+1]; // Store key states so that 
 							    // we can have access at any time
-	Scene scene;
+	Scene* currentScene;
 	GameState currentState;
+	MenuScene menuScene;
+	LevelScene levelScene;
 
 
 };
