@@ -11,11 +11,26 @@ struct Zone
 	float min_y;
 	float max_y;
 };
+enum EnemyType
+{
+	Tree,
+	Bug,
+};
 
 struct ZoneEnemy
 {
 	Zone limit;
 	glm::ivec2 initPos;
+	bool left;
+};
+
+struct InitEnemy
+{
+	int id;
+	EnemyType enemyType;
+	Zone limit;
+	glm::ivec2 initPos;
+	bool left;
 };
 
 struct PosSizeObject

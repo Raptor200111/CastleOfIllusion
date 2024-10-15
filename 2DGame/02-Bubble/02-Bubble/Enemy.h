@@ -11,7 +11,8 @@ public:
     virtual ~Enemy() {}
 
     // Common functions
-    virtual void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) = 0;
+    //virtual void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) = 0;
+    virtual void initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, const ZoneEnemy& initParams) = 0;
     virtual void update(int deltaTime) = 0;
     virtual void render() = 0;
 
@@ -23,6 +24,7 @@ public:
 
     glm::ivec2 getEnemyPos() const { return posEnemy; }
     glm::ivec2 getEnemySize() const { return sizeEnemy; }
+    void moveHorizontal(bool left, int walk_speed);
 
 protected:
     glm::ivec2 tileMapDispl, posEnemy, sizeEnemy, initPos;
@@ -30,5 +32,6 @@ protected:
     Sprite* sprite;
     Texture spritesheet;
     float velocity;
-    bool right;
+    bool left;
+    ZoneEnemy initParams;
 };

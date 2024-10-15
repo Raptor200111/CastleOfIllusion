@@ -4,22 +4,24 @@
 
 enum EnemyBugStates
 {
-	BUG_WALK_LEFT, BUG_WALK_RIGHT, BUG_ROLL_LEFT, BUG_ROLL_RIGHT, BUG_DIE
+	BUG_WALK_RIGHT, BUG_ROLL_RIGHT, BUG_DIE
 };
 
 class EnemyBug : public Enemy
 {
 public:
-	void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, const Zone& limit);
+	EnemyBug() { }
+	~EnemyBug() override {}
+	//void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) override {}
+	void update(int deltaTime) override {}
+	void initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, const ZoneEnemy& initParams) override;
 	void update(int deltaTime, const glm::ivec2& posPlayer);
 	void render() override;
 
 
 private:
 
-	Zone limit;
-
-	int attackDistance = 5*16;//5*mapTileSize
+	int attackDistance = 3*16;//5*mapTileSize
 	bool attaking = false;
 
 	EnemyBugStates enemyBugState = EnemyBugStates::BUG_WALK_RIGHT;

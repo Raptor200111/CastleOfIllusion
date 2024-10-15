@@ -11,8 +11,6 @@ struct Cam {
 #include "TileMap.h"
 #include "Player.h"
 #include "Enemy.h"
-#include "EnemyTree.h"
-#include "EnemyBug.h"
 #include "Block.h"
 #include <map>
 
@@ -30,11 +28,11 @@ private:
 	void updateCamera();
 	void initZoneEnemyTree();
 	void initZoneEnemyBug();
-	bool insideEnemyTreeZone(glm::ivec2& posPlayer);
+	void insideEnemyTreeZone(glm::ivec2& posPlayer);
 
 	TileMap* map;
 	Player* player;
-	std::map<int, std::vector<Block*>> blocksByType;
+	std::map<int, std::vector<Block*>> blocksByType; //key == typeBlock
 	ShaderProgram texProgram;
 	float currentTime;
 	glm::mat4 projection;
@@ -44,11 +42,12 @@ private:
 	Sprite* bgQuad;
 	Texture bgTexture;
 
-	EnemyTree* enemyTree;
-	EnemyBug* enemyBug;
-	bool isInsideEnemyTreeZone;
-	vector<ZoneEnemy> enemyTreeZones;
-	vector<ZoneEnemy> enemyBugZones;
+	//activeEnemies
+	std::map<int,Enemy*> enemies;
+
+	//all enemies
+	vector<InitEnemy> enemyZones;
+	InitEnemy debug;
 };
 
 #endif // _LEVEL_SCENE_INCLUDE
