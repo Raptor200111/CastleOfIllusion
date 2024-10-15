@@ -149,7 +149,7 @@ void LevelScene::update(int deltaTime)
 	//		else		   ==> player "die"; --star;
 	*/
 	if (isInsideEnemyTreeZone) {
-		PosSizeObject treePosSize = { enemyTree->getEnemyTreePos(), enemyTree->getEnemyTreeSize() };
+		PosSizeObject treePosSize = { enemyTree->getEnemyPos(), enemyTree->getEnemySize() };
 		if (player->checkCollisionObject(treePosSize)) {
 			cout << "COLLISION TREE";
 		}
@@ -231,13 +231,13 @@ bool LevelScene::insideEnemyTreeZone(glm::ivec2& posPlayer)
 			if (!isInsideEnemyTreeZone) {
 				enemyTree = new EnemyTree();
 				bool right = posPlayer.x > enemyTreeZone.initPos.x * map->getTileSize();
-				enemyTree->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, right);
+				enemyTree->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);//right
 				enemyTree->setPosition(glm::vec2(enemyTreeZone.initPos.x * map->getTileSize(), (enemyTreeZone.initPos.y) * map->getTileSize()));
 				enemyTree->setTileMap(map);
 				return true;
 			}
 			else {
-				glm::ivec2 posEnemyTree = enemyTree->getEnemyTreePos();
+				glm::ivec2 posEnemyTree = enemyTree->getEnemyPos();
 				if (enemyTreeZone.limit.max_x > posEnemyTree.x && posEnemyTree.x > enemyTreeZone.limit.min_x) {
 					return true;
 				}

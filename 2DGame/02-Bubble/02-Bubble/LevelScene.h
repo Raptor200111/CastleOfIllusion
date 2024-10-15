@@ -10,6 +10,7 @@ struct Cam {
 #include "Scene.h"
 #include "TileMap.h"
 #include "Player.h"
+#include "Enemy.h"
 #include "EnemyTree.h"
 #include "EnemyBug.h"
 #include "Block.h"
