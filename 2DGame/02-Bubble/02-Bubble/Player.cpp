@@ -292,12 +292,12 @@ void Player::setPosition(const glm::vec2& pos)
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x - offset.x), float(tileMapDispl.y + posPlayer.y - offset.y)));
 }
 
-glm::vec2 Player::getPosition()
+glm::ivec2 Player::getPosition()
 {
 	return posPlayer;
 }
 
-glm::vec2 Player::getSize()
+glm::ivec2 Player::getSize()
 {
 	return sizePlayer;
 }
