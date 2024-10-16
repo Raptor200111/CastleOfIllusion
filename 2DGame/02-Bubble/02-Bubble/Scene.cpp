@@ -173,7 +173,7 @@ void Scene::updateLevel(int deltaTime)
 	if (isInsideEnemyTreeZone) {
 		PosSizeObject treePosSize = {enemyTree->getEnemyTreePos(), enemyTree->getEnemyTreeSize()};
 		if (player->checkCollisionObject(treePosSize)) {
-			cout << "COLLISION TREE";
+			//cout << "COLLISION TREE";
 		}
 	}
 
