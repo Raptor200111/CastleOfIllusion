@@ -31,8 +31,8 @@ public:
 	
 	void setTileMap(TileMap *tileMap);
 	void setPosition(const glm::vec2 &pos);
-	glm::vec2 getPosition();
-	glm::vec2 getSize();
+	glm::ivec2 getPosition();
+	glm::ivec2 getSize();
 
   
 	bool checkCollisionObject(const PosSizeObject& object);

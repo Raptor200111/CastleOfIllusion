@@ -13,10 +13,13 @@
   <ItemGroup>
     <ClInclude Include="AnimKeyframes.h" />
     <ClInclude Include="Defs.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyBug.h" />
     <ClInclude Include="EnemyTree.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Block.h" />
+    <ClInclude Include="LevelScene.h" />
+    <ClInclude Include="MenuScene.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Scene.h" />
@@ -27,11 +30,14 @@
     <ClInclude Include="TileMap.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyBug.cpp" />
     <ClCompile Include="EnemyTree.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Block.cpp" />
+    <ClCompile Include="LevelScene.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MenuScene.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
