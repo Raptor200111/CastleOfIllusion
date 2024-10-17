@@ -1,34 +1,27 @@
 #pragma once
 
-#include "Sprite.h"
-#include "TileMap.h"
-#include <cmath>
+#include "Enemy.h"
 
 enum EnemyBugStates
 {
-	BUG_WALK_LEFT, BUG_WALK_RIGHT, BUG_ROLL_LEFT, BUG_ROLL_RIGHT, BUG_DIE
+	BUG_WALK_RIGHT, BUG_ROLL_RIGHT, BUG_DIE
 };
 
-class EnemyBug
+class EnemyBug : public Enemy
 {
 public:
-	void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, const Zone& limit);
+	EnemyBug() { }
+	~EnemyBug() override {}
+	//void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) override {}
+	void update(int deltaTime) override {}
+	void initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, const ZoneEnemy& initParams) override;
 	void update(int deltaTime, const glm::ivec2& posPlayer);
-	void render();
+	void render() override;
 
-	void setTileMap(TileMap* tileMap);
-	void setPosition(const glm::vec2& pos);
 
-	glm::ivec2 getEnemyBugPos() const { return posEnemyBug; }
 private:
-	glm::ivec2 tileMapDispl, posEnemyBug, sizeEnemyBug = glm::ivec2(24, 32), initPos;
-	Zone limit;
-	Texture spritesheet;
-	Sprite* sprite;
-	TileMap* map;
-	float velocity;
-	bool right;
-	int attackDistance = 5*16;//5*mapTileSize
+
+	int attackDistance = 3*16;//5*mapTileSize
 	bool attaking = false;
 
 	EnemyBugStates enemyBugState = EnemyBugStates::BUG_WALK_RIGHT;

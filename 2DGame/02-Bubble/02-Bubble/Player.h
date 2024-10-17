@@ -12,7 +12,7 @@
 
 enum PlayerStates
 {
-	STAND, WALK, JUMP, FALL, DODGE, BUTT_FALL, BUTT_JUMP, FALL_TO_STAND, CLIMB_IDLE, CLIMB
+	IDLE, WALK, JUMP, FALL, DODGE, BUTT_FALL, BUTT_JUMP, READY_TO_PICK, CLIMB_IDLE, CLIMB, TOTAL //Importante que TOTAL este al final
 };
 
 class Player
@@ -31,22 +31,27 @@ public:
 	
 	void setTileMap(TileMap *tileMap);
 	void setPosition(const glm::vec2 &pos);
-	glm::vec2 getPosition();
-	glm::vec2 getSize();
+	glm::ivec2 getPosition();
+	glm::ivec2 getSize();
 
   
 	bool checkCollisionObject(const PosSizeObject& object);
 
 private:
-	bool bJumping, buttFalling, buttJumping, bClimbing, bTouchBlock;
-	glm::ivec2 tileMapDispl, posPlayer, sizePlayer = glm::ivec2(24, 32);
+	bool left;
+	bool bClimbing, bTouchBlock;
+	glm::ivec2 tileMapDispl, posPlayer, sizePlayer, sizeSprite, offset;
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
 	float velocity;
 
-	PlayerStates playerState;
+	PlayerStates oldState, newState;
 
+	void leftMove();
+	void rightMove();
+	void jump(int v);
+	void setSize(glm::ivec2 newSize);
 };
 
 
