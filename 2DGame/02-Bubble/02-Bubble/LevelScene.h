@@ -13,6 +13,7 @@ struct Cam {
 #include "Enemy.h"
 #include "Block.h"
 #include <map>
+#include "GameUI.h"
 
 class LevelScene : public Scene
 {
@@ -48,6 +49,9 @@ private:
 	//all enemies
 	vector<InitEnemy> enemyZones;
 	InitEnemy debug;
+
+
+	 GameUI gameUI;
 };
 
 #endif // _LEVEL_SCENE_INCLUDE
