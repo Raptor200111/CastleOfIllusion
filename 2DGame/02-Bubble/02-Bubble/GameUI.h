@@ -4,7 +4,7 @@
 #include "Quad.h"
 #include "Sprite.h"
 #include "TexturedQuad.h"
-//#include "Text.h"
+#include "Text.h"
 
 class GameUI : public Scene
 {
@@ -27,6 +27,6 @@ private:
 	ShaderProgram simpleProgram, texProgram;
 	float currentTime;
 	glm::mat4 projection;
-	//Text text;
+	Text text;
 };
 

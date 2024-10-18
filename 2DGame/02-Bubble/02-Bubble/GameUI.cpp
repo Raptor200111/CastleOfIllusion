@@ -40,18 +40,18 @@ void GameUI::init()
 
 	starTexture.loadFromFile("images/varied.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	starTexture.setMagFilter(GL_NEAREST);
-	bgTexture.loadFromFile("images/gameUI.jpg", TEXTURE_PIXEL_FORMAT_RGB);
+	bgTexture.loadFromFile("images/GameUI.png", TEXTURE_PIXEL_FORMAT_RGB);
 	bgTexture.setMagFilter(GL_NEAREST);
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH), float(SCREEN_HEIGHT), 0.f);
 	currentTime = 0.0f;
 
-	/* Select which font you want to use
+	// Select which font you want to use
 	if (!text.init("fonts/OpenSans-Regular.ttf"))
 		//if(!text.init("fonts/OpenSans-Bold.ttf"))
 		//if(!text.init("fonts/DroidSerif.ttf"))
 		cout << "Could not load font!!!" << endl;
-		*/
+		
 }
 
 void GameUI::update(int deltaTime)
@@ -93,7 +93,7 @@ void GameUI::render()
 	texProgram.setUniformMatrix4f("modelview", modelview);
 	star->render(starTexture);
 
-	//text.render("Videogames!!!", glm::vec2(10, CAMERA_HEIGHT - 20), 32, glm::vec4(1, 1, 1, 1));
+	text.render("Videogames!!!", glm::vec2(10, SCREEN_HEIGHT - 20), 32, glm::vec4(1, 1, 1, 1));
 }
 
 void GameUI::initShaders()
