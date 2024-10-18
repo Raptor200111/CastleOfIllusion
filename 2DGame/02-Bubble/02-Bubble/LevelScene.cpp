@@ -18,10 +18,11 @@ LevelScene::LevelScene()
 {
 	map = NULL;
 	player = NULL;
-	bgQuad = NULL;
 	blocksByType = std::map<int, std::vector<Block*>>();
 	enemies = std::map<int, Enemy*>();
 	zoomLevel = 2.5f;
+	bgMap = NULL;
+	bgQuad = NULL;
 }
 
 LevelScene::~LevelScene() 
@@ -32,6 +33,8 @@ LevelScene::~LevelScene()
 	if (player != NULL)
 		delete player;
 		*/
+	if (bgMap != NULL)
+		delete bgMap;
 	if (bgQuad != NULL)
 		delete bgQuad;
 	for (auto blockTypes : blocksByType) {
@@ -45,6 +48,8 @@ LevelScene::~LevelScene()
 void LevelScene::init()
 {
 	initShaders();
+
+	//level
 	map = TileMap::createTileMap("levels/levelMatrix.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	player = &Player::instance();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -53,6 +58,9 @@ void LevelScene::init()
 
 	initZoneEnemyTree();
 	initZoneEnemyBug();
+
+	//background
+	bgMap = TileMap::createTileMap("levels/bgTileMap.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 
 	bgTexture.loadFromFile("images/portada.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	bgQuad = Sprite::createSprite(glm::vec2(map->getMapSize() * map->getTileSize()), glm::vec2(1.f, 1.f), &bgTexture, &texProgram);
@@ -83,7 +91,7 @@ void LevelScene::init()
 
 void LevelScene::initZoneEnemyTree()
 {
-	EnemyType enemyTree = EnemyType::Bug;
+	EnemyType enemyTree = EnemyType::Tree;
 	Zone limit = { 4.0f * map->getTileSize(), 22.0f * map->getTileSize(), 0, 0 };
 	glm::ivec2 initPos = glm::ivec2(20.0f, 7.0f);
 	InitEnemy zone1 = {1, enemyTree, limit, initPos, true };
@@ -171,9 +179,12 @@ void LevelScene::render()
 	texProgram.setUniformMatrix4f("modelview", modelview);
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 
-	//level
+	//background
 	bgTexture.use();
 	bgQuad->render();
+	bgMap->render();
+
+	//level
 	map->render();
 	player->render();
 	for (const auto& enemy : enemies) {
