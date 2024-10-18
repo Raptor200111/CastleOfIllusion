@@ -3,6 +3,8 @@
 #include <cmath>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Game.h"
+#include <iomanip>
+#include <sstream>
 
 GameUI::GameUI()
 {
@@ -34,11 +36,11 @@ void GameUI::init()
 	texCoords[0] = glm::vec2(0.f, 0.f); texCoords[1] = glm::vec2(1.f, 1.f);
 	bg = TexturedQuad::createTexturedQuad(geomBg, texCoords, texProgram);
 
-	glm::vec2 geomStar[2] = { glm::vec2(0.f, 0.f), glm::vec2(50, 50) };
-	texCoords[0] = glm::vec2(0.5f, 0.5f); texCoords[1] = glm::vec2(1.f, 1.0f);
+	glm::vec2 geomStar[2] = { glm::vec2(0.f, 0.f), glm::vec2(starSize, starSize) };
+	texCoords[0] = glm::vec2(0.f, 0.f); texCoords[1] = glm::vec2(1.f, 1.0f);
 	star = TexturedQuad::createTexturedQuad(geomStar, texCoords, texProgram);
 
-	starTexture.loadFromFile("images/varied.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	starTexture.loadFromFile("images/powerStar.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	starTexture.setMagFilter(GL_NEAREST);
 	bgTexture.loadFromFile("images/GameUI.png", TEXTURE_PIXEL_FORMAT_RGB);
 	bgTexture.setMagFilter(GL_NEAREST);
@@ -47,9 +49,10 @@ void GameUI::init()
 	currentTime = 0.0f;
 
 	// Select which font you want to use
-	if (!text.init("fonts/OpenSans-Regular.ttf"))
+		//if (!text.init("fonts/OpenSans-Regular.ttf"))
 		//if(!text.init("fonts/OpenSans-Bold.ttf"))
 		//if(!text.init("fonts/DroidSerif.ttf"))
+	if (!text.init("fonts/retro_computer_personal_use.ttf"))
 		cout << "Could not load font!!!" << endl;
 		
 }
@@ -57,6 +60,7 @@ void GameUI::init()
 void GameUI::update(int deltaTime)
 {
 	currentTime += deltaTime;
+	time -= (deltaTime/ 1000000.0f);
 }
 
 void GameUI::render()
@@ -81,19 +85,33 @@ void GameUI::render()
 	modelview = glm::translate(modelview, glm::vec3(64.f, 64.f, 0.f));
 	modelview = glm::rotate(modelview, -currentTime / 1000.f, glm::vec3(0.0f, 0.0f, 1.0f));
 	*/
-	modelview = glm::translate(modelview, glm::vec3(0.f,SCREEN_HEIGHT-77, 0.f));
+	modelview = glm::translate(modelview, glm::vec3(0.f, SCREEN_HEIGHT - 77, 0.f));
 	texProgram.setUniformMatrix4f("modelview", modelview);
 	bg->render(bgTexture);
 
-	modelview = glm::mat4(1.0f);
-	//modelview = glm::translate(glm::mat4(1.0f), glm::vec3(384.f, 48.f, 0.f));
-	//modelview = glm::translate(modelview, glm::vec3(64.f, 64.f, 0.f));
-	//modelview = glm::rotate(modelview, currentTime / 1000.f, glm::vec3(0.0f, 0.0f, 1.0f));
-	modelview = glm::translate(modelview, glm::vec3(34.f, 164.f, 0.f));
-	texProgram.setUniformMatrix4f("modelview", modelview);
-	star->render(starTexture);
+	for (int i = 0; i < stars; i++)
+	{
+		modelview = glm::mat4(1.0f);
+		//modelview = glm::translate(glm::mat4(1.0f), glm::vec3(384.f, 48.f, 0.f));
+		//modelview = glm::translate(modelview, glm::vec3(64.f, 64.f, 0.f));
+		//modelview = glm::rotate(modelview, currentTime / 1000.f, glm::vec3(0.0f, 0.0f, 1.0f));
+		modelview = glm::translate(modelview, glm::vec3(35+i*starSize, SCREEN_HEIGHT - starSize - 15, 0.f));
+		texProgram.setUniformMatrix4f("modelview", modelview);
+		star->render(starTexture);
+	}
 
-	text.render("Videogames!!!", glm::vec2(10, SCREEN_HEIGHT - 20), 32, glm::vec4(1, 1, 1, 1));
+	text.render("0", glm::vec2(295, SCREEN_HEIGHT - 20), textSize, glm::vec4(1, 1, 1, 1));
+	text.render(std::to_string(tries), glm::vec2(295+ textSize, SCREEN_HEIGHT - 20), textSize, glm::vec4(1, 1, 1, 1));
+
+	std::ostringstream oss;
+	oss << std::setw(6) << std::setfill('0') << points;
+	std::string numStr = oss.str();
+	text.render(numStr, glm::vec2(380, SCREEN_HEIGHT - 20), textSize, glm::vec4(1, 1, 1, 1));
+
+	std::ostringstream oss2;
+	oss2 << std::setw(3) << std::setfill('0') << time;
+	std::string timeStr = oss2.str();
+	text.render(timeStr, glm::vec2(530, SCREEN_HEIGHT - 20), textSize, glm::vec4(1, 1, 1, 1));
 }
 
 void GameUI::initShaders()
