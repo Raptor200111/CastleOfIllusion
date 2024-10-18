@@ -42,7 +42,11 @@ LevelScene::~LevelScene()
 			delete block;
 		}
 	}
-	enemies = std::map<int, Enemy*>();
+	for (auto& pair : enemies)
+	{
+		delete pair.second;
+	}
+	enemies.clear();
 }
 
 void LevelScene::init()
@@ -64,7 +68,7 @@ void LevelScene::init()
 
 	bgTexture.loadFromFile("images/portada.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	bgQuad = Sprite::createSprite(glm::vec2(map->getMapSize() * map->getTileSize()), glm::vec2(1.f, 1.f), &bgTexture, &texProgram);
-
+	
 	std::map<int, std::vector<glm::ivec2>> blocksPosByType = map->getBlocksPos();
 
 	for (const auto& blockType : blocksPosByType)
@@ -87,6 +91,7 @@ void LevelScene::init()
 	}
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH), float(SCREEN_HEIGHT), 0.f);
 	currentTime = 0.0f;
+	gameUI.init();
 }
 
 void LevelScene::initZoneEnemyTree()
@@ -166,6 +171,7 @@ void LevelScene::update(int deltaTime)
 	*/
 
 	updateCamera();
+	gameUI.update(deltaTime);
 }
 
 void LevelScene::render()
@@ -197,6 +203,7 @@ void LevelScene::render()
 			block->render();
 		}
 	}
+	gameUI.render();
 }
 
 void LevelScene::updateCamera()

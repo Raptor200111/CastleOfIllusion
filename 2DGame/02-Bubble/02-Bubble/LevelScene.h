@@ -13,6 +13,7 @@ struct Cam {
 #include "Enemy.h"
 #include "Block.h"
 #include <map>
+#include "GameUI.h"
 
 class LevelScene : public Scene
 {
@@ -52,6 +53,9 @@ private:
 	Sprite* bgQuad;
 	Texture bgTexture;
 	TileMap* bgMap;
+
+
+	 GameUI gameUI;
 };
 
 #endif // _LEVEL_SCENE_INCLUDE
