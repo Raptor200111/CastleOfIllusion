@@ -9,6 +9,7 @@ void EnemyBug::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgra
 	initPos = tileMapPos;
 	this->left = initParams.left;
 	this->initParams = initParams;
+	attackSpeed = WALK_SPEED;
 	spritesheet.loadFromFile("images/bug1.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sizeEnemy = glm::ivec2(24.f, 32.f);
 	sprite = Sprite::createSprite(sizeEnemy, glm::vec2(0.25f, 0.5f), &spritesheet, &shaderProgram);
@@ -42,27 +43,26 @@ void EnemyBug::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgra
 void EnemyBug::update(int deltaTime, const glm::ivec2& posPlayer)
 {
 	sprite->updateDiffSize(deltaTime);
-
 	int min_x_attack = posEnemy.x - attackDistance;
 	int max_x_attack = posEnemy.x + attackDistance;
 
-	//player outside attack range walks		
 	if (posPlayer.x< min_x_attack || max_x_attack < posPlayer.x) {
+		attackSpeed = WALK_SPEED;
 		enemyBugState = BUG_WALK_RIGHT;
 		moveHorizontal(left, WALK_SPEED);
 	}
 	//player inside attack range rols x2_Speed
 	else
 	{
-		attaking = true;
+		attackSpeed =1;
 		enemyBugState = BUG_ROLL_RIGHT;
 		//change to dash
-		moveHorizontal(left, WALK_SPEED);
+		moveHorizontal(left, attackSpeed);
 	}
 	
 	//if after mov enemy outside limits, turn around
 	if (posEnemy.x < initParams.limit.min_x || initParams.limit.max_x < posEnemy.x) {
-		attaking = false;
+		//add if collision tile or block (no stair nor ramp)
 		enemyBugState = BUG_WALK_RIGHT;
 		left = !left;
 		moveHorizontal(left, WALK_SPEED);

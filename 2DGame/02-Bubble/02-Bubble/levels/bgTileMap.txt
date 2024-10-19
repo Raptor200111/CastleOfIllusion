@@ -1,0 +1,53 @@
+TILEMAP
+95 48 							-- Size of tile map in tiles
+16 16							-- Tile size & block size
+images/total.png 	-- Tilesheet
+4 6 								-- Number of tiles in tilesheet
+                                                                                               
+                                                                                               
+                                                                                               
+                                                                                               
+                                                                                               
+                                                                                               
+                                                     iiii                                      
+                                                   jjjjji                                      
+                                                   jjjjjj                                      
+                                                   jjjjjj                                      
+                                                                                               
+                                                                                               
+  iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii iiiiiiiiiiiiiii iiiiiiiiiiiiiiiiiiiiii 
+iiiijjjjijjjijijijijiijjjijjjjiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+iijjjijijjijjijijjjiijjjijiijiiiiiiiiiiiiiiiiiiiiiiiiii iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+ijjjijijjjjijiiiiiijijijijjjijiiiiiijiiiiiijjjiijjjjiii jjiii   iijjijj iiiiiiiiiiiijjjjiiiiiii
+jjjjjjjjjjjjj      ijjjjjjjijjjjijjijjjijjijjijjjijijij ijjji   ijjiiij jjiiiiiiiiijjjijjjjjiii
+ jjjjjjjiiijj      jjijjjjjjjjjjjjjijjjjjijjjjjjjjjjjjj jjiji   jjjjjjj jjjjjjjjijjjjjjjjjjjjji
+ jjjjjjj   jj      jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj   jjjjjjjjjjjjjjjjjjjjjjjjjjjjj  
+ jjjjjjj   jj      jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj   jjjjjjjjjjjjjjjjjjjjjjjjjjj   
+ jjj  jj   jj      jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj   jjjj     jjjjjjjjjjjjjjjjjjjjjjjjjjj   
+ jjj       jj         jjjjjjjj           jjjjjjjjjjjj   jjjj                jjjjjjjjjjjj       
+           jj                                        iii    iiiiiiiiii         iiiiiiiiiiiiiii 
+  iiii   iijji                                       iiiiiiiiiiiiiiiii   iiiiiiiiiiiiiiiiiiiiii
+iiii  iiiiiijiiiiiiii                iiiiiiiiiiiiiiiiiiiii     iiiii   iiiiiiiijijijjijijijijii
+ iijjiiiiijjjijjjijiii                       iiiiiiiiiiiiiiiiiiiiiiiii iiijijjijijijjijjjijjji 
+ jjijjjiiijjijijjjijjii                      iijijjijijiiiiiiijjjjiijj jjiijijjjji     jjjjijj 
+ jjijjjijjjjjijijjjijji                     iijjjijjijijijjjjjijiijjjijjjjijjijjij    jjjjjjjj 
+ ijjijijjjjjjjjjjjjjjiii                    iijiijiijjijjjjijijjjjjjjjjjjjjjjjjjjj       jjjjj 
+ jjjjjjjjjjjjjjjjjjjjjiiiiiiiiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj       jjjjj 
+ jjjjjjjjjjjjjjjjjjjjjjjiiiiiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj       jjjjj 
+ jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj       jjjjj 
+ jjjjjjjjjjjj     jjjjjjjjjjjjjjjjijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj             
+ jjjjjjjjj         jjjjjjjjjjjjjjjijjjjjjjjjjjjjjjjj     jjjjjjjjjjjj                          
+      i                                                                                        
+      ii        iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+   iiijiiiiii   iiii                                                                           
+  iiiijjjiiiiiii                                                                               
+  iijijjijjjjijj                                                                               
+ ijijjijjjjijjjj                                                                               
+ jjjjjjjjjjjjjjj                                                                               
+ jjjjjjjjjjjjjjj                                                                               
+ jjjjjjjjjjjjjjj                                                                               
+ jjjjjjjjjjjjjjj                                                                               
+ jjjjjjjjjjjjjjj                                                                               
+ jjjjjjjjjjjjjjj                                                                               
+ jjjjjjjjjjjjjjj                                                                               
+                                                                                               

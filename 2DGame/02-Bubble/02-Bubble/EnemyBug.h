@@ -22,7 +22,7 @@ public:
 private:
 
 	int attackDistance = 3*16;//5*mapTileSize
-	bool attaking = false;
+	int attackSpeed;
 
 	EnemyBugStates enemyBugState = EnemyBugStates::BUG_WALK_RIGHT;
 };

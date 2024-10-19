@@ -184,11 +184,18 @@ bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) c
 	y1 = (pos.y + size.y - 1) / tileSize;
 	for(int y=y0; y<=y1; y++)
 	{
-		int actCharPos = map[y * mapSize.x + x];
-		if (actCharPos != 0 && (10 < actCharPos || actCharPos < 8))
-			return true;
+		int tileType = map[y * mapSize.x + x];
+		if (tileType != 0)
+		{
+			if (tileType == 7 || tileType == 8) {
+				int rampHeight = pos.x % tileSize;
+				if ((pos.y + size.y) > (y * tileSize + rampHeight))
+					return true;
+			}
+			else if(tileType != 9)
+				return true;
+		}
 	}
-	
 	return false;
 }
 
@@ -201,10 +208,16 @@ bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) 
 	y1 = (pos.y + size.y - 1) / tileSize;
 	for(int y=y0; y<=y1; y++)
 	{
-		int actCharPos = map[y * mapSize.x + x];
-		if (actCharPos != 0 && (10 < actCharPos || actCharPos < 8))
+		int tileType = map[y * mapSize.x + x];
+		if (tileType != 0)
 		{
-			return true;
+			if (tileType == 7 || tileType == 8) {
+				int rampHeight = (pos.x + size.x) % tileSize;
+				if ((pos.y + size.y) > (y * tileSize + rampHeight))
+					return true;
+			}
+			else if (tileType != 9)
+				return true;
 		}
 	}
 	
@@ -220,13 +233,19 @@ bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, i
 	y = (pos.y + size.y - 1) / tileSize;
 	for(int x=x0; x<=x1; x++)
 	{
-		int actCharPos = map[y * mapSize.x + x];
-		/*if (56.f >= x1 && x0 >= 54.f) {
-			cout << x << " " << y << " " << actCharPos << "\n";
-		}*/
-		if ((actCharPos != 0 && (10 < actCharPos || actCharPos < 8)) || (blockMap[y * mapSize.x + x] != 0))
+		int tileType = map[y * mapSize.x + x];
+		if (tileType != 0 && tileType != 9)
 		{
-			if(*posY + size.y > tileSize * y)
+			if (tileType == 7 || tileType == 8)
+			{
+				int rampHeight = (pos.x + size.x) % tileSize;
+				int correctedY = y * tileSize + rampHeight - size.y;
+
+				if (*posY + size.y > correctedY) {
+					*posY = correctedY;
+				}
+			}
+			else if(*posY + size.y > tileSize * y)
 			{
 				*posY = tileSize * y - size.y;
 				return true;
@@ -247,8 +266,19 @@ bool TileMap::collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, int
 
 	for (int x = x0; x <= x1; x++)
 	{
-		int actCharPos = map[y * mapSize.x + x];
-		if ((actCharPos != 0 && (10 < actCharPos || actCharPos < 8)) || (blockMap[y * mapSize.x + x] != 0))
+		int tileType = map[y * mapSize.x + x];
+		if (tileType == 7 || tileType == 8)
+		{
+			// Handle ramp collision by adjusting posY based on ramp height
+			int rampHeight = tileSize - (pos.x % tileSize);
+			int correctedY = y * tileSize + rampHeight;
+
+			if (*posY < correctedY) {
+				*posY = correctedY;  // Adjust Y position to align with the ramp
+				return true;
+			}
+		}
+		else if (tileType != 0 && tileType != 9)
 		{
 			if (*posY < tileSize * (y + 1))
 			{
@@ -280,12 +310,7 @@ bool TileMap::collisionStairs(const glm::ivec2& pos, const glm::ivec2& size) con
 		{
 			int tileType = map[y * mapSize.x + x];
 			
-			if (56.f >= x && x >= 54.f && y == 10) {
-				//cout << x << " " << y << " " << tileType << "\n";
-				int xñl = x;
-			}
-			
-			if (tileType == 8)  // Stair tile
+			if (tileType == 9)  // Stair tile
 			{
 				if (y == y1)
 					topStairs = true;

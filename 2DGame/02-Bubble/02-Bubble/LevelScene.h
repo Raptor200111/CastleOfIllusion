@@ -13,6 +13,7 @@ struct Cam {
 #include "Enemy.h"
 #include "Block.h"
 #include <map>
+#include "GameUI.h"
 
 class LevelScene : public Scene
 {
@@ -39,8 +40,6 @@ private:
 
 	float zoomLevel;
 	glm::vec2 cameraPosition;
-	Sprite* bgQuad;
-	Texture bgTexture;
 
 	//activeEnemies
 	std::map<int,Enemy*> enemies;
@@ -48,6 +47,15 @@ private:
 	//all enemies
 	vector<InitEnemy> enemyZones;
 	InitEnemy debug;
+
+
+	//background
+	Sprite* bgQuad;
+	Texture bgTexture;
+	TileMap* bgMap;
+
+
+	 GameUI gameUI;
 };
 
 #endif // _LEVEL_SCENE_INCLUDE
