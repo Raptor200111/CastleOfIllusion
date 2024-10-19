@@ -97,8 +97,6 @@ void Player::update(int deltaTime)
 	else
 		newState = oldState;
 
-		
-
 	if (oldState == PlayerStates::BUTT_FALL) {
 		if (Game::instance().getKey(GLFW_KEY_A)) {
 			leftMove();
@@ -177,6 +175,10 @@ void Player::update(int deltaTime)
 				newState = JUMP;
 				jump(JUMP_SPEED);
 			}
+			else if (Game::instance().getKey(GLFW_KEY_S)) {
+				newState = DODGE;
+				setSize(DODGE_SIZE);
+			}
 		}
 		else
 			newState = FALL;
@@ -192,10 +194,10 @@ void Player::update(int deltaTime)
 		if (!movement) {
 			newState = IDLE;
 		}
-		if (Game::instance().getKey(GLFW_KEY_S)) {
-			newState = DODGE;
-			setSize(DODGE_SIZE);
+		else if (Game::instance().getKey(GLFW_KEY_L) && newState == WALK) {
+			//grab item
 		}
+
 	}
 	if (oldState == PlayerStates::IDLE) {
 		if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
