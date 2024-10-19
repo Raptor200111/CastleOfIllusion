@@ -2,7 +2,6 @@
 #include <GLFW/glfw3.h>
 #include "Game.h"
 
-
 void Game::init()
 {
 	bPlay = true;
