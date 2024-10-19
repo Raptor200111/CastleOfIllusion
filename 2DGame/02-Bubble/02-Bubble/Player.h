@@ -1,11 +1,12 @@
 #ifndef _PLAYER_INCLUDE
 #define _PLAYER_INCLUDE
 
-
+#include <cmath>
+#include <iostream>
+#include <GL/glew.h>
 #include "Sprite.h"
 #include "TileMap.h"
-#include <cmath>
-
+#include "Game.h"
 
 // Player is basically a Sprite that represents the player. As such it has
 // all properties it needs to track its movement, jumping, and collisions.

@@ -1,8 +1,4 @@
-#include <cmath>
-#include <iostream>
-#include <GL/glew.h>
 #include "Player.h"
-#include "Game.h"
 
 #define FALL_STEP 2
 #define WALK_SPEED 2

@@ -180,4 +180,3 @@ void Sprite::setPosition(const glm::vec2 &pos)
 void Sprite::setLeft(bool left) {
 	this->left = left;
 }
-
