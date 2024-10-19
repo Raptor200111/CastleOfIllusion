@@ -4,6 +4,7 @@
 
 #include <glm/glm.hpp>
 #include "ShaderProgram.h"
+#include "SoundManager.h"
 
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.
