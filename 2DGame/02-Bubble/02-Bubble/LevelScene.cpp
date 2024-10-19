@@ -238,7 +238,8 @@ void LevelScene::updateCamera()
 void LevelScene::insideEnemyTreeZone(glm::ivec2& posPlayer)
 {
 	for (const auto& enemyZone : enemyZones) {
-		if (enemyZone.limit.max_x > posPlayer.x && posPlayer.x >= enemyZone.limit.min_x)
+		if (enemyZone.limit.max_y< posPlayer.y+ 50+SCREEN_HEIGHT/2  && enemyZone.limit.min_y> posPlayer.y - 50 - SCREEN_HEIGHT / 2
+			&& enemyZone.limit.max_x > posPlayer.x && posPlayer.x >= enemyZone.limit.min_x)
 		{
 			if (enemies.find(enemyZone.id) == enemies.end()) {
 				Enemy* enemy;
@@ -253,7 +254,7 @@ void LevelScene::insideEnemyTreeZone(glm::ivec2& posPlayer)
 				}
 				ZoneEnemy initParams = { enemyZone.limit, enemyZone.initPos, !right };
 				enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, initParams);
-				enemy->setPosition(glm::vec2(enemyZone.initPos.x * map->getTileSize(), (enemyZone.initPos.y) * map->getTileSize()));
+				enemy->setPosition(glm::vec2(enemyZone.initPos * map->getTileSize()));
 				enemy->setTileMap(map);
 				enemies.insert(std::pair<int, Enemy*>(enemyZone.id, enemy));
 				cout << "INSERTING \n";

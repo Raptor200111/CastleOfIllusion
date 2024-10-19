@@ -2,7 +2,6 @@
 #include <GLFW/glfw3.h>
 #include "Game.h"
 
-
 #define TARGET_FRAMERATE 60.0f
 
 
