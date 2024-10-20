@@ -1,4 +1,5 @@
 #include "EnemyTree.h"
+#include "CollisionManager.h"
 
 #define WALK_SPEED 1
 #define GRAVITY 0.5f
@@ -13,8 +14,8 @@ void EnemyTree::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgr
 	enemyTreeState = WALK_RIGHT;
 
 	spritesheet.loadFromFile("images/tree0.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sizeEnemy = glm::ivec2(24, 32);
-	sprite = Sprite::createSprite(sizeEnemy, glm::vec2(0.25f, 1.f), &spritesheet, &shaderProgram);
+	sizeObject = glm::ivec2(24, 32);
+	sprite = Sprite::createSprite(sizeObject, glm::vec2(0.25f, 1.f), &spritesheet, &shaderProgram);
 
 	sprite->setNumberAnimations(2);
 
@@ -30,7 +31,7 @@ void EnemyTree::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgr
 	sprite->changeAnimation(enemyTreeState);
 
 	tileMapDispl = tileMapPos;
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }
 
 void EnemyTree::update(int deltaTime)
@@ -39,19 +40,21 @@ void EnemyTree::update(int deltaTime)
 	enemyTreeState = WALK_RIGHT;
 	moveHorizontal(left, WALK_SPEED);
 	//if outside limit
-	if (posEnemy.x < initParams.limit.min_x || initParams.limit.max_x < posEnemy.x) {
-		posEnemy = initParams.initPos* map->getTileSize();
+	if (position.x < initParams.limit.min_x || initParams.limit.max_x < position.x) {
+		position = initParams.initPos* map->getTileSize();
 	}
 	velocity += GRAVITY;
-	posEnemy.y += int(velocity);
-	if (map->collisionMoveDown(posEnemy, sizeEnemy, &posEnemy.y))
+	position.y += int(velocity);
+
+	if (CollisionManager::instance().checkCollisionVertical(this) == Tile)
 	{
 		velocity = 0.f;
 	}
+
 	sprite->setLeft(left);
 	if (sprite->animation() != enemyTreeState)
 		sprite->changeAnimation(enemyTreeState);
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }
 void EnemyTree::render()
 {
