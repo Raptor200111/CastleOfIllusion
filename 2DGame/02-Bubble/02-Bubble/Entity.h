@@ -19,8 +19,10 @@ public:
 	glm::ivec2 getPosition() { return position; }
 	glm::ivec2 getSize() {return sizeObject;}
 	void setPositionY(int y) { position.y = y; }
+	bool getLeft() { return left; }
 
 protected:
+	bool left;
 	Texture spritesheet;
 	Sprite* sprite;
 	TileMap* map;

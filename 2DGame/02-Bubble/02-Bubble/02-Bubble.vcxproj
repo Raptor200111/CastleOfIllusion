@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimKeyframes.h" />
+    <ClInclude Include="BossDragon.h" />
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="Defs.h" />
     <ClInclude Include="Enemy.h" />
@@ -37,6 +38,7 @@
     <ClInclude Include="TileMap.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BossDragon.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyBug.cpp" />

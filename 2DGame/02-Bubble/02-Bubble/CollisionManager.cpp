@@ -157,16 +157,14 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 
 	int x0 = pos.x / tileSize;
 	int x1 = (pos.x + size.x - 1) / tileSize;
-	//down
-	int yDown = (pos.y + size.y - 1) / tileSize;
 
-	//up
-	int yUp = pos.y / tileSize;
+	vector<int> upDown= vector<int> (2, 0);
+	int yUp = pos.y / tileSize;						upDown[0] = yUp;
+	int yDown = (pos.y + size.y - 1) / tileSize;	upDown[1] = yDown;
 
-	int inc = yDown - yUp;
 	// Check the tiles around the entity for collisions
 	for (int i = x0; i <= x1; ++i) {
-		for (int j = yUp; j <= yDown; j+=1) {
+		for (int j : upDown) {
 			int tileType = tileMap->getTileType(i, j);
 			if (tileType != 0) {
 				if (tileType == 9)
@@ -174,22 +172,12 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 				
 				if (tileType == 7 || tileType == 8)
 				{
-					int yOnRamp;
-					int xInTile = pos.x % tileSize;
-					if (xInTile == 0)
-						xInTile = 16;
-					if (tileType == 8) {
-						// Ramp that goes up from left to right (\)
-						yOnRamp = tileSize - xInTile;  // Higher y when x is smaller
+					int correctedY = correctRampPos(i, j, size.y, pos, entity->getLeft());
+					if (correctedY != -1)
+					{
+						entity->setPositionY(correctedY);
+						
 					}
-					else if (tileType == 7) {
-						// Ramp that goes up from right to left (/)
-						yOnRamp = xInTile;  // Higher y when x is larger
-					}
-
-					// Correct the y position of the entity to sit on the ramp
-					int correctedY = tileSize * j + yOnRamp - size.y;
-					entity->setPositionY(correctedY);
 					return Tile;
 				}
 				//Down collision
@@ -216,10 +204,43 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 	}
 	return None;
 }
+/*
+int CollisionManager::correctRampPos(int tileX, int tileY, int sizeY, glm::ivec2 pos)
+{
+	int tileLeftX = tileX * tileSize;
+	int tileLocalX = pos.x - tileLeftX;
+	int tileBottomY = (tileY + 1) * tileSize;
+	int correctY = tileBottomY - tileLocalX;
+	if (pos.y + sizeY > correctY) {
+		return correctY - sizeY;
+	}
+	return -1;
+}
+*/
 
+int CollisionManager::correctRampPos(int tileX, int tileY, int sizeY, glm::ivec2 pos, bool left)
+{
+	int yOnRamp;
+	int correctedY = -1;
+	int xInTile = pos.x % tileSize;
+	if (xInTile == 0)
+		xInTile = 16;
+	//if (tileType == 8) {
+	if(!left) {
+		// Ramp that goes up from left to right (\)
+		yOnRamp = tileSize - xInTile;  // Higher y when x is smaller
+	}
+	//else if (tileType == 7) {
+	else if (left) {
+		// Ramp that goes up from right to left (/)
+		yOnRamp = xInTile;  // Higher y when x is larger
+	}
 
+	// Correct the y position of the entity to sit on the ramp
+	correctedY = tileSize * tileY + yOnRamp - sizeY;
+	return correctedY;
 
-
+}
 
 
 void CollisionManager::insideScreenObj(Cam cam)
@@ -295,7 +316,6 @@ void CollisionManager::update(int deltaTime, Cam camera)
 			it->second->update(deltaTime);
 
 		if (checkCollisionObject(&Player::instance(), it->second)) {
-			//cout << "EnemyCollision\n";
 			/*
 			if (Player::instance().killEnemy()) {
 				it = enemies.erase(it);

@@ -36,8 +36,8 @@ public:
 	void setPosition(const glm::vec2& pos);
 	void setLeft(bool left);
 	void addKeyframeDiffSize(int animId, const glm::vec2& frame, const glm::vec2& quadSize, const glm::vec2& sizeInSpritesheet);
-	void updateDiffSize(int deltaTime);
-	void changeAnimationDiffSize(int animId);
+	glm::vec2 updateDiffSize(int deltaTime);
+	glm::vec2 changeAnimationDiffSize(int animId);
 	void updateVertexData(const glm::vec2& quadSize, const glm::vec2& sizeInSpritesheet);
 
 private:
