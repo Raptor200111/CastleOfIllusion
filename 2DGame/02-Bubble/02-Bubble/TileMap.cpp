@@ -26,8 +26,6 @@ TileMap::~TileMap()
 {
 	if(map != NULL)
 		delete map;
-	if (blockMap != NULL)
-		delete blockMap;
 }
 
 
@@ -94,22 +92,15 @@ bool TileMap::loadLevel(const string &levelFile)
 			else if (tile <= '9' && tile >= '0')
 			{
 				int blockType = tile - int('0');
-				auto it = blocksPosByType.find(blockType);
-				if (it != blocksPosByType.end()) {
-					it->second.push_back(glm::ivec2(i, j));  // Add item to existing vector
-				}
-				else {
-					std::vector<glm::ivec2> auxItem = { glm::ivec2(i, j) };  // Initialize vector with the item
-					blocksPosByType.emplace(blockType, auxItem);  // Use emplace to insert new type and item list
-				}
-				map[j * mapSize.x + i] = 0;
+				BlockObj block= { blockType, glm::ivec2(i, j) };
+				blocksObj.push_back(block);
 				blockMap[j * mapSize.x + i] = blockType;
+				map[j * mapSize.x + i] = 0;
 			}
 			else
 			{
 				map[j * mapSize.x + i] = tile - 96;// int('a');
 				blockMap[j * mapSize.x + i] = 0;
-
 			}
 		}
 		fin.get(tile);
@@ -171,124 +162,18 @@ void TileMap::prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program)
 	texCoordLocation = program.bindVertexAttribute("texCoord", 2, 4*sizeof(float), (void *)(2*sizeof(float)));
 }
 
-// Collision tests for axis aligned bounding boxes.
-// Method collisionMoveDown also corrects Y coordinate if the box is
-// already intersecting a tile below.
 
-bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const
+void TileMap::eraseBlock(const glm::ivec2& pos)
 {
-	int x, y0, y1;
-	
-	x = pos.x / tileSize;
-	y0 = pos.y / tileSize;
-	y1 = (pos.y + size.y - 1) / tileSize;
-	for(int y=y0; y<=y1; y++)
-	{
-		int tileType = map[y * mapSize.x + x];
-		if (tileType != 0)
-		{
-			if (tileType == 7 || tileType == 8) {
-				int rampHeight = pos.x % tileSize;
-				if ((pos.y + size.y) > (y * tileSize + rampHeight))
-					return true;
-			}
-			else if(tileType != 9)
-				return true;
-		}
-	}
-	return false;
+	int x = pos.x / tileSize;
+	int y = pos.y / tileSize;
+	blockMap[y * mapSize.x + x] = 0;
 }
-
-bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const
+void TileMap::addBlock(const glm::ivec2& pos)
 {
-	int x, y0, y1;
-	
-	x = (pos.x + size.x - 1) / tileSize;
-	y0 = pos.y / tileSize;
-	y1 = (pos.y + size.y - 1) / tileSize;
-	for(int y=y0; y<=y1; y++)
-	{
-		int tileType = map[y * mapSize.x + x];
-		if (tileType != 0)
-		{
-			if (tileType == 7 || tileType == 8) {
-				int rampHeight = (pos.x + size.x) % tileSize;
-				if ((pos.y + size.y) > (y * tileSize + rampHeight))
-					return true;
-			}
-			else if (tileType != 9)
-				return true;
-		}
-	}
-	
-	return false;
-}
-
-bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const
-{
-	int x0, x1, y;
-	
-	x0 = pos.x / tileSize;
-	x1 = (pos.x + size.x - 1) / tileSize;
-	y = (pos.y + size.y - 1) / tileSize;
-	for(int x=x0; x<=x1; x++)
-	{
-		int tileType = map[y * mapSize.x + x];
-		if (tileType != 0 && tileType != 9)
-		{
-			if (tileType == 7 || tileType == 8)
-			{
-				int rampHeight = (pos.x + size.x) % tileSize;
-				int correctedY = y * tileSize + rampHeight - size.y;
-
-				if (*posY + size.y > correctedY) {
-					*posY = correctedY;
-				}
-			}
-			else if(*posY + size.y > tileSize * y)
-			{
-				*posY = tileSize * y - size.y;
-				return true;
-			}
-		}
-	}
-	
-	return false;
-}
-
-bool TileMap::collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, int* posY) const
-{
-	int x0, x1, y;
-
-	x0 = pos.x / tileSize;
-	x1 = (pos.x + size.x - 1) / tileSize;
-	y = pos.y / tileSize;
-
-	for (int x = x0; x <= x1; x++)
-	{
-		int tileType = map[y * mapSize.x + x];
-		if (tileType == 7 || tileType == 8)
-		{
-			// Handle ramp collision by adjusting posY based on ramp height
-			int rampHeight = tileSize - (pos.x % tileSize);
-			int correctedY = y * tileSize + rampHeight;
-
-			if (*posY < correctedY) {
-				*posY = correctedY;  // Adjust Y position to align with the ramp
-				return true;
-			}
-		}
-		else if (tileType != 0 && tileType != 9)
-		{
-			if (*posY < tileSize * (y + 1))
-			{
-				*posY = tileSize * (y + 1);
-				return true;  
-			}
-		}
-	}
-
-	return false;  
+	int x = pos.x / tileSize;
+	int y = pos.y / tileSize;
+	blockMap[y * mapSize.x + x] = 1;
 }
 
 
@@ -324,62 +209,6 @@ bool TileMap::collisionStairs(const glm::ivec2& pos, const glm::ivec2& size) con
 					intersection = true;
 					// Player is intersecting with the stairs
 
-				return true;
-			}
-		}
-	}
-
-	return false;
-}
-
-bool TileMap::collisionBlockLeft(const glm::ivec2& pos, const glm::ivec2& size) const
-{
-	int x, y0, y1;
-
-	x = pos.x / tileSize;
-	y0 = pos.y / tileSize;
-	y1 = (pos.y + size.y - 1) / tileSize;
-	for (int y = y0; y <= y1; y++)
-	{
-		if (blockMap[y * mapSize.x + x] != 0)
-			return true;
-	}
-
-	return false;
-}
-
-
-bool TileMap::collisionBlockRight(const glm::ivec2 & pos, const glm::ivec2 & size) const
-{
-	int x, y0, y1;
-	x = (pos.x + size.x - 1) / tileSize;
-	y0 = pos.y / tileSize;
-	y1 = (pos.y + size.y - 1) / tileSize;
-	for (int y = y0; y <= y1; y++)
-	{
-		if (blockMap[y * mapSize.x + x] != 0)
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool TileMap::collisionBlockDown(const glm::ivec2& pos, const glm::ivec2& size, int* posY) const
-{
-	int x0, x1, y;
-
-	x0 = pos.x / tileSize;
-	x1 = (pos.x + size.x - 1) / tileSize;
-	y = (pos.y + size.y - 1) / tileSize;
-	for (int x = x0; x <= x1; x++)
-	{
-		if (blockMap[y * mapSize.x + x] != 0)
-		{
-			if (*posY + size.y > tileSize * y)
-			{
-				*posY = tileSize * y - size.y;
 				return true;
 			}
 		}

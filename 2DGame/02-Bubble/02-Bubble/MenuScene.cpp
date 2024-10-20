@@ -18,8 +18,6 @@ MenuScene::~MenuScene()
 
 void MenuScene::init()
 {
-	SoundManager::instance().init();
-	SoundManager::instance().loadMusic("menu", "sound/01_Intro.mp3");
 	SoundManager::instance().setMusicVolume(64);
 	SoundManager::instance().playMusic("menu", -1); 
 	initShaders();
@@ -31,11 +29,6 @@ void MenuScene::init()
 void MenuScene::update(int deltaTime)
 {
     // You can handle any specific menu logic here.
-	
-	/*if (deltaTime >= 300) {
-		SoundManager::instance().stopMusic();
-		SoundManager::instance().cleanUp();
-	}*/
 }
 
 void MenuScene::render()

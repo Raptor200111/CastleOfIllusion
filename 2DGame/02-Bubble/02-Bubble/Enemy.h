@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Sprite.h"
-#include "TileMap.h"
+#include "Entity.h"
 #include <glm/glm.hpp>
 #include <cmath>
 
-class Enemy {
+class Enemy : public Entity
+{
 public:
     Enemy() {}
     virtual ~Enemy() {}
@@ -16,21 +16,10 @@ public:
     virtual void update(int deltaTime) = 0;
     virtual void render() = 0;
 
-    void setTileMap(TileMap* tileMap) { map = tileMap; }
-    void setPosition(const glm::vec2& pos) {
-        posEnemy = pos;
-        sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
-    }
-
-    glm::ivec2 getEnemyPos() const { return posEnemy; }
-    glm::ivec2 getEnemySize() const { return sizeEnemy; }
     void moveHorizontal(bool left, int walk_speed);
 
 protected:
-    glm::ivec2 tileMapDispl, posEnemy, sizeEnemy, initPos;
-    TileMap* map;
-    Sprite* sprite;
-    Texture spritesheet;
+    glm::ivec2 initPos;
     float velocity;
     bool left;
     ZoneEnemy initParams;

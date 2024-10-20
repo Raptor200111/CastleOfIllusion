@@ -1,5 +1,5 @@
 #include "EnemyBug.h"
-
+#include "CollisionManager.h"
 #define WALK_SPEED 1
 #define GRAVITY 0.5f
 
@@ -11,40 +11,40 @@ void EnemyBug::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgra
 	this->initParams = initParams;
 	attackSpeed = WALK_SPEED;
 	spritesheet.loadFromFile("images/bug1.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sizeEnemy = glm::ivec2(24.f, 32.f);
-	sprite = Sprite::createSprite(sizeEnemy, glm::vec2(0.25f, 0.5f), &spritesheet, &shaderProgram);
+	sizeObject = glm::ivec2(24.f, 32.f);
+	sprite = Sprite::createSprite(sizeObject, glm::vec2(0.25f, 0.5f), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(3);
 
 	glm::vec2 totalSizeSpriteSheet = glm::vec2(115.f, 22.f);
-	sizeEnemy = glm::vec2(24.f, 17.f);
-	glm::vec2 sizeSpriteSheet = glm::vec2(sizeEnemy.x / totalSizeSpriteSheet.x, sizeEnemy.y / totalSizeSpriteSheet.y);
+	sizeObject = glm::vec2(24.f, 17.f);
+	glm::vec2 sizeSpriteSheet = glm::vec2(sizeObject.x / totalSizeSpriteSheet.x, sizeObject.y / totalSizeSpriteSheet.y);
 	sprite->setAnimationSpeed(BUG_WALK_RIGHT, 8);
-	sprite->addKeyframeDiffSize(BUG_WALK_RIGHT, glm::vec2(0.f, 0.f), sizeEnemy, sizeSpriteSheet);
-	sprite->addKeyframeDiffSize(BUG_WALK_RIGHT, glm::vec2(sizeSpriteSheet.x, 0.f), sizeEnemy, sizeSpriteSheet);
+	sprite->addKeyframeDiffSize(BUG_WALK_RIGHT, glm::vec2(0.f, 0.f), sizeObject, sizeSpriteSheet);
+	sprite->addKeyframeDiffSize(BUG_WALK_RIGHT, glm::vec2(sizeSpriteSheet.x, 0.f), sizeObject, sizeSpriteSheet);
 
-	sizeEnemy = glm::vec2(17.f, 17.f);
-	sizeSpriteSheet = glm::vec2(sizeEnemy.x / totalSizeSpriteSheet.x, sizeEnemy.y / totalSizeSpriteSheet.y);
+	sizeObject = glm::vec2(17.f, 17.f);
+	sizeSpriteSheet = glm::vec2(sizeObject.x / totalSizeSpriteSheet.x, sizeObject.y / totalSizeSpriteSheet.y);
 	sprite->setAnimationSpeed(BUG_ROLL_RIGHT, 8);
-	sprite->addKeyframeDiffSize(BUG_ROLL_RIGHT, glm::vec2((47.f)/totalSizeSpriteSheet.x, 0.f), sizeEnemy, sizeSpriteSheet);
-	sprite->addKeyframeDiffSize(BUG_ROLL_RIGHT, glm::vec2((47.f+17.f) / totalSizeSpriteSheet.x, 0.f), sizeEnemy, sizeSpriteSheet);
-	sprite->addKeyframeDiffSize(BUG_ROLL_RIGHT, glm::vec2((47.f+17.f) / totalSizeSpriteSheet.x, 0.f), sizeEnemy, sizeSpriteSheet);
+	sprite->addKeyframeDiffSize(BUG_ROLL_RIGHT, glm::vec2((47.f)/totalSizeSpriteSheet.x, 0.f), sizeObject, sizeSpriteSheet);
+	sprite->addKeyframeDiffSize(BUG_ROLL_RIGHT, glm::vec2((47.f+17.f) / totalSizeSpriteSheet.x, 0.f), sizeObject, sizeSpriteSheet);
+	sprite->addKeyframeDiffSize(BUG_ROLL_RIGHT, glm::vec2((47.f+17.f) / totalSizeSpriteSheet.x, 0.f), sizeObject, sizeSpriteSheet);
 
 
-	sizeEnemy = glm::vec2(16.f, 22.f);
-	sizeSpriteSheet = glm::vec2(sizeEnemy.x / totalSizeSpriteSheet.x, 1);
+	sizeObject = glm::vec2(16.f, 22.f);
+	sizeSpriteSheet = glm::vec2(sizeObject.x / totalSizeSpriteSheet.x, 1);
 	sprite->setAnimationSpeed(BUG_DIE, 8);
-	sprite->addKeyframeDiffSize(BUG_DIE, glm::vec2(1.f-sizeSpriteSheet.x, 0.f), sizeEnemy, sizeSpriteSheet);
+	sprite->addKeyframeDiffSize(BUG_DIE, glm::vec2(1.f-sizeSpriteSheet.x, 0.f), sizeObject, sizeSpriteSheet);
 
 	sprite->changeAnimationDiffSize(enemyBugState);
 	tileMapDispl = tileMapPos;
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 
 }
 void EnemyBug::update(int deltaTime, const glm::ivec2& posPlayer)
 {
 	sprite->updateDiffSize(deltaTime);
-	int min_x_attack = posEnemy.x - attackDistance;
-	int max_x_attack = posEnemy.x + attackDistance;
+	int min_x_attack = position.x - attackDistance;
+	int max_x_attack = position.x + attackDistance;
 
 	if (posPlayer.x< min_x_attack || max_x_attack < posPlayer.x) {
 		attackSpeed = WALK_SPEED;
@@ -61,7 +61,7 @@ void EnemyBug::update(int deltaTime, const glm::ivec2& posPlayer)
 	}
 	
 	//if after mov enemy outside limits, turn around
-	if (posEnemy.x < initParams.limit.min_x || initParams.limit.max_x < posEnemy.x) {
+	if (position.x < initParams.limit.min_x || initParams.limit.max_x < position.x) {
 		//add if collision tile or block (no stair nor ramp)
 		enemyBugState = BUG_WALK_RIGHT;
 		left = !left;
@@ -70,15 +70,16 @@ void EnemyBug::update(int deltaTime, const glm::ivec2& posPlayer)
 
 
 	velocity += GRAVITY;
-	posEnemy.y += int(velocity);
-	if (map->collisionMoveDown(posEnemy, sizeEnemy, &posEnemy.y))
+	position.y += int(velocity);
+
+	if (CollisionManager::instance().checkCollisionVertical(this) == Tile)
 	{
 		velocity = 0.f;
 	}
 	sprite->setLeft(left);
 	if (sprite->animation() != enemyBugState)
 		sprite->changeAnimationDiffSize(enemyBugState);
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }
 void EnemyBug::render()
 {

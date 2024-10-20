@@ -4,9 +4,10 @@
 #include <cmath>
 #include "Scene.h"
 #include "Game.h"
+#include "Enemy.h"
 #include "EnemyTree.h"
 #include "EnemyBug.h"
-
+#include "CollisionManager.h"
 
 #define SCREEN_X 32
 #define SCREEN_Y 16
@@ -18,8 +19,6 @@ LevelScene::LevelScene()
 {
 	map = NULL;
 	player = NULL;
-	blocksByType = std::map<int, std::vector<Block*>>();
-	enemies = std::map<int, Enemy*>();
 	zoomLevel = 2.5f;
 	bgMap = NULL;
 	bgQuad = NULL;
@@ -29,148 +28,143 @@ LevelScene::~LevelScene()
 {
 	if (map != NULL)
 		delete map;
-	/*
-	if (player != NULL)
-		delete player;
-		*/
 	if (bgMap != NULL)
 		delete bgMap;
 	if (bgQuad != NULL)
 		delete bgQuad;
-	for (auto blockTypes : blocksByType) {
-		for (auto block : blockTypes.second) {
-			delete block;
-		}
+
+	//quitar
+	for (auto block : blocksObj) {
+		delete block;
 	}
-	for (auto& pair : enemies)
-	{
-		delete pair.second;
-	}
-	enemies.clear();
+	blocksObj.clear();
+	for (auto e : enemiesObj)
+		delete e;
+	enemiesObj.clear();
 }
 
 void LevelScene::init()
 {
 	initShaders();
+	//sound
+	SoundManager::instance().setMusicVolume(64);
+	SoundManager::instance().playMusic("level", -1);
 
 	//level
 	map = TileMap::createTileMap("levels/levelMatrix.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	CollisionManager::instance().init(map);
 	player = &Player::instance();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	player->setPosition(glm::vec2((INIT_PLAYER_X_TILES)*map->getTileSize(), (INIT_PLAYER_Y_TILES)*map->getTileSize()));
 	player->setTileMap(map);
-
+	updateCamera();
 	initZoneEnemyTree();
 	initZoneEnemyBug();
-
+	
+	for (auto block : map->getBlocksPos()) {
+		Block* b = new Block();
+		//cout << block.pos.x << " " << block.pos.y << "\n";
+		b->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, block.type);
+		b->setPosition(glm::ivec2(block.pos.x * map->getTileSize(), block.pos.y * map->getTileSize()));
+		b->setTileMap(map);
+		blocksObj.push_back(b);
+	}
+	CollisionManager::instance().sceneInit(cam,blocksObj, enemiesObj);
+	
 	//background
 	bgMap = TileMap::createTileMap("levels/bgTileMap.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 
 	bgTexture.loadFromFile("images/portada.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	bgQuad = Sprite::createSprite(glm::vec2(map->getMapSize() * map->getTileSize()), glm::vec2(1.f, 1.f), &bgTexture, &texProgram);
-	
-	std::map<int, std::vector<glm::ivec2>> blocksPosByType = map->getBlocksPos();
+	glm::vec2 bgSize =map->getMapSize() * map->getTileSize();
+	bgQuad = Sprite::createSprite(bgSize, glm::vec2(1.f, 1.f), &bgTexture, &texProgram);
 
-	for (const auto& blockType : blocksPosByType)
-	{
-		for (const auto& blockPos : blockType.second) {
-			Block* block = new Block();
-			block->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, blockType.first);
-			block->setPosition(glm::vec2((blockPos.x) * map->getTileSize(), (blockPos.y) * map->getTileSize()));
-			block->setTileMap(map);
-
-			auto it = blocksByType.find(blockType.first);
-			if (it == blocksByType.end()) {
-				std::vector<Block*> auxItem = { block };  // Initialize vector with the item
-				blocksByType.emplace(blockType.first, auxItem);
-			}
-			else {
-				it->second.push_back(block);
-			}
-		}
-	}
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH), float(SCREEN_HEIGHT), 0.f);
 	currentTime = 0.0f;
 	gameUI.init();
+	//211ms
 }
 
 void LevelScene::initZoneEnemyTree()
 {
-	EnemyType enemyTree = EnemyType::Tree;
+	vector<ZoneEnemy> zones;
 	Zone limit = { 4.0f * map->getTileSize(), 22.0f * map->getTileSize(), 0, 0 };
 	glm::ivec2 initPos = glm::ivec2(20.0f, 7.0f);
-	InitEnemy zone1 = {1, enemyTree, limit, initPos, true };
+	ZoneEnemy zone1 = {limit, initPos, true };
+	zones.push_back(zone1);
 
 	limit = { 26.0f * map->getTileSize(), 38.0f * map->getTileSize(), 0, 0 };
 	initPos = glm::ivec2(37.0f, 6.0f);
-	InitEnemy zone2 = { 2, enemyTree, limit, initPos, true };
+	ZoneEnemy zone2 = {limit, initPos, true };
+	zones.push_back(zone2);
 
 	limit = { 39.0f * map->getTileSize(), 46.0f * map->getTileSize(), 0, 0 };
 	initPos = glm::ivec2(45.0f, 7.0f);
-	InitEnemy zone3 = { 3, enemyTree, limit, initPos, true };
+	ZoneEnemy zone3 = {limit, initPos, true };
+	zones.push_back(zone3);
 
 	limit = { 54.0f * map->getTileSize(), 66.0f * map->getTileSize(), 0, 0 };
 	initPos = glm::ivec2(65.0f, 6.0f);
-	InitEnemy zone4 = { 4, enemyTree, limit, initPos, true };
-	
-	enemyZones.push_back(zone1);
-	enemyZones.push_back(zone2);
-	enemyZones.push_back(zone3);
-	enemyZones.push_back(zone4);
+	ZoneEnemy zone4 = {limit, initPos, true };
+	zones.push_back(zone4);
+
+	for (auto zone : zones) {
+		EnemyTree* enemy = new EnemyTree();
+		enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone);
+		enemy->setPosition(glm::ivec2(zone.initPos * map->getTileSize()));
+		enemy->setTileMap(map);
+		enemiesObj.push_back(enemy);
+
+	}
 }
 void LevelScene::initZoneEnemyBug()
 {
-	EnemyType enemyBug = EnemyType::Bug;
+	vector<ZoneEnemy> zones;
 
 	Zone limit = { 34.0f * map->getTileSize(), 46.0f * map->getTileSize(), 17, 20 };
 	glm::ivec2 initPos = glm::ivec2(35.0f, 17.0f);
-	InitEnemy zoneBug1 = { 10, enemyBug, limit, initPos, false };
+	ZoneEnemy zoneBug1 = { limit, initPos, false };
+	zones.push_back(zoneBug1);
 
 	limit = { 76.0f * map->getTileSize(), 89.0f * map->getTileSize(), 20, 20 };
 	initPos = glm::ivec2(88.0f, 20.0f);
-	InitEnemy zoneBug2 = { 20, enemyBug, limit, initPos, false };
+	ZoneEnemy zoneBug2 = { limit, initPos, false };
+	zones.push_back(zoneBug2);
 
 	limit = { 69.0f * map->getTileSize(), 81.0f * map->getTileSize(), 31, 31 };
 	initPos = glm::ivec2(80.0f, 31.0f);
-	InitEnemy zoneBug3 = { 30, enemyBug, limit, initPos, false };
+	ZoneEnemy zoneBug3 = { limit, initPos, false };
+	zones.push_back(zoneBug3);
 
 	limit = { 26.0f * map->getTileSize(), 37.0f * map->getTileSize(), 32, 32 };
 	initPos = glm::ivec2(26.0f, 32.0f);
-	InitEnemy zoneBug4 = { 40, enemyBug, limit, initPos, false };
+	ZoneEnemy zoneBug4 = { limit, initPos, false };
+	zones.push_back(zoneBug4);
 
 	limit = { 14.0f * map->getTileSize(), 24.0f * map->getTileSize(), 30, 32 };
 	initPos = glm::ivec2(14.0f, 30.0f);
-	InitEnemy zoneBug5 = { 50, enemyBug, limit, initPos, false };
+	ZoneEnemy zoneBug5 = { limit, initPos, false };
+	zones.push_back(zoneBug5);
 
-	enemyZones.push_back(zoneBug1);
-	enemyZones.push_back(zoneBug2);
-	enemyZones.push_back(zoneBug3);
-	enemyZones.push_back(zoneBug4);
-	enemyZones.push_back(zoneBug5);
+	for (auto zone : zones) {
+		EnemyBug* enemy = new EnemyBug();
+		enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone);
+		enemy->setPosition(glm::ivec2(zone.initPos * map->getTileSize()));
+		enemy->setTileMap(map);
+		enemiesObj.push_back(enemy);
+
+	}
 }
 
 void LevelScene::update(int deltaTime)
 {
-	insideEnemyTreeZone(player->getPosition());
-	
-	for (const auto& enemy : enemies) {
-		EnemyBug* enemyBug = dynamic_cast<EnemyBug*>(enemy.second);
-		if (enemyBug)
-			enemyBug->update(deltaTime, player->getPosition());
-		else
-			enemy.second->update(deltaTime);
-	}
-	
 
 	player->update(deltaTime);
-	/*
-	therefore i need posPlayer, sizePlayer, isAttacking, posEnemy, sizeEnemy
-	// if collision (posPlayer, sizePlayer,posEnemy, sizeEnemy)
-	//		if isAttacking ==> enemy die
-	//		else		   ==> player "die"; --star;
-	*/
 
 	updateCamera();
+	
+	
+	CollisionManager::instance().update(deltaTime, cam);
+
 	gameUI.update(deltaTime);
 }
 
@@ -186,22 +180,21 @@ void LevelScene::render()
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 
 	//background
+	
 	bgTexture.use();
 	bgQuad->render();
 	bgMap->render();
-
+	
 	//level
 	map->render();
 	player->render();
-	for (const auto& enemy : enemies) {
+	for (const auto& enemy : CollisionManager::instance().enemies) {
 		enemy.second->render();
 	}
 
-	for (const auto& blockTypes : blocksByType)
+	for (const auto& block : CollisionManager::instance().blocks)
 	{
-		for (auto block : blockTypes.second) {
-			block->render();
-		}
+		block.second->render();
 	}
 	gameUI.render();
 }
@@ -228,54 +221,15 @@ void LevelScene::updateCamera()
 	if (cameraPosition.y < 0) cameraPosition.y = 0;
 	if (cameraPosition.x > maxCameraX) cameraPosition.x = maxCameraX;
 	if (cameraPosition.y > maxCameraY) cameraPosition.y = maxCameraY;
+	cam = { cameraPosition.x, cameraPosition.x + zoomScreenWidth, 
+		cameraPosition.y + zoomScreenHeight, cameraPosition.y };
 
 	// Update projection matrix to account for camera movement
-	projection = glm::ortho(cameraPosition.x, cameraPosition.x + zoomScreenWidth,
-		cameraPosition.y + zoomScreenHeight, cameraPosition.y);
-}
+	projection = glm::ortho(cam.left, cam.right,
+		cam.bottom, cam.top);
 
+	cam = { cam.left - 50, cam.right + 50, cam.bottom + 50, cam.top - 50 };
 
-void LevelScene::insideEnemyTreeZone(glm::ivec2& posPlayer)
-{
-	for (const auto& enemyZone : enemyZones) {
-		if (enemyZone.limit.max_y< posPlayer.y+ 50+SCREEN_HEIGHT/2  && enemyZone.limit.min_y> posPlayer.y - 50 - SCREEN_HEIGHT / 2
-			&& enemyZone.limit.max_x > posPlayer.x && posPlayer.x >= enemyZone.limit.min_x)
-		{
-			if (enemies.find(enemyZone.id) == enemies.end()) {
-				Enemy* enemy;
-				bool right = posPlayer.x > enemyZone.initPos.x * map->getTileSize();
-				if (enemyZone.enemyType == EnemyType::Tree)
-				{
-					enemy = new EnemyTree();
-				}
-				else
-				{
-					enemy = new EnemyBug();
-				}
-				ZoneEnemy initParams = { enemyZone.limit, enemyZone.initPos, !right };
-				enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, initParams);
-				enemy->setPosition(glm::vec2(enemyZone.initPos * map->getTileSize()));
-				enemy->setTileMap(map);
-				enemies.insert(std::pair<int, Enemy*>(enemyZone.id, enemy));
-				cout << "INSERTING \n";
-				cout << "Enemy x " << enemy->getEnemyPos().x << " y " << enemy->getEnemyPos().y << "\n";
-				cout << "ZoneLimit x " << enemyZone.limit.min_x << "  max: " << enemyZone.limit.max_x << "\n";
-				cout << "player x " << posPlayer.x << " y " << posPlayer.y << "\n";
-				debug = enemyZone;
-			}
-		}
-		else {
-			auto it = enemies.find(enemyZone.id);
-			if (it != enemies.end())
-			{
-				cout << "DELETING \n";
-				cout << "Enemy x " << it->second->getEnemyPos().x << " y " << it->second->getEnemyPos().y << "\n";
-				cout << "ZoneLimit x " << enemyZone.limit.min_x << "  max: " << enemyZone.limit.max_x << "\n";
-				cout << "player x " << posPlayer.x << " y " << posPlayer.y << "\n";
-				enemies.erase(enemyZone.id);
-			}
-		}
-	}
 }
 
 

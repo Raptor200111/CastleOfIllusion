@@ -1,14 +1,17 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "Game.h"
+#include "SoundManager.h"
 
 void Game::init()
 {
 	bPlay = true;
 	currentState = MENU;
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+	SoundManager::instance().init();
+	menuScene.init();
+	levelScene.init();
 	currentScene = &menuScene;
-	currentScene->init();
 }
 
 bool Game::update(int deltaTime)
@@ -31,7 +34,6 @@ void Game::keyPressed(int key)
 	}
 	else if (currentScene == &menuScene && key == GLFW_KEY_Z) {
 		currentScene = &levelScene;
-		currentScene->init();
 	}
 	keys[key] = true;
 }
