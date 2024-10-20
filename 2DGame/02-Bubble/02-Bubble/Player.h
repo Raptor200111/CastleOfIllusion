@@ -7,6 +7,7 @@
 #include "Sprite.h"
 #include "TileMap.h"
 #include "Game.h"
+#include "ParticleEfect.h"
 
 // Player is basically a Sprite that represents the player. As such it has
 // all properties it needs to track its movement, jumping, and collisions.
@@ -26,6 +27,7 @@ public:
 
 		return P;
 	}
+
 	void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram);
 	void update(int deltaTime);
 	void render();
@@ -46,12 +48,12 @@ private:
 	Sprite *sprite;
 	TileMap *map;
 	float velocity;
-
 	PlayerStates oldState, newState;
+	//ParticleEfect particleEfect;
 
 	void leftMove();
 	void rightMove();
-	void jump(int v);
+	void jump(int speed);
 	void setSize(glm::ivec2 newSize);
 };
 

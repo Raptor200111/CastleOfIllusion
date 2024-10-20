@@ -8,7 +8,6 @@
 #define STANDART_SIZE glm::ivec2(24, 32)
 #define DODGE_SIZE glm::ivec2(24, 32)
 
-
 void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
 	bClimbing = false;
@@ -20,6 +19,11 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	posPlayer = glm::ivec2(0, 0);
 	sizePlayer = glm::ivec2(24, 32);
 	offset = glm::ivec2(4, 8);
+	
+	glm::vec2 vec2Array[] = {glm::vec2(0.066f * 2, 0.f), glm::vec2(0.066f * 3, 0.f), glm::vec2(0.066f * 4, 0.f), glm::vec2(0.066f * 5, 0.f), glm::vec2(0.066f * 6, 0.f), glm::vec2(0.066f * 7, 0.f), glm::vec2(0.066f * 8, 0.f)};
+	
+	
+	//particleEfect.init(tileMapPos, posPlayer, sizeSprite, shaderProgram, "images/Mickey_Mouse.png", 8, glm::vec2(0.066, 0.098), vec2Array);
 
 	spritesheet.loadFromFile("images/Mickey_Mouse.png", TEXTURE_PIXEL_FORMAT_RGBA);	
 	sprite = Sprite::createSprite(sizeSprite, glm::vec2(0.066, 0.098), &spritesheet, &shaderProgram);
@@ -93,6 +97,10 @@ void Player::update(int deltaTime)
 	else
 		newState = oldState;
 
+	if (Game::instance().getKey(GLFW_KEY_M))
+	{
+		//particleEfect.play(posPlayer - glm::ivec2(-32, 0));
+	}
 		
 
 	if (oldState == PlayerStates::BUTT_FALL) {
@@ -343,9 +351,9 @@ void Player::rightMove()
 	}
 }
 
-void Player::jump(int v)
+void Player::jump(int speed)
 {
-	velocity = v;
+	velocity = speed;
 }
 
 void Player::setSize(glm::ivec2 newSize)

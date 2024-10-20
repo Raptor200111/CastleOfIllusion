@@ -1,7 +1,7 @@
 #include "ParticleEfect.h"
 
 
-void ParticleEfect::init(const glm::ivec2& tileMapPos, glm::ivec2& pos, glm::ivec2& siz, ShaderProgram& shaderProgram, string& file, int frameRate, glm::vec2& weirdSize, glm::vec2* framesArray)
+void ParticleEfect::init(const glm::ivec2& tileMapPos, glm::ivec2& pos, glm::ivec2& siz, ShaderProgram& shaderProgram, string file, int frameRate, glm::vec2 weirdSize, glm::vec2* framesArray)
 {
 	tileMapDispl = tileMapPos;
 	position = pos;
@@ -28,7 +28,8 @@ void ParticleEfect::update(int deltaTime)
 
 void ParticleEfect::render()
 {
-	sprite->render();
+	if (sprite->getPlayingNow())
+		sprite->render();
 }
 
 void ParticleEfect::setTileMap(TileMap* tileMap)
@@ -40,4 +41,10 @@ void ParticleEfect::setPosition(const glm::vec2& pos)
 {
 	position = pos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
+}
+
+void ParticleEfect::play(const glm::vec2& pos)
+{
+	setPosition(pos);
+	sprite->playOnce();
 }

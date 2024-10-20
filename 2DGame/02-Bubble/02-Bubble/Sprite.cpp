@@ -34,11 +34,13 @@ Sprite::Sprite(const glm::vec2 &quadSize, const glm::vec2 &sizeInSpritesheet, Te
 	position = glm::vec2(0.f);
 	size = quadSize;
 	left = false;
+	playingOnce = false;
+	playingNow = false;
 }
 
 void Sprite::update(int deltaTime)
 {
-	if(currentAnimation >= 0)
+	if(playingNow)
 	{
 		timeAnimation += deltaTime;
 		while(timeAnimation > animations[currentAnimation].millisecsPerKeyframe)
@@ -47,6 +49,11 @@ void Sprite::update(int deltaTime)
 			currentKeyframe = (currentKeyframe + 1) % animations[currentAnimation].keyframeDispl.size();
 		}
 		texCoordDispl = animations[currentAnimation].keyframeDispl[currentKeyframe];
+		if (playingOnce && (currentKeyframe == (animations[currentAnimation].keyframeDispl.size() - 1)))
+		{
+			playingOnce = false;
+			playingNow = false;
+		}
 	}
 }
 
@@ -95,13 +102,16 @@ void Sprite::addKeyframe(int animId, const glm::vec2 &displacement)
 
 void Sprite::changeAnimation(int animId)
 {
-	if(animId < int(animations.size()))
+	if (animId < int(animations.size()))
 	{
+		playingNow = true;
 		currentAnimation = animId;
 		currentKeyframe = 0;
 		timeAnimation = 0.f;
 		texCoordDispl = animations[animId].keyframeDispl[0];
 	}
+	else
+		playingNow = false;
 }
 
 //Added
@@ -167,6 +177,33 @@ void Sprite::updateVertexData(const glm::vec2& quadSize, const glm::vec2& sizeIn
 
 }
 
+void Sprite::setPlayingOnce(bool playingOnce)
+{
+	this->playingOnce = playingOnce;
+}
+
+bool Sprite::getPlayingNow()
+{
+	return playingNow;
+}
+
+void Sprite::play()
+{
+	if (currentAnimation >= 0)
+		playingNow = true;
+}
+
+void Sprite::stop()
+{
+	playingNow = false;
+}
+
+void Sprite::playOnce()
+{
+	playingOnce = true;
+	play();
+}
+
 int Sprite::animation() const
 {
 	return currentAnimation;
@@ -180,3 +217,4 @@ void Sprite::setPosition(const glm::vec2 &pos)
 void Sprite::setLeft(bool left) {
 	this->left = left;
 }
+
