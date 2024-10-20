@@ -26,11 +26,17 @@ enum CollisionType
 
 enum VColType
 {
-	No,
+	NoVcol,
 	Down,
 	Up,
 };
 
+enum HColType
+{
+	NoHcol,
+	Left,
+	Right,
+};
 struct BlockObj
 {
 	int type;

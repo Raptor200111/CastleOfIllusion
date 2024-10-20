@@ -18,7 +18,6 @@ public:
 	void update(int deltaTime, const glm::ivec2& posPlayer);
 	void render() override;
 
-
 private:
 
 	int attackDistance = 3*16;//5*mapTileSize

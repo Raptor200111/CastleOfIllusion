@@ -8,7 +8,7 @@
 void EnemyTree::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, const ZoneEnemy& initParams)
 {
 	velocity = 0.f;
-	initPos = tileMapPos;
+	tileMapDispl = tileMapPos;
 	this->left = initParams.left;
 	this->initParams = initParams;
 	enemyTreeState = WALK_RIGHT;
@@ -43,9 +43,21 @@ void EnemyTree::update(int deltaTime)
 	if (position.x < initParams.limit.min_x || initParams.limit.max_x < position.x) {
 		position = initParams.initPos* map->getTileSize();
 	}
+
 	velocity += GRAVITY;
 	position.y += int(velocity);
-
+	for (auto block : CollisionManager::instance().blocks)
+	{
+		if (CollisionManager::instance().checkCollisionBlockVertical(this, block.second) == Down) {
+			position.y = block.second->getPosition().y - sizeObject.y;
+			velocity = 0.f;
+		}
+		if (CollisionManager::instance().checkCollisionBlockHorizontal(this, block.second) != NoHcol) {
+			position = initParams.initPos;
+			left = initParams.left;
+			moveHorizontal(left, WALK_SPEED);
+		}	
+	}
 	if (CollisionManager::instance().checkCollisionVertical(this) == Tile)
 	{
 		velocity = 0.f;
@@ -56,8 +68,8 @@ void EnemyTree::update(int deltaTime)
 		sprite->changeAnimation(enemyTreeState);
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }
+
 void EnemyTree::render()
 {
 	sprite->render();
 }
-

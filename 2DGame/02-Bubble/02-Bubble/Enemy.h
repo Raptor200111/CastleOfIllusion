@@ -18,8 +18,9 @@ public:
 
     void moveHorizontal(bool left, int walk_speed);
 
+    glm::ivec2 getInitPos() { return initParams.initPos; }
+
 protected:
-    glm::ivec2 initPos;
     float velocity;
     bool left;
     ZoneEnemy initParams;
