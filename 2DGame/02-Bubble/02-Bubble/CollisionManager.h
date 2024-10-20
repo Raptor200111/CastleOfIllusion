@@ -21,7 +21,7 @@ public:
 	void sceneInit(Cam camera, const std::vector<Block*>& blocksObj, const vector<Enemy*>& enemiesObj);
 	bool checkCollisionObject(Entity* objectA, Entity* objectB);
 	VColType checkCollisionBlockVertical(Entity* objectA, Entity* objectB);
-	bool checkCollisionBlockHorizontal(Entity* objectA, Entity* objectB);
+	HColType checkCollisionBlockHorizontal(Entity* objectA, Entity* objectB);
 	CollisionType checkCollisionHorizontal(Entity* entity);
 	CollisionType checkCollisionVertical(Entity* entity);
 

@@ -68,42 +68,49 @@ VColType CollisionManager::checkCollisionBlockVertical(Entity* objectA, Entity* 
 	glm::ivec2 pos2 = objectB->getPosition();
 	glm::ivec2 size2 = pos2 + objectB->getSize();
 
-	// Check only the vertical (y-axis) overlap
-	if (size1.y < pos2.y || size2.y < pos1.y) {
-		return No; // No vertical overlap
+	if (size1.x <= pos2.x || pos1.x >= size2.x || size1.y <= pos2.y || pos1.y >= size2.y)
+		return NoVcol;
+
+	// From here we know there is a collision, now we check the direction of the horizontal collision
+
+	// Check if the player's bottom side is colliding with the block's top side
+	if (size1.y > pos2.y && pos1.y < pos2.y) {
+		return Down; 
 	}
 
-	// Now check if Entity A se unde en block
-	if (size1.y > pos2.y) {
-		int posY = objectB->getPosition().y - objectA->getSize().y;
-		objectA->setPositionY(posY);
-		return Down;
-	}
-
-	// Else, check if Entity A cabeza incrustada en Block
-	else if (pos1.y < size2.y) {
-		objectA->setPositionY(objectB->getPosition().y + objectB->getSize().y);
+	// Check if the player's top side is colliding with the block's bottom side
+	if (pos1.y < size2.y && size1.y > size2.y) {
 		return Up;
 	}
 
-	// No deberia llegar aki
-	return No;
+	return NoVcol;
+
 }
 
-bool CollisionManager::checkCollisionBlockHorizontal(Entity* objectA, Entity* objectB)
+HColType CollisionManager::checkCollisionBlockHorizontal(Entity* objectA, Entity* objectB)
 {
 	glm::ivec2 pos1 = objectA->getPosition();
 	glm::ivec2 size1 = pos1 + objectA->getSize(); // Bottom-right corner of objectA (x1, y1)
 	glm::ivec2 pos2 = objectB->getPosition();
 	glm::ivec2 size2 = pos2 + objectB->getSize(); // Bottom-right corner of objectB (x2, y2)
 
-	// Check only the horizontal (x-axis) overlap
-	if (size1.x < pos2.x || size2.x < pos1.x) {
-		return false; // No horizontal overlap
+	// If there is no overlap in either x or y axis, return no horizontal collision
+	if (size1.x <= pos2.x || pos1.x >= size2.x || size1.y <= pos2.y || pos1.y >= size2.y)
+		return NoHcol;
+
+	// From here we know there is a collision, now we check the direction of the horizontal collision
+
+	// Check if the player's right side is colliding with the block's left side
+	if (size1.x > pos2.x && pos1.x < pos2.x) {
+		return Right;  // Player's right side collides with block's left side
 	}
 
-	// There is a horizontal overlap (ignore y-axis)
-	return true;
+	// Check if the player's left side is colliding with the block's right side
+	if (pos1.x < size2.x && size1.x > size2.x) {
+		return Left;   // Player's left side collides with block's right side
+	}
+
+	return NoHcol;
 }
 
 
@@ -217,12 +224,14 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 
 void CollisionManager::insideScreenObj(Cam cam)
 {
-	/*
+	
 	for (auto& enemyObj : enemiesObj)
 	{
+		glm::ivec2 posEnemyId = enemyObj->getInitPos();
 		glm::ivec2 posEnemy = enemyObj->getPosition();
-		string idEnemy = std::to_string(posEnemy.x) + " " + std::to_string(posEnemy.y);
-		if (insideScreen(posEnemy, cam))
+		glm::ivec2 posEnemyToCompare = glm::ivec2(posEnemyId.x * tileSize, posEnemyId.y * tileSize);
+		string idEnemy = std::to_string(posEnemyId.x) + " " + std::to_string(posEnemyId.y);
+		if (insideScreen(posEnemyToCompare, cam))
 		{
 			if (enemies.find(idEnemy) == enemies.end())
 			{
@@ -234,13 +243,12 @@ void CollisionManager::insideScreenObj(Cam cam)
 			/*
 			cout << posEnemy.x << " " << posEnemy.y << "\n";
 			cout << cam.left << " " << cam.right << " " << cam.bottom << "  " << cam.top << "\n";
-			*
+			*/
 			if (enemies.find(idEnemy) != enemies.end()) {
 				enemies.erase(idEnemy);
 			}
 		}
 	}
-	*/
 	for (auto& blockObj : blocksObj)
 	{
 		glm::ivec2 posBlock = blockObj->getPosition();
@@ -274,39 +282,27 @@ bool CollisionManager::insideScreen(glm::ivec2 pos, Cam cam)
 }
 
 // Implementation of the callback function
-void CollisionManager::update(int deltaTime, Cam camera) {
+void CollisionManager::update(int deltaTime, Cam camera)
+{
 	// Update enemies
 	insideScreenObj(camera);
 
-	for (auto& it = enemies.begin(); it != enemies.end(); ) {
+	for (auto& it = enemies.begin(); it != enemies.end(); ++it) {
 		EnemyBug* enemyBug = dynamic_cast<EnemyBug*>(it->second);
 		if (enemyBug)
 			enemyBug->update(deltaTime, Player::instance().getPosition());
 		else
 			it->second->update(deltaTime);
 
-		/*
-		if (Player::instance().checkCollisionEnemy(it->second)) {
-			it = enemies.erase(it);
-		}
-		else {
-			
-		}
-		*/
-		++it;
-
-	}
-	for (auto it = blocks.begin(); it != blocks.end(); ) {
-		PosSizeObject posSizeEnemy = { it->second->getPosition(), it->second->getSize() };
-		/*
-		if (Player::instance().checkCollisionBlock(posSizeEnemy)) {
-			it = blocks.erase(it);
+		if (checkCollisionObject(&Player::instance(), it->second)) {
+			//cout << "EnemyCollision\n";
+			/*
+			if (Player::instance().killEnemy()) {
+				it = enemies.erase(it);
+				break;
+			}*/
 
 		}
-		else {
-			
-		}
-		*/
-		++it;
 	}
+
 }

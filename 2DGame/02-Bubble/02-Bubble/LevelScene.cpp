@@ -110,7 +110,7 @@ void LevelScene::initZoneEnemyTree()
 	for (auto zone : zones) {
 		EnemyTree* enemy = new EnemyTree();
 		enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone);
-		enemy->setPosition(glm::ivec2(zone.initPos * map->getTileSize()));
+		enemy->setPosition(glm::ivec2(zone.initPos.x * map->getTileSize(), zone.initPos.y * map->getTileSize()));
 		enemy->setTileMap(map);
 		enemiesObj.push_back(enemy);
 
@@ -148,7 +148,7 @@ void LevelScene::initZoneEnemyBug()
 	for (auto zone : zones) {
 		EnemyBug* enemy = new EnemyBug();
 		enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone);
-		enemy->setPosition(glm::ivec2(zone.initPos * map->getTileSize()));
+		enemy->setPosition(glm::ivec2(zone.initPos.x * map->getTileSize(), zone.initPos.y * map->getTileSize()));
 		enemy->setTileMap(map);
 		enemiesObj.push_back(enemy);
 

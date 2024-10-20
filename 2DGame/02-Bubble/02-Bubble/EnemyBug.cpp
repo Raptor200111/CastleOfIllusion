@@ -6,7 +6,7 @@
 void EnemyBug::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, const ZoneEnemy& initParams)
 {
 	velocity = 0.f;
-	initPos = tileMapPos;
+	tileMapDispl = tileMapPos;
 	this->left = initParams.left;
 	this->initParams = initParams;
 	attackSpeed = WALK_SPEED;
@@ -71,6 +71,18 @@ void EnemyBug::update(int deltaTime, const glm::ivec2& posPlayer)
 
 	velocity += GRAVITY;
 	position.y += int(velocity);
+
+	for (auto block : CollisionManager::instance().blocks)
+	{
+		if (CollisionManager::instance().checkCollisionBlockVertical(this, block.second) == Down) {
+			position.y = block.second->getPosition().y - sizeObject.y;
+			velocity = 0.f;
+		}
+		if (CollisionManager::instance().checkCollisionBlockHorizontal(this, block.second) != NoHcol) {
+			left = !left;
+			moveHorizontal(left, WALK_SPEED);
+		}
+	}
 
 	if (CollisionManager::instance().checkCollisionVertical(this) == Tile)
 	{
