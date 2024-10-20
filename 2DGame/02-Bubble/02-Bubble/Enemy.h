@@ -22,6 +22,5 @@ public:
 
 protected:
     float velocity;
-    bool left;
     ZoneEnemy initParams;
 };

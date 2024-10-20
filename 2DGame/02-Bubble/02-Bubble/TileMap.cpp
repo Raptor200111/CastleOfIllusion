@@ -78,7 +78,6 @@ bool TileMap::loadLevel(const string &levelFile)
 	tileTexSize = glm::vec2(1.f / tilesheetSize.x, 1.f / tilesheetSize.y);
 	
 	map = new int[mapSize.x * mapSize.y];
-	blockMap = new int[mapSize.x * mapSize.y];
 	for(int j=0; j<mapSize.y; j++)
 	{
 		for(int i=0; i<mapSize.x; i++)
@@ -87,20 +86,17 @@ bool TileMap::loadLevel(const string &levelFile)
 			if (tile == ' ')
 			{
 				map[j * mapSize.x + i] = 0;
-				blockMap[j * mapSize.x + i] = 0;
 			}
 			else if (tile <= '9' && tile >= '0')
 			{
 				int blockType = tile - int('0');
 				BlockObj block= { blockType, glm::ivec2(i, j) };
 				blocksObj.push_back(block);
-				blockMap[j * mapSize.x + i] = blockType;
 				map[j * mapSize.x + i] = 0;
 			}
 			else
 			{
 				map[j * mapSize.x + i] = tile - 96;// int('a');
-				blockMap[j * mapSize.x + i] = 0;
 			}
 		}
 		fin.get(tile);
@@ -161,21 +157,6 @@ void TileMap::prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program)
 	posLocation = program.bindVertexAttribute("position", 2, 4*sizeof(float), 0);
 	texCoordLocation = program.bindVertexAttribute("texCoord", 2, 4*sizeof(float), (void *)(2*sizeof(float)));
 }
-
-
-void TileMap::eraseBlock(const glm::ivec2& pos)
-{
-	int x = pos.x / tileSize;
-	int y = pos.y / tileSize;
-	blockMap[y * mapSize.x + x] = 0;
-}
-void TileMap::addBlock(const glm::ivec2& pos)
-{
-	int x = pos.x / tileSize;
-	int y = pos.y / tileSize;
-	blockMap[y * mapSize.x + x] = 1;
-}
-
 
 bool TileMap::collisionStairs(const glm::ivec2& pos, const glm::ivec2& size) const
 {

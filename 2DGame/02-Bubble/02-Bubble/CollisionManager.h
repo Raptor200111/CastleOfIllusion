@@ -34,6 +34,8 @@ public:
 	std::map<string, Enemy*> enemies;
 	std::map<string, Block*> blocks;
 private:
+	int correctRampPos(int tileX, int tileY, int sizeY, glm::ivec2 pos, bool left);
+
 	vector<Enemy*> enemiesObj;
 	vector<Block*> blocksObj;
 	int tileSize;

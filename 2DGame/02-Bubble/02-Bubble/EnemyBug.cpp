@@ -35,14 +35,18 @@ void EnemyBug::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgra
 	sprite->setAnimationSpeed(BUG_DIE, 8);
 	sprite->addKeyframeDiffSize(BUG_DIE, glm::vec2(1.f-sizeSpriteSheet.x, 0.f), sizeObject, sizeSpriteSheet);
 
-	sprite->changeAnimationDiffSize(enemyBugState);
+	glm::vec2 aux = sprite->changeAnimationDiffSize(enemyBugState);
+	if (aux != glm::vec2(0.f))
+		sizeObject = aux;
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 
 }
 void EnemyBug::update(int deltaTime, const glm::ivec2& posPlayer)
 {
-	sprite->updateDiffSize(deltaTime);
+	glm::vec2 aux = sprite->updateDiffSize(deltaTime);
+	if (aux != glm::vec2(0.f))
+		sizeObject = aux;
 	int min_x_attack = position.x - attackDistance;
 	int max_x_attack = position.x + attackDistance;
 
@@ -89,8 +93,11 @@ void EnemyBug::update(int deltaTime, const glm::ivec2& posPlayer)
 		velocity = 0.f;
 	}
 	sprite->setLeft(left);
-	if (sprite->animation() != enemyBugState)
-		sprite->changeAnimationDiffSize(enemyBugState);
+	if (sprite->animation() != enemyBugState) {
+		glm::vec2 aux = sprite->changeAnimationDiffSize(enemyBugState);
+		if (aux != glm::vec2(0.f))
+			sizeObject = aux;
+	}
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }
 void EnemyBug::render()

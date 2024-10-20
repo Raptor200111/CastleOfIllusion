@@ -36,11 +36,6 @@ public:
 
 
 	int getTileType(int x, int y) { return map[y * mapSize.x + x]; }
-	int getBlockType(int x, int y) { return blockMap[y * mapSize.x + x]; }
-
-
-	void eraseBlock(const glm::ivec2& pos);
-	void addBlock(const glm::ivec2& pos);
 
 	//to erase
 	bool collisionStairs(const glm::ivec2& pos, const glm::ivec2& size) const;
@@ -60,7 +55,6 @@ private:
 	Texture tilesheet;
 	glm::vec2 tileTexSize;
 	int *map;
-	int* blockMap;
 	std::vector<BlockObj> blocksObj;
 
 };

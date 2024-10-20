@@ -29,7 +29,6 @@ public:
 	void render();
 
 private:
-	bool left;
 	bool bClimbing, bTouchBlock, bJumping;
 	float velocity;
 
