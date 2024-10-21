@@ -27,28 +27,32 @@ void BossDragon::setBodyAnimations(ShaderProgram& shaderProgram)
 	bodySpritesheet.loadFromFile("images/dragonBody.png", TEXTURE_PIXEL_FORMAT_RGBA);
 
 	glm::vec2 totalSizeSpriteSheet = glm::vec2(225.f, 110.f);
-	sizeObject = glm::ivec2(67.f, 110.f);
-	glm::vec2 sizeSpriteSheet = glm::vec2(sizeObject.x / totalSizeSpriteSheet.x, sizeObject.y / totalSizeSpriteSheet.y);
-	bodySprite = Sprite::createSprite(sizeObject, sizeSpriteSheet, &bodySpritesheet, &shaderProgram);
+	sizeObjectBody = glm::ivec2(75.f, 110.f);
+	glm::vec2 sizeSpriteSheet = glm::vec2(sizeObjectBody.x / totalSizeSpriteSheet.x, 1);
+	bodySprite = Sprite::createSprite(sizeObjectBody, sizeSpriteSheet, &bodySpritesheet, &shaderProgram);
 	bodySprite->setNumberAnimations(1);
 
 
 	bodySprite->setAnimationSpeed(BOSS_BODY_IDLE, 8);
-	sizeObject = glm::vec2(67.f, 110.f);
-	sizeSpriteSheet = glm::vec2(sizeObject.x / totalSizeSpriteSheet.x, sizeObject.y / totalSizeSpriteSheet.y);
-	bodySprite->addKeyframeDiffSize(BOSS_IDLE, glm::vec2(0.f, 0.f), sizeObject, sizeSpriteSheet);
+	/*
+	sizeObjectBody = glm::vec2(77.f, 110.f);
+	sizeSpriteSheet = glm::vec2(sizeObjectBody.x / totalSizeSpriteSheet.x, 1);
+	bodySprite->addKeyframeDiffSize(BOSS_IDLE, glm::vec2(0.f, 0.f), sizeObjectBody, sizeSpriteSheet);
 
-	sizeObject = glm::vec2(63.f, 110.f);
-	sizeSpriteSheet = glm::vec2(sizeObject.x / totalSizeSpriteSheet.x, sizeObject.y / totalSizeSpriteSheet.y);
-	glm::vec2 frame = glm::vec2(76.f / sizeSpriteSheet.x, 0.f);
-	bodySprite->addKeyframeDiffSize(BOSS_IDLE, frame, sizeObject, sizeSpriteSheet);
-
-	sizeObject = glm::vec2(77.f, 110.f);
-	sizeSpriteSheet = glm::vec2(sizeObject.x / totalSizeSpriteSheet.x, sizeObject.y / totalSizeSpriteSheet.y);
-	frame = glm::vec2(148.f / sizeSpriteSheet.x, 0.f);
-	bodySprite->addKeyframeDiffSize(BOSS_IDLE, frame, sizeObject, sizeSpriteSheet);
-
-	bodySprite->changeAnimationDiffSize(bossBodyState);
+	*/
+	sizeObjectBody = glm::vec2(64.f, 110.f);
+	sizeSpriteSheet = glm::vec2(sizeObjectBody.x / totalSizeSpriteSheet.x, 1);
+	glm::vec2 frame = glm::vec2(85.f / totalSizeSpriteSheet.x, 0.f);
+	bodySprite->addKeyframeDiffSize(BOSS_IDLE, frame, sizeObjectBody, sizeSpriteSheet);
+	/*
+	sizeObjectBody = glm::vec2(67.f, 110.f);
+	sizeSpriteSheet = glm::vec2(sizeObjectBody.x / totalSizeSpriteSheet.x, 1);
+	frame = glm::vec2(158.f / totalSizeSpriteSheet.x, 0.f);
+	bodySprite->addKeyframeDiffSize(BOSS_IDLE, frame, sizeObjectBody, sizeSpriteSheet);
+	*/
+	glm::vec2 aux = bodySprite->changeAnimationDiffSize(bossBodyState);
+	if (aux != glm::vec2(0.f))
+		sizeObjectBody = aux;
 }
 
 void BossDragon::setHeadAnimations(ShaderProgram& shaderProgram)
@@ -64,7 +68,7 @@ void BossDragon::setHeadAnimations(ShaderProgram& shaderProgram)
 	glm::vec2 frame;
 	sprite->setAnimationSpeed(BOSS_IDLE, 8);
 	sprite->addKeyframeDiffSize(BOSS_IDLE, glm::vec2(0.f, 0.f), sizeObject, sizeSpriteSheet);
-	//sprite->addKeyframeDiffSize(BOSS_IDLE, glm::vec2(sizeSpriteSheet.x, 0.f), sizeObject, sizeSpriteSheet);
+	sprite->addKeyframeDiffSize(BOSS_IDLE, glm::vec2(46.f/ totalSizeSpriteSheet.x, 0.f), sizeObject, sizeSpriteSheet);
 
 	glm::vec2 aux = sprite->changeAnimationDiffSize(bossDragonState);
 	if (aux != glm::vec2(0.f))
@@ -81,6 +85,7 @@ void BossDragon::update(int deltaTime, const glm::ivec2& posPlayer)
 	int min_x_attack = position.x - attackDistance;
 	int max_x_attack = position.x + attackDistance;
 
+	/*
 	if (posPlayer.x < min_x_attack || max_x_attack < posPlayer.x) {
 		attackSpeed = WALK_SPEED;
 		//bossDragonState = BOSS_ATTACK;
@@ -119,6 +124,7 @@ void BossDragon::update(int deltaTime, const glm::ivec2& posPlayer)
 	{
 		velocity = 0.f;
 	}
+	*/
 	sprite->setLeft(left);
 	bodySprite->setLeft(left);
 	if (sprite->animation() != bossDragonState) {
@@ -126,12 +132,13 @@ void BossDragon::update(int deltaTime, const glm::ivec2& posPlayer)
 		if (aux != glm::vec2(0.f))
 			sizeObject = aux;
 	}
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
-	bodySprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
+	//sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
+	//bodySprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 
 }
 void BossDragon::render()
 {
+	
 	bodySprite->render(); 
 	sprite->render();
 }

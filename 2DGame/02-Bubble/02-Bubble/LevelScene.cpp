@@ -13,7 +13,7 @@
 #define SCREEN_Y 16
 
 #define INIT_PLAYER_X_TILES 2//+35+36// 4+20
-#define INIT_PLAYER_Y_TILES 8//+8+2 //20
+#define INIT_PLAYER_Y_TILES 44//+8+2 //20
 
 LevelScene::LevelScene()
 {
@@ -81,6 +81,14 @@ void LevelScene::init()
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH), float(SCREEN_HEIGHT), 0.f);
 	currentTime = 0.0f;
 	gameUI.init();
+
+
+	Zone limit = { 4.0f * map->getTileSize(), 22.0f * map->getTileSize(), 0, 0 };
+	glm::ivec2 initPos = glm::ivec2(10.0f, 38.0f);
+	ZoneEnemy zone1 = { limit, initPos, false };
+	boss.initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone1);
+	boss.setDragonPosition(glm::ivec2(zone1.initPos.x * map->getTileSize(), zone1.initPos.y * map->getTileSize()));
+	boss.setTileMap(map);
 	//211ms
 }
 
@@ -164,7 +172,7 @@ void LevelScene::update(int deltaTime)
 	
 	
 	CollisionManager::instance().update(deltaTime, cam);
-
+	boss.update(deltaTime, player->getPosition());
 	gameUI.update(deltaTime);
 }
 
@@ -196,6 +204,8 @@ void LevelScene::render()
 	{
 		block.second->render();
 	}
+
+	boss.render();
 	gameUI.render();
 }
 
@@ -215,7 +225,7 @@ void LevelScene::updateCamera()
 
 	// Constrain the camera within the map boundaries
 	float maxCameraX = map->getMapSize().x * map->getTileSize() - zoomScreenWidth;
-	float maxCameraY = map->getMapSize().y * map->getTileSize() - zoomScreenHeight;
+	float maxCameraY = map->getMapSize().y * map->getTileSize() - zoomScreenHeight+50;
 
 	if (cameraPosition.x < 0) cameraPosition.x = 0;
 	if (cameraPosition.y < 0) cameraPosition.y = 0;
