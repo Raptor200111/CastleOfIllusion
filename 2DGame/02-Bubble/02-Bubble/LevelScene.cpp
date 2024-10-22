@@ -90,6 +90,7 @@ void LevelScene::init()
 	boss.setBossPosition(glm::ivec2(zone1.initPos.x * map->getTileSize(), zone1.initPos.y * map->getTileSize()));
 	boss.setTileMap(map);
 	//211ms
+
 }
 
 void LevelScene::initZoneEnemyTree()
@@ -207,6 +208,7 @@ void LevelScene::render()
 
 	boss.render();
 	gameUI.render();
+	
 }
 
 void LevelScene::updateCamera()

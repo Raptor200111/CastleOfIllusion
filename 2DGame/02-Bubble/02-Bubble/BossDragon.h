@@ -35,7 +35,7 @@ private:
 	void setBodyAnimations(ShaderProgram& shaderProgram);
 	void setHeadAnimations(ShaderProgram& shaderProgram);
 	void changeHeadState(BossDragonStates objective);
-	void shoot();
+	void shoot(int deltaTime);
 	int state= 0;                       // Boss's state
 
 	int timeSinceLastStateChange = 0;    // Time accumulator for state changes during idle
@@ -51,10 +51,13 @@ private:
 	Texture bodySpritesheet;
 	Sprite* bodySprite;
 
-
-	glm::ivec2 sizeObjBody;
-	glm::ivec2 posBody;
+	
+	glm::ivec2 sizeObjBody, sizeObjHead;
+	glm::ivec2 posBody, posHead;
+	glm::ivec2 positionStartShoot;
 	vector<BossShoot*> shoots;
+	vector<vector<float>> angleShoots;
+	int indexAngleShoot = 0;
 	BossDragonStates bossDragonState = BossDragonStates::BOSS_LEFT;
 	BossBodyStates bossBodyState = BossBodyStates::BOSS_BODY_IDLE;
 	vector<BossDragonStates> states;
