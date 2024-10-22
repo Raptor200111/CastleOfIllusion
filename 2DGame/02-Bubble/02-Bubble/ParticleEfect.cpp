@@ -1,5 +1,5 @@
 #include "ParticleEfect.h"
-
+#include "Game.h"
 
 void ParticleEfect::init(const glm::ivec2& tileMapPos, glm::ivec2& pos, glm::ivec2& siz, ShaderProgram& shaderProgram, string file, int frameRate, glm::vec2 weirdSize, glm::vec2* framesArray)
 {

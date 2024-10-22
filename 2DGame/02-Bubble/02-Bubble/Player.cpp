@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Game.h"
 
 #define FALL_STEP 2
 #define WALK_SPEED 2
@@ -23,8 +24,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	
 	glm::vec2 vec2Array[] = {glm::vec2(0.066f * 2, 0.f), glm::vec2(0.066f * 3, 0.f), glm::vec2(0.066f * 4, 0.f), glm::vec2(0.066f * 5, 0.f), glm::vec2(0.066f * 6, 0.f), glm::vec2(0.066f * 7, 0.f), glm::vec2(0.066f * 8, 0.f)};
 	
-	
-	//particleEfect.init(tileMapPos, posPlayer, sizeSprite, shaderProgram, "images/Mickey_Mouse.png", 8, glm::vec2(0.066, 0.098), vec2Array);
+	particleEfect.init(tileMapPos, getPosition(), sizeSprite, shaderProgram, "images/Mickey_Mouse.png", 8, glm::vec2(0.066, 0.098), vec2Array);
 
 	spritesheet.loadFromFile("images/Mickey_Mouse.png", TEXTURE_PIXEL_FORMAT_RGBA);	
 	sprite = Sprite::createSprite(sizeSprite, glm::vec2(0.066, 0.098), &spritesheet, &shaderProgram);
@@ -97,7 +97,7 @@ void Player::update(int deltaTime)
 
 	if (Game::instance().getKey(GLFW_KEY_M))
 	{
-		//particleEfect.play(posPlayer - glm::ivec2(-32, 0));
+		particleEfect.play(getPosition() - glm::ivec2(-32, 0));
 	}
 
 	if (bJumping)

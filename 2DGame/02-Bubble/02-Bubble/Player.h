@@ -6,7 +6,6 @@
 #include <GL/glew.h>
 #include "Sprite.h"
 #include "TileMap.h"
-#include "Game.h"
 #include "ParticleEfect.h"
 #include "Entity.h"
 #include "CollisionManager.h"
@@ -38,7 +37,7 @@ private:
 	bool bClimbing, bTouchBlock, bJumping;
 	float velocity;
 	PlayerStates oldState, newState;
-	//ParticleEfect particleEfect;
+	ParticleEfect particleEfect;
 
 	void leftMove();
 	void rightMove();

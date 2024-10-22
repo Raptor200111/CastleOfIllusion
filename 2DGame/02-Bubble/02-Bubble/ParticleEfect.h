@@ -6,7 +6,6 @@
 #include <GL/glew.h>
 #include "Sprite.h"
 #include "TileMap.h"
-#include "Game.h"
 
 class ParticleEfect
 {
