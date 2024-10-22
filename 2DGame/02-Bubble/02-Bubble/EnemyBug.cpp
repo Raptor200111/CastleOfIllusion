@@ -78,16 +78,17 @@ void EnemyBug::update(int deltaTime)
 	velocity += GRAVITY;
 	position.y += int(velocity);
 
-	for (auto block : CollisionManager::instance().blocks)
+	Block* b = CollisionManager::instance().collisionEntityBlockV(this);
+	if (b != NULL)
 	{
-		if (CollisionManager::instance().checkCollisionBlockVertical(this, block.second) == Down) {
-			position.y = block.second->getPosition().y - sizeObject.y;
-			velocity = 0.f;
-		}
-		if (CollisionManager::instance().checkCollisionBlockHorizontal(this, block.second) != NoHcol) {
-			left = !left;
-			moveHorizontal(left, WALK_SPEED);
-		}
+		position.y = b->getPosition().y - sizeObject.y;
+		velocity = 0.f;
+	}
+	b = CollisionManager::instance().collisionEntityBlockH(this);
+	if (b != NULL)
+	{
+		left = !left;
+		moveHorizontal(left, WALK_SPEED);
 	}
 
 	if (CollisionManager::instance().checkCollisionVertical(this) == Tile)
