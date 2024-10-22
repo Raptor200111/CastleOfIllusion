@@ -32,12 +32,12 @@ public:
 	std::map<string, Enemy*> enemies;
 	std::map<string, Block*> blocks;
 private:
-	int correctRampPos(int tileX, int tileY, int sizeY, glm::ivec2 pos, bool left);
 	VColType checkCollisionBlockVertical(Entity* objectA, Entity* objectB);
 	HColType checkCollisionBlockHorizontal(Entity* objectA, Entity* objectB);
 	void insideScreenObj(Cam cam);
 	bool insideScreen(glm::ivec2 pos, Cam cam);
 
+	bool correctRamp(Entity* entity);
 	vector<Enemy*> enemiesObj;
 	vector<Block*> blocksObj;
 	int tileSize;
