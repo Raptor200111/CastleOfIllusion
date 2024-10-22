@@ -322,3 +322,21 @@ void CollisionManager::update(int deltaTime, Cam camera)
 	}
 
 }
+
+Block* CollisionManager::collisionPlayerBlockH() {
+	for (auto& it = blocks.begin(); it != blocks.end(); ++it) {
+		if (checkCollisionBlockHorizontal(&Player::instance(), it->second)) {
+			return it->second;
+			break;
+		}
+	}
+}
+
+Block* CollisionManager::collisionPlayerBlockV() {
+	for (auto& it = blocks.begin(); it != blocks.end(); ++it) {
+		if (checkCollisionBlockVertical(&Player::instance(), it->second)) {
+			return it->second;
+			break;
+		}
+	}
+}
