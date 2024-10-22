@@ -322,3 +322,22 @@ void CollisionManager::update(int deltaTime, Cam camera)
 	}
 
 }
+
+Block* CollisionManager::collisionEntityBlockH(Entity* entity) {
+	for (auto& it = blocks.begin(); it != blocks.end(); ++it) {
+		if (checkCollisionBlockHorizontal(entity, it->second)) {
+			return it->second;
+			break;
+		}
+	}
+}
+
+Block* CollisionManager::collisionEntityBlockV(Entity* entity) {
+	for (auto& it = blocks.begin(); it != blocks.end(); ++it) {
+		if (checkCollisionBlockVertical(entity, it->second)) {
+			return it->second;
+			break;
+		}
+	}
+}
+
