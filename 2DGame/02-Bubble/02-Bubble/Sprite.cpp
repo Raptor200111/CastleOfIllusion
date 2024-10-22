@@ -2,7 +2,7 @@
 #include <GL/gl.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Sprite.h"
-
+#include <iostream>
 
 Sprite *Sprite::createSprite(const glm::vec2 &quadSize, const glm::vec2 &sizeInSpritesheet, Texture *spritesheet, ShaderProgram *program)
 {
@@ -115,8 +115,9 @@ void Sprite::changeAnimation(int animId)
 }
 
 //Added
-void Sprite::updateDiffSize(int deltaTime)
+glm::vec2 Sprite::updateDiffSize(int deltaTime)
 {
+	glm::vec2 quadsize = glm::vec2(0.f);
 	if (currentAnimation >= 0)
 	{
 		timeAnimation += deltaTime;
@@ -130,7 +131,9 @@ void Sprite::updateDiffSize(int deltaTime)
 
 		}
 		texCoordDispl = animations[currentAnimation].keyframeDispl[currentKeyframe];
+		quadsize = animations[currentAnimation].quadSizes[currentKeyframe];
 	}
+	return quadsize;
 }
 
 void Sprite::addKeyframeDiffSize(int animId, const glm::vec2& displacement, const glm::vec2& quadSize, const glm::vec2& sizeInSpritesheet)
@@ -146,8 +149,9 @@ void Sprite::addKeyframeDiffSize(int animId, const glm::vec2& displacement, cons
 	}
 }
 
-void Sprite::changeAnimationDiffSize(int animId)
+glm::vec2 Sprite::changeAnimationDiffSize(int animId)
 {
+	glm::vec2 quadsize = glm::vec2(0.f);
 	if (animId < int(animations.size()))
 	{
 		currentAnimation = animId;
@@ -159,7 +163,9 @@ void Sprite::changeAnimationDiffSize(int animId)
 		currentQuadSize = animations[animId].quadSizes[0];  
 		currentSpriteSheetSize = animations[animId].spriteSheetSizes[0];
 		updateVertexData(currentQuadSize, currentSpriteSheetSize);
+		quadsize = currentQuadSize;
 	}
+	return quadsize;
 }
 
 void Sprite::updateVertexData(const glm::vec2& quadSize, const glm::vec2& sizeInSpritesheet)

@@ -12,12 +12,13 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
 	bClimbing = false;
 	bTouchBlock = false;
+	bJumping = false;
 	velocity = 0.f;
 	oldState = newState = IDLE;
 
 	sizeSprite = glm::ivec2(32, 48);
-	posPlayer = glm::ivec2(0, 0);
-	sizePlayer = glm::ivec2(24, 32);
+	position = glm::ivec2(0, 0);
+	sizeObject = glm::ivec2(24, 32);
 	offset = glm::ivec2(4, 8);
 	
 	glm::vec2 vec2Array[] = {glm::vec2(0.066f * 2, 0.f), glm::vec2(0.066f * 3, 0.f), glm::vec2(0.066f * 4, 0.f), glm::vec2(0.066f * 5, 0.f), glm::vec2(0.066f * 6, 0.f), glm::vec2(0.066f * 7, 0.f), glm::vec2(0.066f * 8, 0.f)};
@@ -70,8 +71,8 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
 	sprite->changeAnimation(IDLE);
 	tileMapDispl = tileMapPos;
-	//setPosition(posPlayer);
-	//sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
+	//setPosition(position);
+	//sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }
 
 void Player::update(int deltaTime)
@@ -81,18 +82,15 @@ void Player::update(int deltaTime)
 	bool newbTouchBlock = false; //Why?
 
 	velocity += GRAVITY;
-	posPlayer.y += int(velocity) + 1;
+	position.y += int(velocity) + 1;
 
-	if (map->collisionStairs(posPlayer, sizePlayer))
+	if (Game::instance().getKey(GLFW_KEY_A))
 	{
-		newState = CLIMB_IDLE;
-		velocity = 0;
+		leftMove();
 	}
-	else if (oldState == CLIMB_IDLE || oldState == CLIMB)
+	else if (Game::instance().getKey(GLFW_KEY_D))
 	{
-		oldState = IDLE;
-		newState = IDLE;
-		sprite->changeAnimation(IDLE);
+		rightMove();
 	}
 	else
 		newState = oldState;
@@ -101,164 +99,32 @@ void Player::update(int deltaTime)
 	{
 		//particleEfect.play(posPlayer - glm::ivec2(-32, 0));
 	}
-		
 
-	if (oldState == PlayerStates::BUTT_FALL) {
-		if (Game::instance().getKey(GLFW_KEY_A)) {
-			leftMove();
-		}
-		if (Game::instance().getKey(GLFW_KEY_D)) {
-			rightMove();
-		}
-		if (map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y))
-		{
-			velocity = 0;
-		}
-		if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
-		{
-			velocity = 0;
-			newState = IDLE;
-		}
-		posPlayer.y += 1;
-		if (map->collisionBlockDown(posPlayer, sizePlayer, &posPlayer.y))
-		{
-			jump(BUTT_JUMP_SPEED);
-			newState = BUTT_JUMP;
-			//cout << "Butt With Block" << endl;
-		}
-	}
-	if (oldState == PlayerStates::BUTT_JUMP) {
-		if (Game::instance().getKey(GLFW_KEY_A)) {
-			leftMove();
-		}
-		if (Game::instance().getKey(GLFW_KEY_D)) {
-			rightMove();
-		}
-		if (map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y))
-		{
-			velocity = 0;
-		}
-		if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y) || map->collisionBlockDown(posPlayer, sizePlayer, &posPlayer.y))
-		{
-			velocity = 0;
-			newState = IDLE;
-		}
-	}
-	
-	if (oldState == PlayerStates::CLIMB_IDLE || oldState == PlayerStates::CLIMB) {
-		posPlayer.y -= int(velocity) + 1;
-		velocity = 0;
-		if (Game::instance().getKey(GLFW_KEY_A)) {
-			leftMove();
-		}
-		if (Game::instance().getKey(GLFW_KEY_D)) {
-			rightMove();
-		}
-		if (Game::instance().getKey(GLFW_KEY_W)) {
-			posPlayer.y -= WALK_SPEED;
-			newState = CLIMB;
-		}
-		if (Game::instance().getKey(GLFW_KEY_S)) {
-			posPlayer.y += WALK_SPEED;
-			newState = CLIMB;
-		}
-	}
-	if (oldState == PlayerStates::DODGE) {
-		if (!Game::instance().getKey(GLFW_KEY_S)) {
-			setSize(STANDART_SIZE);
-			newState = IDLE;
-		}
-		if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
-		{
-			velocity = 0;
-		}
-	}
-	if (oldState == PlayerStates::WALK) {
-		if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
-		{
-			velocity = 0;
-			if (Game::instance().getKey(GLFW_KEY_W)) {
-				newState = JUMP;
-				jump(JUMP_SPEED);
-			}
-		}
-		else
-			newState = FALL;
-		bool movement = false;
-		if (Game::instance().getKey(GLFW_KEY_A)) {
-			leftMove();
-			movement = true;
-		}
-		if (Game::instance().getKey(GLFW_KEY_D)) {
-			rightMove();
-			movement = true;
-		}
-		if (!movement) {
-			newState = IDLE;
-		}
-		if (Game::instance().getKey(GLFW_KEY_S)) {
-			newState = DODGE;
-			setSize(DODGE_SIZE);
-		}
-	}
-	if (oldState == PlayerStates::IDLE) {
-		if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
-		{
-			velocity = 0;
-			if (Game::instance().getKey(GLFW_KEY_W)) {
-				newState = JUMP;
-				jump(JUMP_SPEED);
-			}
-		}
-		else
-			newState = FALL;
-
-		if (Game::instance().getKey(GLFW_KEY_A)) {
-			newState = WALK;
-			leftMove();
-		}
-		if (Game::instance().getKey(GLFW_KEY_D)) {
-			newState = WALK;
-			rightMove();
-		}
-		if (Game::instance().getKey(GLFW_KEY_S)) {
-			newState = DODGE;
-			setSize(DODGE_SIZE);
-		}
-	}
-	if (oldState == PlayerStates::FALL) {
-		if (Game::instance().getKey(GLFW_KEY_A)) {
-			leftMove();
-		}
-		if (Game::instance().getKey(GLFW_KEY_D)) {
-			rightMove();
-		}
+	if (bJumping)
+	{
 		if (Game::instance().getKey(GLFW_KEY_S)) {
 			newState = BUTT_FALL;
 		}
-		if (map->collisionMoveDown(posPlayer, sizePlayer, &posPlayer.y))
+		if (velocity > 0 || CollisionManager::instance().checkCollisionVertical(this) == CollisionType::Tile)
 		{
 			velocity = 0;
-			newState = IDLE;
 		}
 	}
-	if (oldState == PlayerStates::JUMP) {
-		if (Game::instance().getKey(GLFW_KEY_A)) {
-			leftMove();
-		}
-		if (Game::instance().getKey(GLFW_KEY_D)) {
-			rightMove();
-		}
-		if (Game::instance().getKey(GLFW_KEY_S)) {
-			newState = BUTT_FALL;
-		}
-		if (velocity > 0 || map->collisionMoveUp(posPlayer, sizePlayer, &posPlayer.y))
+	else
+	{
+		if (CollisionManager::instance().checkCollisionVertical(this) == CollisionType::Tile)
 		{
-			velocity = 0;
-			newState = FALL;
+			if (Game::instance().getKey(GLFW_KEY_W))
+			{
+				bJumping = false;
+				newState = IDLE;
+				jump(JUMP_SPEED);
+			}
+			else {
+				velocity = 0;
+			}
 		}
 	}
-
 	if (newbTouchBlock != bTouchBlock) { //From here to...
 		if (newbTouchBlock) {
 			cout << "Tocado\n";
@@ -275,9 +141,10 @@ void Player::update(int deltaTime)
 		oldState = newState;
 		sprite->changeAnimation(newState);
 	}
-		
-	//sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
-	setPosition(posPlayer);
+	sprite->setLeft(left);
+
+	//sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
+	setPosition(position);
 }
 
 void Player::render()
@@ -285,70 +152,39 @@ void Player::render()
 	sprite->render();
 }
 
-void Player::setTileMap(TileMap* tileMap)
-{
-	map = tileMap;
-}
-
-void Player::setPosition(const glm::vec2& pos)
-{
-	posPlayer = pos;
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x - offset.x), float(tileMapDispl.y + posPlayer.y - offset.y)));
-}
-
-glm::ivec2 Player::getPosition()
-{
-	return posPlayer;
-}
-
-glm::ivec2 Player::getSize()
-{
-	return sizePlayer;
-}
-
-bool Player::checkCollisionObject(const PosSizeObject& object)
-{
-	glm::ivec2 pos1 = posPlayer;
-	glm::ivec2 size1 = pos1 + sizePlayer;
-	glm::ivec2 pos2 = object.posObject;
-	glm::ivec2 size2 = pos2 + object.sizeObject;
-
-	if (size1.x < pos2.x || size2.x < pos1.x) return false;
-	if (size1.y < pos2.y || size2.y < pos1.y) return false;
-	return true;
-}
-
 void Player::leftMove()
 {
-	left = true;
-	sprite->setLeft(left);
-	
-	posPlayer.x -= WALK_SPEED;
-	if (map->collisionBlockLeft(posPlayer, sizePlayer))
+	left = true;	
+	position.x -= WALK_SPEED;
+	/*if (map->collisionBlockLeft(posPlayer, sizePlayer))
 	{
 		//newbTouchBlock = true; // WHY ?
-		posPlayer.x += WALK_SPEED;
+		position.x += WALK_SPEED;
 	}
-	else if (map->collisionMoveLeft(posPlayer, sizePlayer))
+	else*/
+	if (CollisionManager::instance().checkCollisionHorizontal(this) == CollisionType::Tile)
 	{
-		posPlayer.x += WALK_SPEED;
+		position.x += WALK_SPEED;
 	}
 }
 
 void Player::rightMove()
 {
+	
 	left = false;
-	sprite->setLeft(left);
-	posPlayer.x += WALK_SPEED;
-	if (map->collisionBlockRight(posPlayer, sizePlayer))
+	position.x += WALK_SPEED;
+	/*
+	if (map->collisionBlockRight(position, sizeObject))
 	{
 		//newbTouchBlock = true;
-		posPlayer.x -= WALK_SPEED;
+		position.x -= WALK_SPEED;
 	}
-	else if (map->collisionMoveRight(posPlayer, sizePlayer))
+	else*/
+	if (CollisionManager::instance().checkCollisionHorizontal(this) == CollisionType::Tile)
 	{
-		posPlayer.x -= WALK_SPEED;
+		position.x -= WALK_SPEED;
 	}
+	
 }
 
 void Player::jump(int speed)
@@ -358,6 +194,5 @@ void Player::jump(int speed)
 
 void Player::setSize(glm::ivec2 newSize)
 {
-	sizePlayer = newSize;
+	sizeObject = newSize;
 }
-

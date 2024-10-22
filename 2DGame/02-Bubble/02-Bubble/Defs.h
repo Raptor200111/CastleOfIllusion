@@ -17,6 +17,33 @@ enum EnemyType
 	Bug,
 };
 
+enum CollisionType
+{
+	None,
+	Tile,
+	Stairs,
+};
+
+enum VColType
+{
+	NoVcol,
+	Down,
+	Up,
+};
+
+enum HColType
+{
+	NoHcol,
+	Left,
+	Right,
+};
+struct BlockObj
+{
+	int type;
+	glm::ivec2 pos;
+
+};
+
 struct ZoneEnemy
 {
 	Zone limit;
@@ -24,9 +51,12 @@ struct ZoneEnemy
 	bool left;
 };
 
+struct Cam {
+	float left, right, bottom, top;
+};
+
 struct InitEnemy
 {
-	int id;
 	EnemyType enemyType;
 	Zone limit;
 	glm::ivec2 initPos;

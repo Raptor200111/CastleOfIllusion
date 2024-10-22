@@ -7,8 +7,9 @@
 
 void Block::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, int numBlock)
 {
+	sizeObject = glm::ivec2(16, 16);
 	spritesheet.loadFromFile("images/blocks.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sprite = Sprite::createSprite(sizeBlock, glm::vec2(1 / 6.f, 0.5), &spritesheet, &shaderProgram);
+	sprite = Sprite::createSprite(sizeObject, glm::vec2(1 / 6.f, 0.5), &spritesheet, &shaderProgram);
 
 	sprite->setNumberAnimations(1);
 
@@ -24,7 +25,7 @@ void Block::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, int
 
 	sprite->changeAnimation(0);
 	tileMapDispl = tileMapPos;
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posBlock.x), float(tileMapDispl.y + posBlock.y)));
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 
 }
 void Block::update(int deltaTime)
@@ -35,20 +36,4 @@ void Block::update(int deltaTime)
 void Block::render()
 {
 	sprite->render();
-}
-
-void Block::setTileMap(TileMap* tileMap)
-{
-	map = tileMap;
-}
-
-void Block::setPosition(const glm::vec2& pos)
-{
-	posBlock = pos;
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posBlock.x), float(tileMapDispl.y + posBlock.y)));
-}
-
-glm::ivec2 Block::getBlockPos() const
-{
-	return posBlock;
 }

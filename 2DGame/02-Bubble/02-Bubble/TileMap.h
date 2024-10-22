@@ -7,7 +7,7 @@
 #include "ShaderProgram.h"
 #include <map>
 #include <vector>
-
+#include "Defs.h"
 // Class Tilemap is capable of loading a tile map from a text file in a very
 // simple format (see level01.txt for an example). With this information
 // it builds a single VBO that contains all tiles. As a result the render
@@ -32,17 +32,13 @@ public:
 	int getTileSize() const { return tileSize; }
 	glm::ivec2 getMapSize() const { return mapSize; }
 
-	std::map<int, std::vector<glm::ivec2>> getBlocksPos() const { return blocksPosByType; }
+	std::vector<BlockObj> getBlocksPos() const { return blocksObj; }
 
-	bool collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const;
-	bool collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const;
-	bool collisionMoveDown(const glm::ivec2& pos, const glm::ivec2& size, int* posY) const;
 
-	bool collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, int* posY) const;
+	int getTileType(int x, int y) { return map[y * mapSize.x + x]; }
+
+	//to erase
 	bool collisionStairs(const glm::ivec2& pos, const glm::ivec2& size) const;
-	bool collisionBlockLeft(const glm::ivec2& pos, const glm::ivec2& size) const;
-	bool collisionBlockRight(const glm::ivec2& pos, const glm::ivec2& size) const;
-	bool collisionBlockDown(const glm::ivec2& pos, const glm::ivec2& size, int* posY) const;
 	
 private:
 	bool loadLevel(const string &levelFile);
@@ -59,8 +55,7 @@ private:
 	Texture tilesheet;
 	glm::vec2 tileTexSize;
 	int *map;
-	int* blockMap;
-	std::map<int, std::vector<glm::ivec2>> blocksPosByType;
+	std::vector<BlockObj> blocksObj;
 
 };
 

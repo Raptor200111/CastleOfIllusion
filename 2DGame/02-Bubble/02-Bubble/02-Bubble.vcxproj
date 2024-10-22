@@ -12,10 +12,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimKeyframes.h" />
+    <ClInclude Include="BossDragon.h" />
+    <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="Defs.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyBug.h" />
     <ClInclude Include="EnemyTree.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Block.h" />
     <ClInclude Include="GameUI.h" />
@@ -36,9 +39,12 @@
     <ClInclude Include="TileMap.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BossDragon.cpp" />
+    <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyBug.cpp" />
     <ClCompile Include="EnemyTree.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="GameUI.cpp" />
