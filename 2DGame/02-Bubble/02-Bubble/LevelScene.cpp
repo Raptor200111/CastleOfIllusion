@@ -84,10 +84,11 @@ void LevelScene::init()
 
 
 	Zone limit = { 4.0f * map->getTileSize(), 22.0f * map->getTileSize(), 0, 0 };
-	glm::ivec2 initPos = glm::ivec2(10.0f, 38.0f);
-	ZoneEnemy zone1 = { limit, initPos, false };
+	glm::ivec2 finalPosBoss = glm::ivec2(10.0f * map->getTileSize(), 38.0f * map->getTileSize());
+	ZoneEnemy zone1 = { limit, finalPosBoss, false };
 	boss.initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone1);
-	boss.setBossPosition(glm::ivec2(zone1.initPos.x * map->getTileSize(), zone1.initPos.y * map->getTileSize()));
+	glm::ivec2 initPos = glm::ivec2(finalPosBoss.x, finalPosBoss.y - 110);
+	boss.setBossPosition(initPos);
 	boss.setTileMap(map);
 	//211ms
 
@@ -173,6 +174,11 @@ void LevelScene::update(int deltaTime)
 	
 	
 	CollisionManager::instance().update(deltaTime, cam);
+
+	//change condition to when player appears
+	if (gameUI.getTime() < 398)
+		boss.setActive();
+
 	boss.update(deltaTime);
 	gameUI.update(deltaTime);
 }
