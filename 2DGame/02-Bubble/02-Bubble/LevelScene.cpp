@@ -13,7 +13,7 @@
 #define SCREEN_Y 16
 
 #define INIT_PLAYER_X_TILES 2//+35+36// 4+20
-#define INIT_PLAYER_Y_TILES 44//+8+2 //20
+#define INIT_PLAYER_Y_TILES 8//44+2 //20
 
 LevelScene::LevelScene()
 {
@@ -58,8 +58,8 @@ void LevelScene::init()
 	player->setPosition(glm::vec2((INIT_PLAYER_X_TILES)*map->getTileSize(), (INIT_PLAYER_Y_TILES)*map->getTileSize()));
 	player->setTileMap(map);
 	updateCamera();
-	initZoneEnemyTree();
-	initZoneEnemyBug();
+	//initZoneEnemyTree();
+	//initZoneEnemyBug();
 	
 	for (auto block : map->getBlocksPos()) {
 		Block* b = new Block();
