@@ -57,7 +57,7 @@ private:
 	glm::ivec2 positionStartShoot;
 	vector<BossShoot*> shoots;
 	vector<vector<float>> angleShoots;
-	int indexAngleShoot = 0;
+	int indexAngleShoot, indexQuadrantShoot = 0;
 	int MaxShoots = 3;
 	BossDragonStates bossDragonState = BossDragonStates::BOSS_LEFT;
 	BossBodyStates bossBodyState = BossBodyStates::BOSS_BODY_IDLE;

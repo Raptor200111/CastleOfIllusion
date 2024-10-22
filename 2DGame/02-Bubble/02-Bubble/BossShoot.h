@@ -13,13 +13,14 @@ public:
 	void update(int deltaTime);
 	void render();
 	void setActive() { active = true; }
-	void setAngle(float angle);
+	void setDirection(glm::vec2 direction);
+
 private:
 	void setShootAnimations(ShaderProgram& shaderProgram);
 	
-	glm::vec2 velocity;   
+	glm::vec2 endDirection;   
 	bool active = false;
-	float speed = 500.0f;
+	float speed = 100.0f;
 
 	int maxTime = 160*100;
 	int elapsedTime = 0;
