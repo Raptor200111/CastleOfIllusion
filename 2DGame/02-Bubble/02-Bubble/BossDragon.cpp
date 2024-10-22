@@ -39,7 +39,7 @@ void BossDragon::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProg
 	setHeadAnimations(shaderProgram);
 	posBody = glm::ivec2(0, 0);
 	setHeadSpritePos();
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < MaxShoots; ++i) {
 		BossShoot* s = new BossShoot();
 		s->init(tileMapDispl, shaderProgram);
 		s->setPosition(posHead);
@@ -152,14 +152,14 @@ void BossDragon::update(int deltaTime)
 		}
 	}
 	// After 160ms, start the shooting phase
-	else if (cycleTime < idleDuration + 3* moveInterval) {
+	else if (cycleTime < idleDuration + MaxShoots* shootInterval) {
 		timeSinceLastShoot += deltaTime;
 
 		// Shoot every moveInterval, up to 3 shoots
-		if (timeSinceLastShoot >= moveInterval && shootCount < 3) {
+		if (timeSinceLastShoot >= shootInterval && shootCount < 3) {
 			shoot(deltaTime);  // Move the player to the right
 			shootCount++;   // Increment move counter
-			timeSinceLastShoot -= moveInterval;  // Reset the timer for the next move
+			timeSinceLastShoot -= shootInterval;  // Reset the timer for the next move
 		}
 	}
 	// Reset cycle
@@ -170,6 +170,9 @@ void BossDragon::update(int deltaTime)
 		timeSinceLastStateChange = 0; // Reset idle state change timer
 		timeSinceLastShoot = 0;       // Reset movement timer
 	}
+
+	for (auto s: shoots)
+		s->update(deltaTime);
 		
 	if (bossDragonState != sprite->animation())
 	{
@@ -186,8 +189,8 @@ void BossDragon::render()
 	
 	bodySprite->render(); 
 	sprite->render();
-	for (int i = 0; i < shootCount; i++)
-		shoots[i]->render();
+	for (auto s : shoots)
+		s->render();
 		
 }
 
@@ -263,6 +266,7 @@ void BossDragon::shoot(int deltaTime)
 	cout << angleDegrees << "\n";
 	if (angleDegrees < 0) angleDegrees += 180;  // Ensure the angle is positive
 	BossDragonStates objective;
+	angleDegrees = 130;
 	if (angleDegrees >= 135 && angleDegrees < 180) {
 		objective = BOSS_LEFT ;
 		indexAngleShoot = 135;
@@ -282,7 +286,4 @@ void BossDragon::shoot(int deltaTime)
 	shoots[shootCount]->setPosition(positionStartShoot);
 	shoots[shootCount]->setAngle(indexAngleShoot + (shootCount*1.3));
 	shoots[shootCount]->setActive();
-
-	for (int i = 0; i < shootCount; i++)
-		shoots[i]->update(deltaTime);
 }

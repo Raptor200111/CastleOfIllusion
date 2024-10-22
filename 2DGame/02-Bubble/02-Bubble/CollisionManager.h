@@ -28,6 +28,7 @@ public:
 	Block* collisionEntityBlockH(Entity* entity);
 	Block* collisionEntityBlockV(Entity* entity);
 
+	bool checkCollisionStairs(Entity* entity);
 	std::map<string, Enemy*> enemies;
 	std::map<string, Block*> blocks;
 private:

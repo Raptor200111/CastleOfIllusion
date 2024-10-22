@@ -1,5 +1,6 @@
 #include "BossShoot.h"
-
+#include <cmath>
+#include <iostream>
 void BossShoot::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
 	velocity = glm::vec2(1.0f);
@@ -14,10 +15,11 @@ void BossShoot::update(int deltaTime) {
 	
 	if (active) {
 		float deltaSeconds = deltaTime / 1000.0f;
-		position += velocity * speed * deltaSeconds;
-
-		elapsedTime += deltaTime;
-		if (elapsedTime >= maxTime)
+		float aux = speed * deltaSeconds;
+		glm::ivec2 add = glm::ivec2(std::ceill(velocity.x * aux), std::ceill(velocity.y * aux));
+		position += add;
+		cout << "Shoot" << position.x << " " << position.y << "\n";
+		if(position.x < 0 || position.x > 96*16 || position.y < 0 || position.y> 736)
 		{
 			elapsedTime = 0;
 			active = false;
@@ -32,7 +34,7 @@ void BossShoot::render() {
 
 void BossShoot::setAngle(float angle)
 {
-	float angleRadians = angle * (3.141592 / 180.0f);
+	float angleRadians = glm::radians(angle);
 	velocity.x = std::cos(angleRadians);
 	velocity.y = std::sin(angleRadians);
 }

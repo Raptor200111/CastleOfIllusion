@@ -44,7 +44,7 @@ private:
 
 	const int idleDuration = 160*10;          // 160ms idle period
 	const int stateChangeInterval = 16 * 10;   // 16ms interval for state change during idle
-	const int moveInterval = 8 * 10;          // 8ms interval for each shoot during shooting phase
+	const int shootInterval = 8 * 15;          // 8ms interval for each shoot during shooting phase
 
 	int shootCount = 0;                   // Count the number of shoots made during the shooting phase
 
@@ -58,6 +58,7 @@ private:
 	vector<BossShoot*> shoots;
 	vector<vector<float>> angleShoots;
 	int indexAngleShoot = 0;
+	int MaxShoots = 3;
 	BossDragonStates bossDragonState = BossDragonStates::BOSS_LEFT;
 	BossBodyStates bossBodyState = BossBodyStates::BOSS_BODY_IDLE;
 	vector<BossDragonStates> states;

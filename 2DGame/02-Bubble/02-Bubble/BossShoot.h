@@ -19,7 +19,7 @@ private:
 	
 	glm::vec2 velocity;   
 	bool active = false;
-	float speed = 10.0f;
+	float speed = 500.0f;
 
 	int maxTime = 160*100;
 	int elapsedTime = 0;
