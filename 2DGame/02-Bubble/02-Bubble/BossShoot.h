@@ -12,9 +12,17 @@ public:
 	void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
 	void update(int deltaTime);
 	void render();
+	void setActive() { active = true; }
+	void setAngle(float angle);
 private:
 	void setShootAnimations(ShaderProgram& shaderProgram);
-	float velocity;
+	
+	glm::vec2 velocity;   
+	bool active = false;
+	float speed = 500.0f;
+
+	int maxTime = 160*100;
+	int elapsedTime = 0;
 	BossShootStates shootState = BossShootStates::BOSS_SHOOT_START;
 };
 

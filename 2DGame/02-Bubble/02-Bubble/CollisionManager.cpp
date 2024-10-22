@@ -128,6 +128,8 @@ CollisionType CollisionManager::checkCollisionHorizontal(Entity* entity)
 	int y1 = (pos.y + size.y - 1) / tileSize;
 	int inc = xRight - xLeft;
 	CollisionType value = None;
+	bool stairs = false;
+	bool tile = false;
 	// Check the tiles around the entity for collisions
 	for (int i = xLeft; i <= xRight; i+=inc) {
 		for (int j = y0; j < y1; ++j) {
@@ -135,17 +137,21 @@ CollisionType CollisionManager::checkCollisionHorizontal(Entity* entity)
 			if (tileType != 0 && tileType != 7 && tileType != 8) {
 				if (tileType == 9)
 				{
-					value = Stairs;
-					return value;
+					stairs = true;
 				}
-				else {
-					value = Tile;
-					return value;
+				if (tileType != 0 && tileType != 9){
+					tile = true;
 				}
 			}
 		}
 	}
-	return value;
+	if (stairs && tile)
+		return TileStairs;
+	else if (stairs)
+		return Stairs;
+	else if (tile)
+		return Tile;
+	return None;
 }
 
 
@@ -162,13 +168,15 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 	int yUp = pos.y / tileSize;						upDown[0] = yUp;
 	int yDown = (pos.y + size.y - 1) / tileSize;	upDown[1] = yDown;
 
+	bool stairs = false;
+	bool tile = false;
 	// Check the tiles around the entity for collisions
 	for (int i = x0; i <= x1; ++i) {
 		for (int j : upDown) {
 			int tileType = tileMap->getTileType(i, j);
 			if (tileType != 0) {
 				if (tileType == 9)
-					return Stairs;
+					stairs = true;
 				
 				if (tileType == 7 || tileType == 8)
 				{
@@ -178,7 +186,7 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 						entity->setPositionY(correctedY);
 						
 					}
-					return Tile;
+					tile = true;
 				}
 				//Down collision
 				else if (j == yDown)
@@ -188,7 +196,7 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 					{
 						int posY = tileSize * j - size.y;
 						entity->setPositionY(posY);
-						return Tile;
+						tile = true;
 					}
 
 				}
@@ -197,11 +205,17 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 				{
 					int posY = tileSize * (j + 1);
 					entity->setPositionY(posY);
-					return Tile;
+					tile = true;
 				}
 			}
 		}
 	}
+	if (tile && stairs)
+		return TileStairs;
+	else if (tile)
+		return Tile;
+	else if (stairs)
+		return Stairs;
 	return None;
 }
 /*
@@ -217,6 +231,7 @@ int CollisionManager::correctRampPos(int tileX, int tileY, int sizeY, glm::ivec2
 	return -1;
 }
 */
+
 
 int CollisionManager::correctRampPos(int tileX, int tileY, int sizeY, glm::ivec2 pos, bool left)
 {

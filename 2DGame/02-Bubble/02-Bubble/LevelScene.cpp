@@ -13,7 +13,7 @@
 #define SCREEN_Y 16
 
 #define INIT_PLAYER_X_TILES 2//+35+36// 4+20
-#define INIT_PLAYER_Y_TILES 8//44//+8+2 //20
+#define INIT_PLAYER_Y_TILES 44//+8+2 //20
 
 LevelScene::LevelScene()
 {
@@ -90,6 +90,7 @@ void LevelScene::init()
 	boss.setBossPosition(glm::ivec2(zone1.initPos.x * map->getTileSize(), zone1.initPos.y * map->getTileSize()));
 	boss.setTileMap(map);
 	//211ms
+
 }
 
 void LevelScene::initZoneEnemyTree()
@@ -207,6 +208,7 @@ void LevelScene::render()
 
 	boss.render();
 	gameUI.render();
+	
 }
 
 void LevelScene::updateCamera()

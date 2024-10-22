@@ -1,13 +1,15 @@
 #include "BossDragon.h"
 #include "CollisionManager.h"
 #include "Player.h"
+#include <iostream>
+
 #define WALK_SPEED 1
 #define GRAVITY 0.5f
 #define MAX_TIME_BW_SHOOTS = 24
 
 BossDragon::BossDragon() {
 	bodySprite =NULL;
-	shoots = vector<BossShoot*>(3);
+	shoots = vector<BossShoot*>();
 }
 BossDragon::~BossDragon()
 {
@@ -28,13 +30,26 @@ void BossDragon::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProg
 	this->left = initParams.left;
 	this->initParams = initParams;
 	states = { BOSS_LEFT, BOSS_LEFT_DOWN, BOSS_DOWN, BOSS_RIGHT_DOWN, BOSS_DOWN, BOSS_LEFT_DOWN };
+	angleShoots = vector<vector<float>> {
+		{0.f, 15.f, 30.f},
+		{45.f, 60.f, 75.f},
+		{90.f, 105.f, 120.f} };
 	setBodyAnimations(shaderProgram);
 	
 	setHeadAnimations(shaderProgram);
-	
+	posBody = glm::ivec2(0, 0);
+	setHeadSpritePos();
+	for (int i = 0; i < MaxShoots; ++i) {
+		BossShoot* s = new BossShoot();
+		s->init(tileMapDispl, shaderProgram);
+		s->setPosition(posHead);
+		s->setTileMap(map);
+		shoots.push_back(s);
+	}
+
 	bodySprite->setPosition(glm::vec2(float(tileMapDispl.x + posBody.x), float(tileMapDispl.y + posBody.y)));
 
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posHead.x), float(tileMapDispl.y + posHead.y)));
 
 }
 
@@ -77,47 +92,47 @@ void BossDragon::setHeadAnimations(ShaderProgram& shaderProgram)
 	spritesheet.loadFromFile("images/dragonHeads.png", TEXTURE_PIXEL_FORMAT_RGBA);
 
 	glm::vec2 totalSizeSpriteSheet = glm::vec2(85.f, 73.f);
-	sizeObject = glm::ivec2(39.f, 32.f);
-	glm::vec2 sizeSpriteSheet = glm::vec2(sizeObject.x / totalSizeSpriteSheet.x, sizeObject.y / totalSizeSpriteSheet.y);
+	sizeObjHead = glm::ivec2(39.f, 32.f);
+	glm::vec2 sizeSpriteSheet = glm::vec2(sizeObjHead.x / totalSizeSpriteSheet.x, sizeObjHead.y / totalSizeSpriteSheet.y);
 	glm::vec2 frame;
-	sprite = Sprite::createSprite(sizeObject, sizeSpriteSheet, &spritesheet, &shaderProgram);
+	sprite = Sprite::createSprite(sizeObjHead, sizeSpriteSheet, &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(5);
 	sprite->setAnimationSpeed(BOSS_IDLE, 8);
 
-	sizeObject = glm::vec2(39.f, 32.f);
+	sizeObjHead = glm::vec2(39.f, 32.f);
 	sprite->setAnimationSpeed(BOSS_LEFT, 8);
-	sprite->addKeyframeDiffSize(BOSS_LEFT, glm::vec2(0.f, 0.f), sizeObject, sizeSpriteSheet);
-	sprite->addKeyframeDiffSize(BOSS_IDLE, glm::vec2(0.f, 0.f), sizeObject, sizeSpriteSheet);
+	sprite->addKeyframeDiffSize(BOSS_LEFT, glm::vec2(0.f, 0.f), sizeObjHead, sizeSpriteSheet);
+	sprite->addKeyframeDiffSize(BOSS_IDLE, glm::vec2(0.f, 0.f), sizeObjHead, sizeSpriteSheet);
 
-	sizeObject = glm::vec2(32.f, 32.f);
-	sizeSpriteSheet = glm::vec2(sizeObject.x / totalSizeSpriteSheet.x, sizeObject.y / totalSizeSpriteSheet.y);
+	sizeObjHead = glm::vec2(32.f, 32.f);
+	sizeSpriteSheet = glm::vec2(sizeObjHead.x / totalSizeSpriteSheet.x, sizeObjHead.y / totalSizeSpriteSheet.y);
 	sprite->setAnimationSpeed(BOSS_LEFT_DOWN, 8);
-	sprite->addKeyframeDiffSize(BOSS_LEFT_DOWN, glm::vec2(53.f/ totalSizeSpriteSheet.x, 0.f), sizeObject, sizeSpriteSheet);
-	sprite->addKeyframeDiffSize(BOSS_IDLE, glm::vec2(53.f / totalSizeSpriteSheet.x, 0.f), sizeObject, sizeSpriteSheet);
+	sprite->addKeyframeDiffSize(BOSS_LEFT_DOWN, glm::vec2(53.f/ totalSizeSpriteSheet.x, 0.f), sizeObjHead, sizeSpriteSheet);
+	sprite->addKeyframeDiffSize(BOSS_IDLE, glm::vec2(53.f / totalSizeSpriteSheet.x, 0.f), sizeObjHead, sizeSpriteSheet);
 
 
-	sizeObject = glm::vec2(32.f, 32.f);
-	sizeSpriteSheet = glm::vec2(sizeObject.x / totalSizeSpriteSheet.x, sizeObject.y / totalSizeSpriteSheet.y);
+	sizeObjHead = glm::vec2(32.f, 32.f);
+	sizeSpriteSheet = glm::vec2(sizeObjHead.x / totalSizeSpriteSheet.x, sizeObjHead.y / totalSizeSpriteSheet.y);
 	sprite->setAnimationSpeed(BOSS_RIGHT_DOWN, 8);
-	sprite->addKeyframeDiffSize(BOSS_RIGHT_DOWN, glm::vec2(15.f / totalSizeSpriteSheet.x, 41.f / totalSizeSpriteSheet.y), sizeObject, sizeSpriteSheet);
-	sprite->addKeyframeDiffSize(BOSS_IDLE, glm::vec2(15.f / totalSizeSpriteSheet.x, 41.f / totalSizeSpriteSheet.y), sizeObject, sizeSpriteSheet);
+	sprite->addKeyframeDiffSize(BOSS_RIGHT_DOWN, glm::vec2(15.f / totalSizeSpriteSheet.x, 41.f / totalSizeSpriteSheet.y), sizeObjHead, sizeSpriteSheet);
+	sprite->addKeyframeDiffSize(BOSS_IDLE, glm::vec2(15.f / totalSizeSpriteSheet.x, 41.f / totalSizeSpriteSheet.y), sizeObjHead, sizeSpriteSheet);
 
-	sizeObject = glm::vec2(16.f, 32.f);
-	sizeSpriteSheet = glm::vec2(sizeObject.x / totalSizeSpriteSheet.x, sizeObject.y / totalSizeSpriteSheet.y);
+	sizeObjHead = glm::vec2(16.f, 32.f);
+	sizeSpriteSheet = glm::vec2(sizeObjHead.x / totalSizeSpriteSheet.x, sizeObjHead.y / totalSizeSpriteSheet.y);
 	sprite->setAnimationSpeed(BOSS_DOWN, 8);
-	sprite->addKeyframeDiffSize(BOSS_DOWN, glm::vec2(62.f / totalSizeSpriteSheet.x, 41.f / totalSizeSpriteSheet.y), sizeObject, sizeSpriteSheet);
-	sprite->addKeyframeDiffSize(BOSS_IDLE, glm::vec2(62.f / totalSizeSpriteSheet.x, 41.f / totalSizeSpriteSheet.y), sizeObject, sizeSpriteSheet);
+	sprite->addKeyframeDiffSize(BOSS_DOWN, glm::vec2(62.f / totalSizeSpriteSheet.x, 41.f / totalSizeSpriteSheet.y), sizeObjHead, sizeSpriteSheet);
+	sprite->addKeyframeDiffSize(BOSS_IDLE, glm::vec2(62.f / totalSizeSpriteSheet.x, 41.f / totalSizeSpriteSheet.y), sizeObjHead, sizeSpriteSheet);
 
 	glm::vec2 aux = sprite->changeAnimationDiffSize(bossDragonState);
 	if (aux != glm::vec2(0.f))
-		sizeObject = aux;
+		sizeObjHead = aux;
 }
 
 void BossDragon::update(int deltaTime)
 {
 	glm::vec2 aux = sprite->updateDiffSize(deltaTime);
 	if (aux != glm::vec2(0.f))
-		sizeObject = aux;
+		sizeObjHead = aux;
 	bodySprite->updateDiffSize(deltaTime);
 
 
@@ -136,18 +151,18 @@ void BossDragon::update(int deltaTime)
 			timeSinceLastStateChange -= stateChangeInterval;  // Reset the timer for state change
 		}
 	}
-	// After 160ms, start the moving phase (next 24 ms)
-	else if (cycleTime < idleDuration + 3* moveInterval) {
+	// After 160ms, start the shooting phase
+	else if (cycleTime < idleDuration + MaxShoots* shootInterval) {
 		timeSinceLastShoot += deltaTime;
 
-		// Move every 8ms, up to 3 moves
-		if (timeSinceLastShoot >= moveInterval && shootCount < 3) {
-			shoot();  // Move the player to the right
+		// Shoot every moveInterval, up to 3 shoots
+		if (timeSinceLastShoot >= shootInterval && shootCount < 3) {
+			shoot(deltaTime);  // Move the player to the right
 			shootCount++;   // Increment move counter
-			timeSinceLastShoot -= moveInterval;  // Reset the timer for the next move
+			timeSinceLastShoot -= shootInterval;  // Reset the timer for the next move
 		}
 	}
-	// Reset cycle after 160ms idle + 24ms moving
+	// Reset cycle
 	else {
 		cycleTime = 0;               // Reset cycle time
 		state = 0;                   // Reset state
@@ -155,12 +170,15 @@ void BossDragon::update(int deltaTime)
 		timeSinceLastStateChange = 0; // Reset idle state change timer
 		timeSinceLastShoot = 0;       // Reset movement timer
 	}
-	
+
+	for (auto s: shoots)
+		s->update(deltaTime);
+		
 	if (bossDragonState != sprite->animation())
 	{
 		glm::vec2 aux = sprite->changeAnimationDiffSize(bossDragonState);
 		if (aux != glm::vec2(0.f))
-			sizeObject = aux;
+			sizeObjHead = aux;
 	}
 	bodySprite->setPosition(glm::vec2(float(tileMapDispl.x + posBody.x), float(tileMapDispl.y + posBody.y)));
 	setHeadSpritePos();
@@ -171,6 +189,9 @@ void BossDragon::render()
 	
 	bodySprite->render(); 
 	sprite->render();
+	for (auto s : shoots)
+		s->render();
+		
 }
 
 void BossDragon::setHeadSpritePos()
@@ -183,23 +204,37 @@ void BossDragon::setHeadSpritePos()
 
 	case BOSS_LEFT:
 		diffPos = glm::ivec2(18-18, y);
+		sizeObject = glm::ivec2(22, 19);
+		positionStartShoot = glm::ivec2(0, 13);
 		break;
 	case BOSS_LEFT_DOWN:
 		diffPos = glm::ivec2(18-11, y);
+		sizeObject = glm::ivec2(15, 24);
+		positionStartShoot = glm::ivec2(3, 20);
 		break;
 	case BOSS_RIGHT_DOWN:
 		diffPos = glm::ivec2(18-3, y);
+		sizeObject = glm::ivec2(15, 24);
+		positionStartShoot = glm::ivec2(21, 21);
 		break;
 
 	case BOSS_DOWN:
 		diffPos = glm::ivec2(18-0, y);
+		sizeObject = glm::ivec2(14, 30);
+		positionStartShoot = glm::ivec2(0, 0);
 		break;
 	default:
 		diffPos = glm::ivec2(0, y);
+		sizeObject = glm::ivec2(22, 19);
+		positionStartShoot = glm::ivec2(0, 13);
 		break;
 	}
-	position = posBody + diffPos;
-	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
+	posHead = posBody + diffPos;
+	position = posHead;
+	positionStartShoot = posHead + positionStartShoot;
+	if (BOSS_RIGHT_DOWN)
+		position.x = 17;
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posHead.x), float(tileMapDispl.y + posHead.y)));
 }
 
 void BossDragon::changeHeadState(BossDragonStates objective)
@@ -223,28 +258,32 @@ void BossDragon::changeHeadState(BossDragonStates objective)
 }
 
 
-void BossDragon::shoot()
+void BossDragon::shoot(int deltaTime)
 {
-	/*
-	shoots[shootCount]->init(tileMapDispl, shader);
-	shoots[shootCount]->setPosition();
-	shoots[shootCount]->setTileMap(map);
-	*/
-	glm::ivec2 direction = Player::instance().getPosition() - position;
-	float angle = atan2(-direction.y, direction.x);  // Invert y-axis since we're interested in the bottom half.
+	glm::ivec2 direction = Player::instance().getPosition() - posHead;
+	float angle = atan2(direction.y, direction.x);  // Invert y-axis since we're interested in the bottom half.
 	float angleDegrees = glm::degrees(angle);
+	cout << angleDegrees << "\n";
 	if (angleDegrees < 0) angleDegrees += 180;  // Ensure the angle is positive
 	BossDragonStates objective;
-	if (angleDegrees >= 0 && angleDegrees < 45) {
+	angleDegrees = 130;
+	if (angleDegrees >= 135 && angleDegrees < 180) {
 		objective = BOSS_LEFT ;
+		indexAngleShoot = 135;
 	}
-	else if (angleDegrees >= 45 && angleDegrees < 90) {
+	else if (angleDegrees >= 90 && angleDegrees < 135) {
 		objective = BOSS_LEFT_DOWN;
+		indexAngleShoot = 90;
 	}
 	else {
-		//if (angleDegrees >= 90 && angleDegrees < 135)
+		//(angleDegrees0-90
 		objective = BOSS_RIGHT_DOWN;
+		indexAngleShoot = 45;
 	}
 	changeHeadState(objective);
-
+	setHeadSpritePos();
+	cout << "shootAngle" << indexAngleShoot + (shootCount * 1.3) << "\n";
+	shoots[shootCount]->setPosition(positionStartShoot);
+	shoots[shootCount]->setAngle(indexAngleShoot + (shootCount*1.3));
+	shoots[shootCount]->setActive();
 }
