@@ -31,7 +31,8 @@ private:
 	Texture bgTexture;
 	TexturedQuad* bg;
 	ShaderProgram simpleProgram, texProgram;
-	float currentTime;
+	int maxTime= 400 * 1000;
+	int elapsedTime= 0;
 	glm::mat4 projection;
 	int textSize = 25;
 	Text text;

@@ -46,7 +46,6 @@ void GameUI::init()
 	bgTexture.setMagFilter(GL_NEAREST);
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH), float(SCREEN_HEIGHT), 0.f);
-	currentTime = 0.0f;
 
 	// Select which font you want to use
 		//if (!text.init("fonts/OpenSans-Regular.ttf"))
@@ -59,8 +58,12 @@ void GameUI::init()
 
 void GameUI::update(int deltaTime)
 {
-	currentTime += deltaTime;
-	time -= (deltaTime/ 1000000.0f);
+	elapsedTime += deltaTime;
+	if (elapsedTime >= maxTime) {
+		//die maximum time;
+		elapsedTime = 0;
+	}
+	time = (maxTime-elapsedTime)/1000;
 }
 
 void GameUI::render()

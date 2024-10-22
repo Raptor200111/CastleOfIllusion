@@ -1,5 +1,7 @@
 #include "EnemyBug.h"
 #include "CollisionManager.h"
+#include "Player.h"
+
 #define WALK_SPEED 1
 #define GRAVITY 0.5f
 
@@ -42,14 +44,14 @@ void EnemyBug::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgra
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 
 }
-void EnemyBug::update(int deltaTime, const glm::ivec2& posPlayer)
+void EnemyBug::update(int deltaTime)
 {
 	glm::vec2 aux = sprite->updateDiffSize(deltaTime);
 	if (aux != glm::vec2(0.f))
 		sizeObject = aux;
 	int min_x_attack = position.x - attackDistance;
 	int max_x_attack = position.x + attackDistance;
-
+	glm::ivec2 posPlayer = Player::instance().getPosition();
 	if (posPlayer.x< min_x_attack || max_x_attack < posPlayer.x) {
 		attackSpeed = WALK_SPEED;
 		enemyBugState = BUG_WALK_RIGHT;
@@ -76,16 +78,17 @@ void EnemyBug::update(int deltaTime, const glm::ivec2& posPlayer)
 	velocity += GRAVITY;
 	position.y += int(velocity);
 
-	for (auto block : CollisionManager::instance().blocks)
+	Block* b = CollisionManager::instance().collisionEntityBlockV(this);
+	if (b != NULL)
 	{
-		if (CollisionManager::instance().checkCollisionBlockVertical(this, block.second) == Down) {
-			position.y = block.second->getPosition().y - sizeObject.y;
-			velocity = 0.f;
-		}
-		if (CollisionManager::instance().checkCollisionBlockHorizontal(this, block.second) != NoHcol) {
-			left = !left;
-			moveHorizontal(left, WALK_SPEED);
-		}
+		position.y = b->getPosition().y - sizeObject.y;
+		velocity = 0.f;
+	}
+	b = CollisionManager::instance().collisionEntityBlockH(this);
+	if (b != NULL)
+	{
+		left = !left;
+		moveHorizontal(left, WALK_SPEED);
 	}
 
 	if (CollisionManager::instance().checkCollisionVertical(this) == Tile)

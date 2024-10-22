@@ -309,11 +309,7 @@ void CollisionManager::update(int deltaTime, Cam camera)
 	insideScreenObj(camera);
 
 	for (auto& it = enemies.begin(); it != enemies.end(); ++it) {
-		EnemyBug* enemyBug = dynamic_cast<EnemyBug*>(it->second);
-		if (enemyBug)
-			enemyBug->update(deltaTime, Player::instance().getPosition());
-		else
-			it->second->update(deltaTime);
+		it->second->update(deltaTime);
 
 		if (checkCollisionObject(&Player::instance(), it->second)) {
 			/*
@@ -326,3 +322,22 @@ void CollisionManager::update(int deltaTime, Cam camera)
 	}
 
 }
+
+Block* CollisionManager::collisionEntityBlockH(Entity* entity) {
+	for (auto& it = blocks.begin(); it != blocks.end(); ++it) {
+		if (checkCollisionBlockHorizontal(entity, it->second)) {
+			return it->second;
+			break;
+		}
+	}
+}
+
+Block* CollisionManager::collisionEntityBlockV(Entity* entity) {
+	for (auto& it = blocks.begin(); it != blocks.end(); ++it) {
+		if (checkCollisionBlockVertical(entity, it->second)) {
+			return it->second;
+			break;
+		}
+	}
+}
+

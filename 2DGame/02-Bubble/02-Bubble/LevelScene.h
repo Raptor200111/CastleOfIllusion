@@ -10,6 +10,7 @@
 #include "Block.h"
 #include <vector>
 #include "GameUI.h"
+#include "BossDragon.h"
 
 class LevelScene : public Scene
 {
@@ -48,6 +49,7 @@ private:
 
 
 	 GameUI gameUI;
+	 BossDragon boss;
 };
 
 #endif // _LEVEL_SCENE_INCLUDE

@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="AnimKeyframes.h" />
     <ClInclude Include="BossDragon.h" />
+    <ClInclude Include="BossShoot.h" />
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="Defs.h" />
     <ClInclude Include="Enemy.h" />
@@ -39,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BossDragon.cpp" />
+    <ClCompile Include="BossShoot.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyBug.cpp" />
