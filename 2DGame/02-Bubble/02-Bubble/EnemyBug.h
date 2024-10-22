@@ -13,9 +13,8 @@ public:
 	EnemyBug() { }
 	~EnemyBug() override {}
 	//void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) override {}
-	void update(int deltaTime) override {}
+	void update(int deltaTime) override;
 	void initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, const ZoneEnemy& initParams) override;
-	void update(int deltaTime, const glm::ivec2& posPlayer);
 	void render() override;
 
 private:

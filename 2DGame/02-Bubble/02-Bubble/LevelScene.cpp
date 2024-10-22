@@ -87,7 +87,7 @@ void LevelScene::init()
 	glm::ivec2 initPos = glm::ivec2(10.0f, 38.0f);
 	ZoneEnemy zone1 = { limit, initPos, false };
 	boss.initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone1);
-	boss.setDragonPosition(glm::ivec2(zone1.initPos.x * map->getTileSize(), zone1.initPos.y * map->getTileSize()));
+	boss.setBossPosition(glm::ivec2(zone1.initPos.x * map->getTileSize(), zone1.initPos.y * map->getTileSize()));
 	boss.setTileMap(map);
 	//211ms
 }
@@ -172,7 +172,7 @@ void LevelScene::update(int deltaTime)
 	
 	
 	CollisionManager::instance().update(deltaTime, cam);
-	boss.update(deltaTime, player->getPosition());
+	boss.update(deltaTime);
 	gameUI.update(deltaTime);
 }
 

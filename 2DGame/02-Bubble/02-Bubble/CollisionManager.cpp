@@ -309,11 +309,7 @@ void CollisionManager::update(int deltaTime, Cam camera)
 	insideScreenObj(camera);
 
 	for (auto& it = enemies.begin(); it != enemies.end(); ++it) {
-		EnemyBug* enemyBug = dynamic_cast<EnemyBug*>(it->second);
-		if (enemyBug)
-			enemyBug->update(deltaTime, Player::instance().getPosition());
-		else
-			it->second->update(deltaTime);
+		it->second->update(deltaTime);
 
 		if (checkCollisionObject(&Player::instance(), it->second)) {
 			/*
