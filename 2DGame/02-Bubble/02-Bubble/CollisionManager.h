@@ -30,8 +30,8 @@ public:
 	bool insideScreen(glm::ivec2 pos, Cam cam);
 	void update(int deltaTime, Cam camera);
 	
-	Block* collisionPlayerBlockH();
-	Block* collisionPlayerBlockV();
+	Block* collisionEntityBlockH(Entity* entity);
+	Block* collisionEntityBlockV(Entity* entity);
 
 	std::map<string, Enemy*> enemies;
 	std::map<string, Block*> blocks;
