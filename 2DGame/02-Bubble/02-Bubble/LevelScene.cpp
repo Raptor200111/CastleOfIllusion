@@ -179,7 +179,7 @@ void LevelScene::update(int deltaTime)
 	insideScreenObj();
 
 
-
+	CollisionManager::instance().update(screenBlocks);
 	player->update(deltaTime);
 	updateCamera();
 
