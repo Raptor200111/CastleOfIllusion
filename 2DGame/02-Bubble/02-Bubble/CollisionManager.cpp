@@ -10,21 +10,14 @@
 CollisionManager::CollisionManager()
 {
 	tileMap = NULL;
-	blocks = std::map<string, Block*>();
-	enemies = std::map<string, Enemy*>();
+	screenBlocks = std::map<string, Block*>();
 }
 
 CollisionManager::~CollisionManager()
-{/*
-	for (auto block : blocksObj) {
-			delete block;
-	}
-	blocksObj.clear();
-	blocks.clear();
-	for (auto e : enemiesObj)
-		delete e;
-	enemiesObj.clear();
-	enemies.clear();*/
+{
+	for (auto& screenBlock : screenBlocks)
+		screenBlock.second = NULL;
+	screenBlocks.clear();
 }
 
 
@@ -33,19 +26,11 @@ void CollisionManager::init(TileMap* tileMap)
 	this->tileMap = tileMap;
 	tileSize = tileMap->getTileSize();
 	mapSize = tileMap->getMapSize();
-/*	cout << "Collision\n";
-
-	for (auto block : blocksObj)
-	{
-		cout << block->getPosition().x/16 << " " << block->getPosition().y/16 << "\n";
-	}*/
 }
 
-void CollisionManager::sceneInit(Cam camera, const std::vector<Block*>& blocksObj, const vector<Enemy*>& enemiesObj)
+void CollisionManager::update(const std::map<string, Block*>& screenBlocks)
 {
-	this->blocksObj = blocksObj;
-	this->enemiesObj = enemiesObj;
-	cout << tileSize;
+	this->screenBlocks = screenBlocks;
 }
 
 
@@ -256,89 +241,10 @@ bool CollisionManager::correctRamp(Entity* entity)
 }
 
 
-void CollisionManager::insideScreenObj(Cam cam)
-{
-	
-	for (auto& enemyObj : enemiesObj)
-	{
-		glm::ivec2 posEnemyId = enemyObj->getInitPos();
-		glm::ivec2 posEnemy = enemyObj->getPosition();
-		glm::ivec2 posEnemyToCompare = glm::ivec2(posEnemyId.x * tileSize, posEnemyId.y * tileSize);
-		string idEnemy = std::to_string(posEnemyId.x) + " " + std::to_string(posEnemyId.y);
-		if (insideScreen(posEnemyToCompare, cam))
-		{
-			if (enemies.find(idEnemy) == enemies.end())
-			{
-				enemies.insert(std::pair<string, Enemy*>(idEnemy, enemyObj));
-			}
-		}
-		else
-		{
-			/*
-			cout << posEnemy.x << " " << posEnemy.y << "\n";
-			cout << cam.left << " " << cam.right << " " << cam.bottom << "  " << cam.top << "\n";
-			*/
-			if (enemies.find(idEnemy) != enemies.end()) {
-				enemies.erase(idEnemy);
-			}
-		}
-	}
-	for (auto& blockObj : blocksObj)
-	{
-		glm::ivec2 posBlock = blockObj->getPosition();
-		string idBlock = std::to_string(posBlock.x) + " " + std::to_string(posBlock.y);
-		if (insideScreen(posBlock, cam))
-		{
-			if (blocks.find(idBlock) == blocks.end())
-			{
-				blocks.insert(std::pair<string, Block*>(idBlock, blockObj));
-			}
-		}
-		else
-		{
-			if (blocks.find(idBlock) != blocks.end()) {
-				blocks.erase(idBlock);
-			}
-		}
-	}
-
-}
-
-bool CollisionManager::insideScreen(glm::ivec2 pos, Cam cam)
-{
-
-	if (cam.left < pos.x && pos.x < cam.right && cam.top < pos.y && pos.y < cam.bottom) {
-		/*cout << left << " " << right << "\n";
-		cout << pos.x << "\n";*/
-		return true;
-	}
-	return false;
-}
-
-// Implementation of the callback function
-void CollisionManager::update(int deltaTime, Cam camera)
-{
-	// Update enemies
-	insideScreenObj(camera);
-
-	for (auto& it = enemies.begin(); it != enemies.end(); ++it) {
-		it->second->update(deltaTime);
-
-		if (checkCollisionObject(&Player::instance(), it->second)) {
-			/*
-			if (Player::instance().killEnemy()) {
-				it = enemies.erase(it);
-				break;
-			}*/
-
-		}
-	}
-
-}
-
 Block* CollisionManager::collisionEntityBlockH(Entity* entity) {
-	for (auto& it = blocks.begin(); it != blocks.end(); ++it) {
+	for (auto& it = screenBlocks.begin(); it != screenBlocks.end(); ++it) {
 		if (checkCollisionBlockHorizontal(entity, it->second)) {
+
 			return it->second;
 			break;
 		}
@@ -346,8 +252,10 @@ Block* CollisionManager::collisionEntityBlockH(Entity* entity) {
 }
 
 Block* CollisionManager::collisionEntityBlockV(Entity* entity) {
-	for (auto& it = blocks.begin(); it != blocks.end(); ++it) {
+	for (auto& it = screenBlocks.begin(); it != screenBlocks.end(); ++it) {
 		if (checkCollisionBlockVertical(entity, it->second)) {
+			int correctedY = it->second->getPosition().y - entity->getSize().y;
+			entity->setPositionY(correctedY);
 			return it->second;
 			break;
 		}
