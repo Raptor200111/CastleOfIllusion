@@ -263,7 +263,7 @@ void BossDragon::shoot(int deltaTime)
 	glm::ivec2 direction = Player::instance().getPosition() - posHead;
 	float angle = atan2(direction.y, direction.x);  // Invert y-axis since we're interested in the bottom half.
 	float angleDegrees = glm::degrees(angle);
-	cout << angleDegrees << "\n";
+	//cout << angleDegrees << "\n";
 	if (angleDegrees < 0) angleDegrees += 180;  // Ensure the angle is positive
 	BossDragonStates objective;
 	angleDegrees = 130;
@@ -282,7 +282,7 @@ void BossDragon::shoot(int deltaTime)
 	}
 	changeHeadState(objective);
 	setHeadSpritePos();
-	cout << "shootAngle" << indexAngleShoot + (shootCount * 1.3) << "\n";
+	//cout << "shootAngle" << indexAngleShoot + (shootCount * 1.3) << "\n";
 	shoots[shootCount]->setPosition(positionStartShoot);
 	shoots[shootCount]->setAngle(indexAngleShoot + (shootCount*1.3));
 	shoots[shootCount]->setActive();

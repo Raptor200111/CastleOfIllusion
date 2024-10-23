@@ -1,9 +1,6 @@
-#include <cmath>
-#include <iostream>
-#include <GL/glew.h>
 #include "Player.h"
 #include "Game.h"
-#include "CollisionManager.h"
+
 
 #define FALL_STEP 2
 #define WALK_SPEED 2
@@ -13,30 +10,27 @@
 #define STANDART_SIZE glm::ivec2(24, 32)
 #define DODGE_SIZE glm::ivec2(24, 32)
 
-
 void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
 	bClimbing = false;
 	bTouchBlock = false;
-	bJumping = false;
-	velocity = 0.f;
+	yAxisSpeed = 0.f;
 	oldState = newState = IDLE;
 
 	sizeSprite = glm::ivec2(32, 48);
-	position = glm::ivec2(0, 0);
-	sizeObject = glm::ivec2(24, 32);
-	offset = glm::ivec2(4, 8);
+	setSize(glm::ivec2(24, 32));
+	setOffset(glm::ivec2(4, 8));
 
-	spritesheet.loadFromFile("images/Mickey_Mouse.png", TEXTURE_PIXEL_FORMAT_RGBA);	
+	spritesheet.loadFromFile("images/Mickey_Mouse.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(sizeSprite, glm::vec2(0.066, 0.098), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(TOTAL);
 
 	sprite->setAnimationSpeed(IDLE, 4);
-	sprite->addKeyframe(IDLE, glm::vec2(0.f, 0.f)); 
+	sprite->addKeyframe(IDLE, glm::vec2(0.f, 0.f));
 	sprite->addKeyframe(IDLE, glm::vec2(0.066f, 0.f));
 
 	sprite->setAnimationSpeed(WALK, 8);
-	sprite->addKeyframe(WALK, glm::vec2(0.066f * 2, 0.f)); 
+	sprite->addKeyframe(WALK, glm::vec2(0.066f * 2, 0.f));
 	sprite->addKeyframe(WALK, glm::vec2(0.066f * 3, 0.f));
 	sprite->addKeyframe(WALK, glm::vec2(0.066f * 4, 0.f));
 	sprite->addKeyframe(WALK, glm::vec2(0.066f * 5, 0.f));
@@ -45,14 +39,14 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	sprite->addKeyframe(WALK, glm::vec2(0.066f * 8, 0.f));
 
 	sprite->setAnimationSpeed(DODGE, 8);
-	sprite->addKeyframe(DODGE, glm::vec2(0, 0.098 * 1)); 
+	sprite->addKeyframe(DODGE, glm::vec2(0, 0.098 * 1));
 	sprite->addKeyframe(DODGE, glm::vec2(0.066f * 1, 0.098 * 1));
 
 	sprite->setAnimationSpeed(JUMP, 8);
-	sprite->addKeyframe(JUMP, glm::vec2(0.066f * 2, 0.098 * 1)); 
+	sprite->addKeyframe(JUMP, glm::vec2(0.066f * 2, 0.098 * 1));
 
 	sprite->setAnimationSpeed(FALL, 8);
-	sprite->addKeyframe(FALL, glm::vec2(0.066f * 3, 0.098 * 1)); 
+	sprite->addKeyframe(FALL, glm::vec2(0.066f * 3, 0.098 * 1));
 
 	sprite->setAnimationSpeed(READY_TO_PICK, 8);
 	sprite->addKeyframe(READY_TO_PICK, glm::vec2(0.066f * 0, 0.098 * 3));
@@ -72,8 +66,8 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
 	sprite->changeAnimation(IDLE);
 	tileMapDispl = tileMapPos;
-	//setPosition(position);
-	//sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
+	//setPosition(glm::ivec2(0, 0));
+
 }
 
 void Player::update(int deltaTime)
@@ -82,43 +76,201 @@ void Player::update(int deltaTime)
 	bool oldbClimbing = bClimbing;
 	bool newbTouchBlock = false; //Why?
 
-	velocity += GRAVITY;
-	position.y += int(velocity) + 1;
+	yAxisSpeed += GRAVITY;
+	position.y += int(yAxisSpeed) + 1;
 
-	if (Game::instance().getKey(GLFW_KEY_A))
-	{
-		leftMove();
-	}
-	else if (Game::instance().getKey(GLFW_KEY_D))
-	{
-		rightMove();
-	}
+	CollisionType colType = CollisionType::None;
+	Block* block = nullptr;
 
-	if (bJumping)
-	{
+	if (oldState == PlayerStates::BUTT_FALL) {
+		if (Game::instance().getKey(GLFW_KEY_A)) {
+			leftMove();
+		}
+		if (Game::instance().getKey(GLFW_KEY_D)) {
+			rightMove();
+		}
+		if (stopFallingCollision(block, colType))
+		{
+			if (yAxisSpeed > 0)
+				newState = IDLE;
+			yAxisSpeed = 0;
+		}
+		if (block != nullptr)
+		{
+			yAxisSpeed = BUTT_JUMP_SPEED;
+			newState = BUTT_JUMP;
+			// destruccion del objeto que devuelve
+			// delete b;
+		}
+	}
+	if (oldState == PlayerStates::BUTT_JUMP) {
+		if (Game::instance().getKey(GLFW_KEY_A)) {
+			leftMove();
+		}
+		if (Game::instance().getKey(GLFW_KEY_D)) {
+			rightMove();
+		}
+		if (stopFallingCollision(block, colType))
+		{
+			if (yAxisSpeed > 0)
+				newState = IDLE;
+			yAxisSpeed = 0;
+			position.y ++;
+		}
+		if (block != nullptr)
+		{
+			yAxisSpeed = BUTT_JUMP_SPEED;
+			newState = BUTT_JUMP;
+			// destruccion del objeto que devuelve
+			// delete b;
+		}
+	}
+	if (oldState == PlayerStates::CLIMB_IDLE || oldState == PlayerStates::CLIMB) {
+		yAxisSpeed = 0;
+		if (Game::instance().getKey(GLFW_KEY_W)) {
+			position.y -= WALK_SPEED;
+			newState = CLIMB;
+		}
+		if (Game::instance().getKey(GLFW_KEY_S)) {
+			position.y += WALK_SPEED;
+			newState = CLIMB;
+		}
+		if (Game::instance().getKey(GLFW_KEY_L)) {
+			newState = FALL;
+		}
+		
+		if (stopFallingCollision(block, colType))
+			newState = IDLE;
+		else if (colType == CollisionType::None)
+			newState == FALL;
+	}
+	if (oldState == PlayerStates::DODGE) {
+		if (!Game::instance().getKey(GLFW_KEY_S)) {
+			setSize(STANDART_SIZE);
+			newState = IDLE;
+		}
+		if (stopFallingCollision(block, colType))
+		{
+			yAxisSpeed = 0;
+		}
+
+		if (Game::instance().getKey(GLFW_KEY_K)) {
+			newState = JUMP;
+			yAxisSpeed = JUMP_SPEED;
+		}
+	}
+	if (oldState == PlayerStates::WALK) {
+		bool movement = false;
+		if (stopFallingCollision(block, colType))
+		{
+			yAxisSpeed = 0;
+			if (Game::instance().getKey(GLFW_KEY_K)) {
+				newState = JUMP;
+				yAxisSpeed = JUMP_SPEED;
+				movement = true;
+			}
+			else if (colType == CollisionType::TileStairs && Game::instance().getKey(GLFW_KEY_S))
+			{
+				changeToClimb();
+				movement = true;
+			}
+		}
+		else
+		{
+			newState = FALL;
+			movement = true;
+		}
+			
+		if (Game::instance().getKey(GLFW_KEY_A)) {
+			leftMove();
+			movement = true;
+		}
+		if (Game::instance().getKey(GLFW_KEY_D)) {
+			rightMove();
+			movement = true;
+		}
+		if (!movement) {
+			newState = IDLE;
+		}
+		if (Game::instance().getKey(GLFW_KEY_S)) {
+			newState = DODGE;
+			//setSize(DODGE_SIZE); PIENSATELO
+		}
+	}
+	if (oldState == PlayerStates::IDLE) {
+		if (Game::instance().getKey(GLFW_KEY_A)) {
+			newState = WALK;
+			leftMove();
+		}
+		if (Game::instance().getKey(GLFW_KEY_D)) {
+			newState = WALK;
+			rightMove();
+		}
+	
+		if (stopFallingCollision(block, colType))
+		{
+			yAxisSpeed = 0;
+			if (Game::instance().getKey(GLFW_KEY_K)) {
+				newState = JUMP;
+				yAxisSpeed = JUMP_SPEED;
+			}
+
+			if (Game::instance().getKey(GLFW_KEY_S)) {
+				if (colType == CollisionType::TileStairs)
+					changeToClimb();
+				else
+					newState = DODGE;
+				// change size, piensatelo: ???
+			}
+		}
+		else
+		{
+			newState = FALL;
+		}
+	}
+	if (oldState == PlayerStates::FALL) {
+		if (Game::instance().getKey(GLFW_KEY_A)) {
+			leftMove();
+		}
+		if (Game::instance().getKey(GLFW_KEY_D)) {
+			rightMove();
+		}
 		if (Game::instance().getKey(GLFW_KEY_S)) {
 			newState = BUTT_FALL;
 		}
-		if (velocity > 0 || CollisionManager::instance().checkCollisionVertical(this) == CollisionType::Tile)
+		if (stopFallingCollision(block, colType)) 
 		{
-			velocity = 0;
+			yAxisSpeed = 0;
+			newState = IDLE;
+		}
+
+		if (colType == CollisionType::Stairs && Game::instance().getKey(GLFW_KEY_W))
+		{
+			changeToClimb();
 		}
 	}
-	else
-	{
-		if (CollisionManager::instance().checkCollisionVertical(this) == CollisionType::Tile)
+	if (oldState == PlayerStates::JUMP) {
+		if (Game::instance().getKey(GLFW_KEY_A)) {
+			leftMove();
+		}
+		if (Game::instance().getKey(GLFW_KEY_D)) {
+			rightMove();
+		}
+		if (Game::instance().getKey(GLFW_KEY_S)) {
+			newState = BUTT_FALL;
+		}
+		if ((stopFallingCollision(block, colType) && yAxisSpeed < 0) || yAxisSpeed > 0) 
 		{
-			if (Game::instance().getKey(GLFW_KEY_W))
-			{
-				bJumping = false;
-				newState = IDLE;
-				jump(JUMP_SPEED);
-			}
-			else {
-				velocity = 0;
-			}
+			yAxisSpeed = 0;
+			newState = FALL;
+		}
+
+		if (colType == CollisionType::Stairs && Game::instance().getKey(GLFW_KEY_W))
+		{
+			changeToClimb();
 		}
 	}
+
 	if (newbTouchBlock != bTouchBlock) { //From here to...
 		if (newbTouchBlock) {
 			cout << "Tocado\n";
@@ -135,9 +287,7 @@ void Player::update(int deltaTime)
 		oldState = newState;
 		sprite->changeAnimation(newState);
 	}
-	sprite->setLeft(left);
 
-	//sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 	setPosition(position);
 }
 
@@ -148,45 +298,67 @@ void Player::render()
 
 void Player::leftMove()
 {
-	left = true;	
+	left = true;
+	sprite->setLeft(left);
+
 	position.x -= WALK_SPEED;
-	/*if (map->collisionBlockLeft(posPlayer, sizePlayer))
-	{
-		//newbTouchBlock = true; // WHY ?
+
+	CollisionType colType = CollisionManager::instance().checkCollisionHorizontal(this);
+	if (colType == CollisionType::Tile)
 		position.x += WALK_SPEED;
-	}
-	else*/
-	if (CollisionManager::instance().checkCollisionHorizontal(this) == CollisionType::Tile)
+	else if (colType == CollisionType::Stairs && Game::instance().getKey(GLFW_KEY_W))
+		changeToClimb();
+	
+	Block* b = CollisionManager::instance().collisionEntityBlockH(this);
+	if (b != nullptr)
 	{
 		position.x += WALK_SPEED;
+		if (Game::instance().getKey(GLFW_KEY_L))
+			cout << "Take Item" << endl;
 	}
 }
 
 void Player::rightMove()
 {
-	
 	left = false;
+	sprite->setLeft(left);
 	position.x += WALK_SPEED;
-	/*
-	if (map->collisionBlockRight(position, sizeObject))
-	{
-		//newbTouchBlock = true;
+
+	CollisionType colType = CollisionManager::instance().checkCollisionHorizontal(this);
+	if (colType == CollisionType::Tile)
 		position.x -= WALK_SPEED;
-	}
-	else*/
-	if (CollisionManager::instance().checkCollisionHorizontal(this) == CollisionType::Tile)
+	else if (colType == CollisionType::Stairs && Game::instance().getKey(GLFW_KEY_W))
+		changeToClimb();
+
+	Block* b = CollisionManager::instance().collisionEntityBlockH(this);
+	if (b != nullptr)
 	{
 		position.x -= WALK_SPEED;
+		if (Game::instance().getKey(GLFW_KEY_L))
+			cout << "Take Item" << endl;
 	}
+}
+
+void Player::changeToClimb()
+{
+	newState = CLIMB;
+	//calcular posicion de la escalera
+}
+
+bool Player::stopFallingCollision(Block*& block, CollisionType& colType)
+{
+	auto originalPos = position;
+	colType = CollisionManager::instance().checkCollisionVertical(this);
 	
-}
+	auto tileCorrectedPos = position;
+	block = CollisionManager::instance().collisionEntityBlockV(this);
 
-void Player::jump(int v)
-{
-	velocity = v;
-}
+	if (originalPos != tileCorrectedPos && tileCorrectedPos != position)
+		position = tileCorrectedPos;
 
-void Player::setSize(glm::ivec2 newSize)
-{
-	sizeObject = newSize;
+	if (colType == CollisionType::Tile || colType == CollisionType::TileStairs)
+		return true;
+	if (block != nullptr) 
+		return true;
+	return false;
 }

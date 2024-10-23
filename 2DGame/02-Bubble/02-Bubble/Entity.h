@@ -10,16 +10,18 @@ public:
 
 	virtual ~Entity() { if (sprite) delete sprite; }
 
+	
+	glm::ivec2 getPosition() { return position; }
+	glm::ivec2 getSize() { return sizeObject; }
+	bool getLeft() { return left; }
+	void setPositionY(int y) { position.y = y; }
 	void setTileMap(TileMap* tileMap) { map = tileMap; }
 	void setPosition(const glm::vec2& pos) {
 		position = pos;
 		sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x - offset.x), float(tileMapDispl.y + position.y - offset.y)));
-
 	}
-	glm::ivec2 getPosition() { return position; }
-	glm::ivec2 getSize() {return sizeObject;}
-	void setPositionY(int y) { position.y = y; }
-	bool getLeft() { return left; }
+	void setSize(glm::ivec2 size) { sizeObject = size; }
+	void setOffset(glm::ivec2 offset) { this->offset = offset; }
 
 protected:
 	bool left;

@@ -45,7 +45,7 @@ void CollisionManager::sceneInit(Cam camera, const std::vector<Block*>& blocksOb
 {
 	this->blocksObj = blocksObj;
 	this->enemiesObj = enemiesObj;
-	cout << tileSize;
+	//cout << tileSize;
 }
 
 

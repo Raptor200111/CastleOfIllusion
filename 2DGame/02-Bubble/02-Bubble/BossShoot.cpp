@@ -18,7 +18,7 @@ void BossShoot::update(int deltaTime) {
 		float aux = speed * deltaSeconds;
 		glm::ivec2 add = glm::ivec2(std::ceill(velocity.x * aux), std::ceill(velocity.y * aux));
 		position += add;
-		cout << "Shoot" << position.x << " " << position.y << "\n";
+		//cout << "Shoot" << position.x << " " << position.y << "\n";
 		if(position.x < 0 || position.x > 96*16 || position.y < 0 || position.y> 736)
 		{
 			elapsedTime = 0;
