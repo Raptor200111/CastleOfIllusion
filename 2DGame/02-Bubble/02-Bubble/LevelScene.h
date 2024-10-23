@@ -27,9 +27,20 @@ private:
 	void initZoneEnemyTree();
 	void initZoneEnemyBug();
 
-	vector<Enemy*> enemiesObj;
-	vector<Block*> blocksObj;
 
+
+	void insideScreenObj();
+	bool insideScreen(const glm::ivec2& pos);
+
+	vector<Enemy*> playrunEnemies;
+	vector<Block*> playrunBlocks;
+
+	vector<Enemy*> allEnemies;
+	vector<Block*> allBlocks;
+
+	std::map<string, Enemy*> screenEnemies;
+	std::map<string, Block*> screenBlocks;
+	std::map<string, Block*>  playrunMovBlocks;
 
 	TileMap* map;
 	Player* player;
@@ -48,11 +59,10 @@ private:
 	TileMap* bgMap;
 
 
-	 GameUI gameUI;
-	 BossDragon boss;
+	GameUI gameUI;
+	BossDragon boss;
 };
 
 #endif // _LEVEL_SCENE_INCLUDE
-
 
 
