@@ -124,7 +124,12 @@ CollisionType CollisionManager::checkCollisionHorizontal(Entity* entity)
 				{
 					stairs = true;
 				}
-				if (tileType != 0 && tileType != 9){
+				/*else if (tileType != 7 && tileType != 8)
+				{
+
+					tile = true;
+				}*/
+				else {
 					tile = true;
 				}
 			}
@@ -157,24 +162,13 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 	bool tile = false;
 	// Check the tiles around the entity for collisions
 	for (int i = x0; i <= x1; ++i) {
-		for (int j : upDown) {
+		for (int j = yUp; j <= yDown; j++) {
 			int tileType = tileMap->getTileType(i, j);
 			if (tileType != 0) {
 				if (tileType == 9)
 					stairs = true;
 				
-				if (tileType == 7 || tileType == 8)
-				{
-					int correctedY = correctRampPos(i, j, size.y, pos, entity->getLeft());
-					if (correctedY != -1)
-					{
-						entity->setPositionY(correctedY);
-						
-					}
-					tile = true;
-				}
-				//Down collision
-				else if (j == yDown)
+				if (j == yDown)
 				{
 					
 					if (pos.y + size.y > tileSize * j)
@@ -188,13 +182,18 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 				//Up collision
 				else if (j == yUp && pos.y < tileSize * (j + 1))
 				{
-					int posY = tileSize * (j + 1);
-					entity->setPositionY(posY);
+					if (!stairs) {
+						int posY = tileSize * (j + 1);
+						entity->setPositionY(posY);
+					}
 					tile = true;
 				}
 			}
 		}
 	}
+	if (correctRamp(entity))
+		tile = true;
+
 	if (tile && stairs)
 		return TileStairs;
 	else if (tile)
@@ -203,42 +202,41 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 		return Stairs;
 	return None;
 }
-/*
-int CollisionManager::correctRampPos(int tileX, int tileY, int sizeY, glm::ivec2 pos)
+bool CollisionManager::correctRamp(Entity* entity)
 {
-	int tileLeftX = tileX * tileSize;
-	int tileLocalX = pos.x - tileLeftX;
-	int tileBottomY = (tileY + 1) * tileSize;
-	int correctY = tileBottomY - tileLocalX;
-	if (pos.y + sizeY > correctY) {
-		return correctY - sizeY;
-	}
-	return -1;
-}
-*/
+	glm::ivec2 pos = entity->getPosition();
+	glm::ivec2 size = entity->getSize();
+	bool left = entity->getLeft();
+	bool tile = false;
 
-
-int CollisionManager::correctRampPos(int tileX, int tileY, int sizeY, glm::ivec2 pos, bool left)
-{
-	int yOnRamp;
-	int correctedY = -1;
-	int xInTile = pos.x % tileSize;
-	if (xInTile == 0)
-		xInTile = 16;
-	//if (tileType == 8) {
-	if(!left) {
-		// Ramp that goes up from left to right (\)
-		yOnRamp = tileSize - xInTile;  // Higher y when x is smaller
+	int playerFeetX = (pos.x + size.x / 2.0f)/tileSize;
+	//i dont put -1 cause before it already corrected it
+	int y = (pos.y + size.y) / tileSize;
+	int correctedY;
+	if (left)
+	{
+		int x = pos.x / tileSize;
+		int tileInFront = tileMap->getTileType(x, y - 1);
+		if (tileInFront == 7 || tileInFront == 8) {
+			int xInTile = tileSize- (pos.x % tileSize);
+			correctedY = y * tileSize - size.y - xInTile;
+			entity->setPositionY(correctedY);
+			tile = true;
+		}
 	}
-	//else if (tileType == 7) {
-	else if (left) {
-		// Ramp that goes up from right to left (/)
-		yOnRamp = xInTile;  // Higher y when x is larger
+	else
+	{
+		//this option if only heels touch ramp
+		int x = (pos.x) / tileSize;
+		int tileBelow = tileMap->getTileType(x, y);
+		if (tileBelow == 7 || tileBelow == 8) {
+			int xInTile = pos.x % tileSize;
+			correctedY = y * tileSize - size.y + xInTile;
+			entity->setPositionY(correctedY);
+			tile = true;
+		}
 	}
-
-	// Correct the y position of the entity to sit on the ramp
-	correctedY = tileSize * tileY + yOnRamp - sizeY;
-	return correctedY;
+	return tile;
 
 }
 
