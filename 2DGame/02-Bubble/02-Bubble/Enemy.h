@@ -16,7 +16,7 @@ public:
     virtual void update(int deltaTime) = 0;
     virtual void render() = 0;
     virtual void collideVertical() = 0;
-    virtual void collideHorizontal() = 0;
+    virtual void collideHorizontal(Block* b) = 0;
     void moveHorizontal(bool left, int walk_speed);
 
     glm::ivec2 getInitPos() { return initParams.initPos; }
