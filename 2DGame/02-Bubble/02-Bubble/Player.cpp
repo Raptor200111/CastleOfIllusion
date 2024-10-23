@@ -94,22 +94,23 @@ void Player::update(int deltaTime)
 			newState = WALK;
 			rightMove();
 		}
-
 		if (stopFallingCollision(block, colType))
 		{
-			yAxisSpeed = 0;
 			if (Game::instance().getKey(GLFW_KEY_K)) {
 				newState = JUMP;
 				yAxisSpeed = JUMP_SPEED;
+				break;
 			}
-
-			if (Game::instance().getKey(GLFW_KEY_S)) {
-				if (colType == CollisionType::TileStairs)
+			else if (Game::instance().getKey(GLFW_KEY_S)) {
+				if (colType == CollisionType::TileStairs) {
 					changeToClimb();
+					position.y++;
+				}
 				else
 					newState = DODGE;
 				// change size, piensatelo: ???
 			}
+			yAxisSpeed = 0;
 		}
 		else
 		{
@@ -119,42 +120,39 @@ void Player::update(int deltaTime)
 	}
 	case WALK:
 	{
-		bool movement = false;
+		newState = IDLE;
+		if (Game::instance().getKey(GLFW_KEY_A)) {
+			leftMove();
+			newState = WALK;
+		}
+		if (Game::instance().getKey(GLFW_KEY_D)) {
+			rightMove();
+			newState = WALK;
+		}
+
 		if (stopFallingCollision(block, colType))
 		{
-			yAxisSpeed = 0;
 			if (Game::instance().getKey(GLFW_KEY_K)) {
 				newState = JUMP;
 				yAxisSpeed = JUMP_SPEED;
-				movement = true;
+				break;
 			}
-			else if (colType == CollisionType::TileStairs && Game::instance().getKey(GLFW_KEY_S))
-			{
-				changeToClimb();
-				movement = true;
+			else if (Game::instance().getKey(GLFW_KEY_S)) {
+				newState = DODGE;
+				//setSize(DODGE_SIZE); PIENSATELO
+				if (colType == CollisionType::TileStairs)
+				{
+					changeToClimb();
+					position.y++;
+				}
 			}
+			yAxisSpeed = 0;
 		}
 		else
 		{
 			newState = FALL;
-			movement = true;
 		}
-
-		if (Game::instance().getKey(GLFW_KEY_A)) {
-			leftMove();
-			movement = true;
-		}
-		if (Game::instance().getKey(GLFW_KEY_D)) {
-			rightMove();
-			movement = true;
-		}
-		if (!movement) {
-			newState = IDLE;
-		}
-		if (Game::instance().getKey(GLFW_KEY_S)) {
-			newState = DODGE;
-			//setSize(DODGE_SIZE); PIENSATELO
-		}
+		
 		break;
 	}
 	case JUMP:
@@ -173,7 +171,6 @@ void Player::update(int deltaTime)
 			yAxisSpeed = 0;
 			newState = FALL;
 		}
-
 		if (colType == CollisionType::Stairs && Game::instance().getKey(GLFW_KEY_W))
 		{
 			changeToClimb();
