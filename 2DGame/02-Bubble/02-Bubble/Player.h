@@ -32,6 +32,7 @@ private:
 	void rightMove();
 	void changeToClimb();
 	bool stopFallingCollision(Block*& block, CollisionType& colType);
+	bool stairCollision();
 };
 
 #endif // _PLAYER_INCLUDE

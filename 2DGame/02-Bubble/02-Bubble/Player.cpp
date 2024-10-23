@@ -82,131 +82,19 @@ void Player::update(int deltaTime)
 	CollisionType colType = CollisionType::None;
 	Block* block = nullptr;
 
-	if (oldState == PlayerStates::BUTT_FALL) {
+	switch (oldState)
+	{
+	case IDLE:
+	{
 		if (Game::instance().getKey(GLFW_KEY_A)) {
+			newState = WALK;
 			leftMove();
 		}
 		if (Game::instance().getKey(GLFW_KEY_D)) {
+			newState = WALK;
 			rightMove();
-		}
-		if (stopFallingCollision(block, colType))
-		{
-			if (yAxisSpeed > 0)
-				newState = IDLE;
-			yAxisSpeed = 0;
-		}
-		if (block != nullptr)
-		{
-			yAxisSpeed = BUTT_JUMP_SPEED;
-			newState = BUTT_JUMP;
-			// destruccion del objeto que devuelve
-			// delete b;
-		}
-	}
-	if (oldState == PlayerStates::BUTT_JUMP) {
-		if (Game::instance().getKey(GLFW_KEY_A)) {
-			leftMove();
-		}
-		if (Game::instance().getKey(GLFW_KEY_D)) {
-			rightMove();
-		}
-		if (stopFallingCollision(block, colType))
-		{
-			if (yAxisSpeed > 0)
-				newState = IDLE;
-			yAxisSpeed = 0;
-			position.y ++;
-		}
-		if (block != nullptr)
-		{
-			yAxisSpeed = BUTT_JUMP_SPEED;
-			newState = BUTT_JUMP;
-			// destruccion del objeto que devuelve
-			// delete b;
-		}
-	}
-	if (oldState == PlayerStates::CLIMB_IDLE || oldState == PlayerStates::CLIMB) {
-		yAxisSpeed = 0;
-		if (Game::instance().getKey(GLFW_KEY_W)) {
-			position.y -= WALK_SPEED;
-			newState = CLIMB;
-		}
-		if (Game::instance().getKey(GLFW_KEY_S)) {
-			position.y += WALK_SPEED;
-			newState = CLIMB;
-		}
-		if (Game::instance().getKey(GLFW_KEY_L)) {
-			newState = FALL;
-		}
-		
-		if (stopFallingCollision(block, colType))
-			newState = IDLE;
-		else if (colType == CollisionType::None)
-			newState == FALL;
-	}
-	if (oldState == PlayerStates::DODGE) {
-		if (!Game::instance().getKey(GLFW_KEY_S)) {
-			setSize(STANDART_SIZE);
-			newState = IDLE;
-		}
-		if (stopFallingCollision(block, colType))
-		{
-			yAxisSpeed = 0;
 		}
 
-		if (Game::instance().getKey(GLFW_KEY_K)) {
-			newState = JUMP;
-			yAxisSpeed = JUMP_SPEED;
-		}
-	}
-	if (oldState == PlayerStates::WALK) {
-		bool movement = false;
-		if (stopFallingCollision(block, colType))
-		{
-			yAxisSpeed = 0;
-			if (Game::instance().getKey(GLFW_KEY_K)) {
-				newState = JUMP;
-				yAxisSpeed = JUMP_SPEED;
-				movement = true;
-			}
-			else if (colType == CollisionType::TileStairs && Game::instance().getKey(GLFW_KEY_S))
-			{
-				changeToClimb();
-				movement = true;
-			}
-		}
-		else
-		{
-			newState = FALL;
-			movement = true;
-		}
-			
-		if (Game::instance().getKey(GLFW_KEY_A)) {
-			leftMove();
-			movement = true;
-		}
-		if (Game::instance().getKey(GLFW_KEY_D)) {
-			rightMove();
-			movement = true;
-		}
-		if (!movement) {
-			newState = IDLE;
-		}
-		if (Game::instance().getKey(GLFW_KEY_S)) {
-			newState = DODGE;
-			//setSize(DODGE_SIZE); PIENSATELO
-		}
-	}
-	if (oldState == PlayerStates::IDLE) {
-		if (Game::instance().getKey(GLFW_KEY_A)) {
-			newState = WALK;
-			leftMove();
-		}
-		if (Game::instance().getKey(GLFW_KEY_D)) {
-			newState = WALK;
-			rightMove();
-		}
-	
 		if (stopFallingCollision(block, colType))
 		{
 			yAxisSpeed = 0;
@@ -227,8 +115,50 @@ void Player::update(int deltaTime)
 		{
 			newState = FALL;
 		}
+		break;
 	}
-	if (oldState == PlayerStates::FALL) {
+	case WALK:
+	{
+		bool movement = false;
+		if (stopFallingCollision(block, colType))
+		{
+			yAxisSpeed = 0;
+			if (Game::instance().getKey(GLFW_KEY_K)) {
+				newState = JUMP;
+				yAxisSpeed = JUMP_SPEED;
+				movement = true;
+			}
+			else if (colType == CollisionType::TileStairs && Game::instance().getKey(GLFW_KEY_S))
+			{
+				changeToClimb();
+				movement = true;
+			}
+		}
+		else
+		{
+			newState = FALL;
+			movement = true;
+		}
+
+		if (Game::instance().getKey(GLFW_KEY_A)) {
+			leftMove();
+			movement = true;
+		}
+		if (Game::instance().getKey(GLFW_KEY_D)) {
+			rightMove();
+			movement = true;
+		}
+		if (!movement) {
+			newState = IDLE;
+		}
+		if (Game::instance().getKey(GLFW_KEY_S)) {
+			newState = DODGE;
+			//setSize(DODGE_SIZE); PIENSATELO
+		}
+		break;
+	}
+	case JUMP:
+	{
 		if (Game::instance().getKey(GLFW_KEY_A)) {
 			leftMove();
 		}
@@ -238,7 +168,30 @@ void Player::update(int deltaTime)
 		if (Game::instance().getKey(GLFW_KEY_S)) {
 			newState = BUTT_FALL;
 		}
-		if (stopFallingCollision(block, colType)) 
+		if ((stopFallingCollision(block, colType) && yAxisSpeed < 0) || yAxisSpeed > 0)
+		{
+			yAxisSpeed = 0;
+			newState = FALL;
+		}
+
+		if (colType == CollisionType::Stairs && Game::instance().getKey(GLFW_KEY_W))
+		{
+			changeToClimb();
+		}
+		break;
+	}
+	case FALL:
+	{
+		if (Game::instance().getKey(GLFW_KEY_A)) {
+			leftMove();
+		}
+		if (Game::instance().getKey(GLFW_KEY_D)) {
+			rightMove();
+		}
+		if (Game::instance().getKey(GLFW_KEY_S)) {
+			newState = BUTT_FALL;
+		}
+		if (stopFallingCollision(block, colType))
 		{
 			yAxisSpeed = 0;
 			newState = IDLE;
@@ -248,26 +201,122 @@ void Player::update(int deltaTime)
 		{
 			changeToClimb();
 		}
+		break;
 	}
-	if (oldState == PlayerStates::JUMP) {
+	case DODGE:
+	{
+		if (!Game::instance().getKey(GLFW_KEY_S)) {
+			setSize(STANDART_SIZE);
+			newState = IDLE;
+		}
+		if (stopFallingCollision(block, colType))
+		{
+			yAxisSpeed = 0;
+		}
+
+		if (Game::instance().getKey(GLFW_KEY_K)) {
+			newState = JUMP;
+			yAxisSpeed = JUMP_SPEED;
+		}
+		break;
+	}
+	case BUTT_FALL:
+	{
 		if (Game::instance().getKey(GLFW_KEY_A)) {
 			leftMove();
 		}
 		if (Game::instance().getKey(GLFW_KEY_D)) {
 			rightMove();
 		}
-		if (Game::instance().getKey(GLFW_KEY_S)) {
-			newState = BUTT_FALL;
-		}
-		if ((stopFallingCollision(block, colType) && yAxisSpeed < 0) || yAxisSpeed > 0) 
+		if (stopFallingCollision(block, colType))
 		{
+			if (yAxisSpeed > 0)
+				newState = IDLE;
 			yAxisSpeed = 0;
+		}
+		if (block != nullptr)
+		{
+			yAxisSpeed = BUTT_JUMP_SPEED;
+			newState = BUTT_JUMP;
+			// destruccion del objeto que devuelve
+			// delete b;
+		}
+		break;
+	}
+	case BUTT_JUMP:
+	{
+		if (Game::instance().getKey(GLFW_KEY_A)) {
+			leftMove();
+		}
+		if (Game::instance().getKey(GLFW_KEY_D)) {
+			rightMove();
+		}
+		if (stopFallingCollision(block, colType))
+		{
+			if (yAxisSpeed > 0)
+				newState = IDLE;
+			yAxisSpeed = 0;
+			position.y++;
+		}
+		if (block != nullptr)
+		{
+			yAxisSpeed = BUTT_JUMP_SPEED;
+			newState = BUTT_JUMP;
+			// destruccion del objeto que devuelve
+			// delete b;
+		}
+		break;
+	}
+	case READY_TO_PICK:
+		break;
+	case CLIMB_IDLE:
+	{
+		position.y -= int(yAxisSpeed) + 1;
+		yAxisSpeed = 0;
+
+		if (!stairCollision())
+		{
+			newState == FALL;
+			break;
+		}
+		if (Game::instance().getKey(GLFW_KEY_W)) {
+			position.y -= WALK_SPEED;
+			newState = CLIMB;
+		}
+		if (Game::instance().getKey(GLFW_KEY_S)) {
+			position.y += WALK_SPEED;
+			newState = CLIMB;
+		}
+		if (Game::instance().getKey(GLFW_KEY_L)) {
 			newState = FALL;
 		}
-
-		if (colType == CollisionType::Stairs && Game::instance().getKey(GLFW_KEY_W))
+		break;
+	}
+	case CLIMB:
 		{
-			changeToClimb();
+			position.y -= int(yAxisSpeed) + 1;
+			yAxisSpeed = 0;
+
+			if (!stairCollision())
+			{
+				newState == FALL;
+				break;
+			}
+			else
+				newState = CLIMB_IDLE;
+
+			if (Game::instance().getKey(GLFW_KEY_W)) {
+				position.y -= WALK_SPEED;
+				newState = CLIMB;
+			}
+			if (Game::instance().getKey(GLFW_KEY_S)) {
+				position.y += WALK_SPEED;
+				newState = CLIMB;
+			}
+			if (Game::instance().getKey(GLFW_KEY_L)) {
+				newState = FALL;
+			}
+			break;
 		}
 	}
 
@@ -359,6 +408,16 @@ bool Player::stopFallingCollision(Block*& block, CollisionType& colType)
 	if (colType == CollisionType::Tile || colType == CollisionType::TileStairs)
 		return true;
 	if (block != nullptr) 
+		return true;
+	return false;
+}
+
+bool Player::stairCollision()
+{
+	auto oldPos = position;
+	auto colType = CollisionManager::instance().checkCollisionVertical(this);
+	position = oldPos;
+	if (colType == CollisionType::Stairs || colType == CollisionType::TileStairs)
 		return true;
 	return false;
 }
