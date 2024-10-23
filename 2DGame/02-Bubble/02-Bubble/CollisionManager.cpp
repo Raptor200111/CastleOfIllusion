@@ -60,11 +60,13 @@ VColType CollisionManager::checkCollisionBlockVertical(Entity* objectA, Entity* 
 
 	// Check if the player's bottom side is colliding with the block's top side
 	if (size1.y > pos2.y && pos1.y < pos2.y) {
+		objectA->setPositionY(pos2.y - objectA->getSize().y);
 		return Down;
 	}
 
 	// Check if the player's top side is colliding with the block's bottom side
 	if (pos1.y < size2.y && size1.y > size2.y) {
+		objectA->setPositionY(size2.y);
 		return Up;
 	}
 
@@ -238,7 +240,7 @@ bool CollisionManager::correctRamp(Entity* entity)
 
 Block* CollisionManager::collisionEntityBlockH(Entity* entity) {
 	for (auto& it = screenBlocks.begin(); it != screenBlocks.end(); ++it) {
-		if (checkCollisionBlockHorizontal(entity, it->second)) {
+		if (checkCollisionBlockHorizontal(entity, it->second) != NoHcol) {
 
 			return it->second;
 			break;
@@ -248,9 +250,8 @@ Block* CollisionManager::collisionEntityBlockH(Entity* entity) {
 
 Block* CollisionManager::collisionEntityBlockV(Entity* entity) {
 	for (auto& it = screenBlocks.begin(); it != screenBlocks.end(); ++it) {
-		if (checkCollisionBlockVertical(entity, it->second)) {
-			int correctedY = it->second->getPosition().y - entity->getSize().y;
-			entity->setPositionY(correctedY);
+		VColType vColType = checkCollisionBlockVertical(entity, it->second);
+		if (vColType != NoVcol) {
 			return it->second;
 			break;
 		}
