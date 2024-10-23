@@ -33,6 +33,7 @@ public:
 	vector<BossShoot*> getShoots() { return shoots; }
 
 	void setActive() { active = true; }
+
 private:
 	void setHeadSpritePos();
 	void setBodyAnimations(ShaderProgram& shaderProgram);
@@ -43,13 +44,13 @@ private:
 	bool active = false;
 
 	//cycle var
-	int state= 0;                       // Boss's state
+	int state = 0;                       // Boss's state
 
 	int timeSinceLastStateChange = 0;    // Time accumulator for state changes during idle
 	int timeSinceLastShoot = 0;           // Time accumulator for shoot during move shooting
 	int cycleTime = 0;                   // Total time for the current cycle
 
-	const int idleDuration = 160*10;          // 160ms idle period
+	const int idleDuration = 160 * 10;          // 160ms idle period
 	const int stateChangeInterval = 16 * 10;   // 16ms interval for state change during idle
 	const int shootInterval = 8 * 15;          // 8ms interval for each shoot during shooting phase
 
@@ -72,4 +73,3 @@ private:
 	BossBodyStates bossBodyState = BossBodyStates::BOSS_BODY_IDLE;
 	vector<BossDragonStates> states;
 };
-

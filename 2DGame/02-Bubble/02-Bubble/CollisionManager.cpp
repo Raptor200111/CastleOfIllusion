@@ -60,7 +60,7 @@ VColType CollisionManager::checkCollisionBlockVertical(Entity* objectA, Entity* 
 
 	// Check if the player's bottom side is colliding with the block's top side
 	if (size1.y > pos2.y && pos1.y < pos2.y) {
-		return Down; 
+		return Down;
 	}
 
 	// Check if the player's top side is colliding with the block's bottom side
@@ -116,7 +116,7 @@ CollisionType CollisionManager::checkCollisionHorizontal(Entity* entity)
 	bool stairs = false;
 	bool tile = false;
 	// Check the tiles around the entity for collisions
-	for (int i = xLeft; i <= xRight; i+=inc) {
+	for (int i = xLeft; i <= xRight; i += inc) {
 		for (int j = y0; j < y1; ++j) {
 			int tileType = tileMap->getTileType(i, j);
 			if (tileType != 0 && tileType != 7 && tileType != 8) {
@@ -124,12 +124,7 @@ CollisionType CollisionManager::checkCollisionHorizontal(Entity* entity)
 				{
 					stairs = true;
 				}
-				/*else if (tileType != 7 && tileType != 8)
-				{
-
-					tile = true;
-				}*/
-				else {
+				if (tileType != 0 && tileType != 9) {
 					tile = true;
 				}
 			}
@@ -154,7 +149,7 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 	int x0 = pos.x / tileSize;
 	int x1 = (pos.x + size.x - 1) / tileSize;
 
-	vector<int> upDown= vector<int> (2, 0);
+	vector<int> upDown = vector<int>(2, 0);
 	int yUp = pos.y / tileSize;						upDown[0] = yUp;
 	int yDown = (pos.y + size.y - 1) / tileSize;	upDown[1] = yDown;
 
@@ -167,10 +162,10 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 			if (tileType != 0) {
 				if (tileType == 9)
 					stairs = true;
-				
+
 				if (j == yDown)
 				{
-					
+
 					if (pos.y + size.y > tileSize * j)
 					{
 						int posY = tileSize * j - size.y;
@@ -202,6 +197,7 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 		return Stairs;
 	return None;
 }
+
 bool CollisionManager::correctRamp(Entity* entity)
 {
 	glm::ivec2 pos = entity->getPosition();
@@ -209,7 +205,7 @@ bool CollisionManager::correctRamp(Entity* entity)
 	bool left = entity->getLeft();
 	bool tile = false;
 
-	int playerFeetX = (pos.x + size.x / 2.0f)/tileSize;
+	int playerFeetX = (pos.x + size.x / 2.0f) / tileSize;
 	//i dont put -1 cause before it already corrected it
 	int y = (pos.y + size.y) / tileSize;
 	int correctedY;
@@ -218,7 +214,7 @@ bool CollisionManager::correctRamp(Entity* entity)
 		int x = pos.x / tileSize;
 		int tileInFront = tileMap->getTileType(x, y - 1);
 		if (tileInFront == 7 || tileInFront == 8) {
-			int xInTile = tileSize- (pos.x % tileSize);
+			int xInTile = tileSize - (pos.x % tileSize);
 			correctedY = y * tileSize - size.y - xInTile;
 			entity->setPositionY(correctedY);
 			tile = true;
@@ -240,7 +236,6 @@ bool CollisionManager::correctRamp(Entity* entity)
 
 }
 
-
 Block* CollisionManager::collisionEntityBlockH(Entity* entity) {
 	for (auto& it = screenBlocks.begin(); it != screenBlocks.end(); ++it) {
 		if (checkCollisionBlockHorizontal(entity, it->second)) {
@@ -261,4 +256,3 @@ Block* CollisionManager::collisionEntityBlockV(Entity* entity) {
 		}
 	}
 }
-
