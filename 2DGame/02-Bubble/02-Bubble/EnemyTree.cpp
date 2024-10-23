@@ -1,6 +1,6 @@
 #include "EnemyTree.h"
 #include "CollisionManager.h"
-
+#include <iostream>
 #define WALK_SPEED 1
 #define GRAVITY 0.5f
 
@@ -60,29 +60,15 @@ void EnemyTree::update(int deltaTime)
 	velocity += GRAVITY;
 	position.y += int(velocity);
 
-	Block* b = CollisionManager::instance().collisionEntityBlockV(this);
-	if (b != NULL)
-	{
-		position.y = b->getPosition().y - sizeObject.y;
-		velocity = 0.f;
-	}
-	b = CollisionManager::instance().collisionEntityBlockH(this);
-	if (b != NULL)
-	{
-		position = initParams.initPos;
-		left = initParams.left;
-		moveHorizontal(left, WALK_SPEED);
-	}
-	if (CollisionManager::instance().checkCollisionVertical(this) == Tile)
-	{
-		velocity = 0.f;
-	}
-
 	sprite->setLeft(left);
 	if (sprite->animation() != enemyTreeState) {
 		glm::vec2 aux = sprite->changeAnimationDiffSize(enemyTreeState);
 		if (aux != glm::vec2(0.f))
 			sizeObject = aux;
+	}
+
+	if (sizeObject.y > 33) {
+		std::cout << "ERROR \n";
 	}
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }
@@ -90,4 +76,19 @@ void EnemyTree::update(int deltaTime)
 void EnemyTree::render()
 {
 	sprite->render();
+}
+
+void EnemyTree::collideVertical()
+{
+	velocity = 0;
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
+}
+
+void EnemyTree::collideHorizontal()
+{
+	position = initParams.initPos;
+	left = initParams.left;
+	moveHorizontal(left, WALK_SPEED);
+	sprite->setLeft(left);
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));	
 }

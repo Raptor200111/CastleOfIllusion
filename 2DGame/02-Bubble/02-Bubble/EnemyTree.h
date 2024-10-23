@@ -16,7 +16,8 @@ public:
 	void initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, const ZoneEnemy& initParams) override;
 	void update(int deltaTime) override;
 	void render() override;
-
+	void collideVertical() override;
+	void collideHorizontal() override;
 private:
 	
 	EnemyTreeStates enemyTreeState = EnemyTreeStates::WALK_RIGHT;

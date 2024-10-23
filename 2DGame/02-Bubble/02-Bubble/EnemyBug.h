@@ -16,6 +16,8 @@ public:
 	void update(int deltaTime) override;
 	void initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, const ZoneEnemy& initParams) override;
 	void render() override;
+	void collideVertical() override;
+	void collideHorizontal() override;
 
 private:
 

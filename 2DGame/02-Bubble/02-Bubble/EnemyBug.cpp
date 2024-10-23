@@ -78,23 +78,6 @@ void EnemyBug::update(int deltaTime)
 	velocity += GRAVITY;
 	position.y += int(velocity);
 
-	Block* b = CollisionManager::instance().collisionEntityBlockV(this);
-	if (b != NULL)
-	{
-		position.y = b->getPosition().y - sizeObject.y;
-		velocity = 0.f;
-	}
-	b = CollisionManager::instance().collisionEntityBlockH(this);
-	if (b != NULL)
-	{
-		left = !left;
-		moveHorizontal(left, WALK_SPEED);
-	}
-
-	if (CollisionManager::instance().checkCollisionVertical(this) == Tile)
-	{
-		velocity = 0.f;
-	}
 	sprite->setLeft(left);
 	if (sprite->animation() != enemyBugState) {
 		glm::vec2 aux = sprite->changeAnimationDiffSize(enemyBugState);
@@ -106,4 +89,19 @@ void EnemyBug::update(int deltaTime)
 void EnemyBug::render()
 {
 	sprite->render();
+}
+
+
+void EnemyBug::collideVertical()
+{
+	velocity = 0;
+}
+
+void EnemyBug::collideHorizontal()
+{
+	left = !left;
+	moveHorizontal(left, WALK_SPEED);
+	sprite->setLeft(left);
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
+
 }

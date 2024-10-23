@@ -66,7 +66,7 @@ void LevelScene::init()
 	player->setTileMap(map);
 	updateCamera();
 	initZoneEnemyTree();
-	initZoneEnemyBug();
+	//initZoneEnemyBug();
 
 	for (auto block : map->getBlocksPos()) {
 		Block* b = new Block();
@@ -183,12 +183,13 @@ void LevelScene::update(int deltaTime)
 	player->update(deltaTime);
 	updateCamera();
 
-	/*
+	
 	//??? PLAYRUN (screen, playrun+alive or screen+alive)
-	for (auto playrunEnemy : playrunEnemies) {
-		playrunEnemy->update(deltaTime);
+	for (auto screenEnemy : screenEnemies) {
+		screenEnemy.second->update(deltaTime);
 	}
 
+	/*
 	Block* a = player->PickedUpBlock();
 	if (a != NULL)
 	{
@@ -201,36 +202,43 @@ void LevelScene::update(int deltaTime)
 		//search b in allBlocks
 		//once found add it to movBlocks
 	}
+	*/
+
 
 	//collisions enemies: blocks, tiles, player
+	//--- only alive enemies
 	for (auto& itEnemy = screenEnemies.begin(); itEnemy != screenEnemies.end(); ++itEnemy)
 	{
-		//--- only alive enemies
+		/*
 		if (CollisionManager::instance().checkCollisionObject(player, itEnemy->second)) {
 			if (Player::instance().killEnemy()) {
 				it = enemies.erase(it);
 				break;
 			}
 		}
-
+		*/
 		for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
 		{
-			if (CollisionManager::instance().checkCollisionBlockVertical(itEnemy->second, itBlock->second))
+			VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(itEnemy->second, itBlock->second);
+			if (vBlockCollision != NoVcol)
 			{
+				itEnemy->second->collideVertical();
 				break;
 			}
-			if (CollisionManager::instance().checkCollisionBlockHorizontal(itEnemy->second, itBlock->second))
+			HColType hBlockCollision = CollisionManager::instance().checkCollisionBlockHorizontal(itEnemy->second, itBlock->second);
+			if (hBlockCollision != NoHcol)
 			{
+				itEnemy->second->collideHorizontal();
 				break;
 			}
 		}
-		if (CollisionManager::instance().checkCollisionVertical(itEnemy->second))
+		if (CollisionManager::instance().checkCollisionVertical(itEnemy->second) == Tile)
 		{
+			itEnemy->second->collideVertical();
 		}
-		//---
 	}
 
-	//Collision Moving Blocks: enemies, tiles
+	/*Collision Moving Blocks : enemies, tiles
 	for (auto& itMovBlock = playrunMovBlocks.begin(); itMovBlock != playrunMovBlocks.end(); ++itMovBlock)
 	{
 		for (auto& itPlayrunEnemy : playrunEnemies) {
@@ -250,7 +258,7 @@ void LevelScene::update(int deltaTime)
 	if (gameUI.getTime() < 398)
 		boss.setActive();
 
-	boss.update(deltaTime);
+	//boss.update(deltaTime);
 	gameUI.update(deltaTime);
 }
 
