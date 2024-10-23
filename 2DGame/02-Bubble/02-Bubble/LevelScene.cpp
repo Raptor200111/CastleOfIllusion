@@ -13,7 +13,7 @@
 #define SCREEN_Y 16
 
 #define INIT_PLAYER_X_TILES 2//+35+36// 4+20
-#define INIT_PLAYER_Y_TILES 8//44+2 //20
+#define INIT_PLAYER_Y_TILES 44//+8+2 //20
 
 LevelScene::LevelScene()
 {
@@ -28,7 +28,7 @@ LevelScene::LevelScene()
 
 }
 
-LevelScene::~LevelScene() 
+LevelScene::~LevelScene()
 {
 	if (map != NULL)
 		delete map;
@@ -65,9 +65,9 @@ void LevelScene::init()
 	player->setPosition(glm::vec2((INIT_PLAYER_X_TILES)*map->getTileSize(), (INIT_PLAYER_Y_TILES)*map->getTileSize()));
 	player->setTileMap(map);
 	updateCamera();
-	//initZoneEnemyTree();
-	//initZoneEnemyBug();
-	
+	initZoneEnemyTree();
+	initZoneEnemyBug();
+
 	for (auto block : map->getBlocksPos()) {
 		Block* b = new Block();
 		//cout << block.pos.x << " " << block.pos.y << "\n";
@@ -78,12 +78,12 @@ void LevelScene::init()
 	}
 	playrunBlocks = allBlocks;
 	playrunEnemies = allEnemies;
-	
+
 	//background
 	bgMap = TileMap::createTileMap("levels/bgTileMap.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 
 	bgTexture.loadFromFile("images/portada.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	glm::vec2 bgSize =map->getMapSize() * map->getTileSize();
+	glm::vec2 bgSize = map->getMapSize() * map->getTileSize();
 	bgQuad = Sprite::createSprite(bgSize, glm::vec2(1.f, 1.f), &bgTexture, &texProgram);
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH), float(SCREEN_HEIGHT), 0.f);
@@ -107,22 +107,22 @@ void LevelScene::initZoneEnemyTree()
 	vector<ZoneEnemy> zones;
 	Zone limit = { 4.0f * map->getTileSize(), 22.0f * map->getTileSize(), 0, 0 };
 	glm::ivec2 initPos = glm::ivec2(20.0f, 7.0f);
-	ZoneEnemy zone1 = {limit, initPos, true };
+	ZoneEnemy zone1 = { limit, initPos, true };
 	zones.push_back(zone1);
 
 	limit = { 26.0f * map->getTileSize(), 38.0f * map->getTileSize(), 0, 0 };
 	initPos = glm::ivec2(37.0f, 6.0f);
-	ZoneEnemy zone2 = {limit, initPos, true };
+	ZoneEnemy zone2 = { limit, initPos, true };
 	zones.push_back(zone2);
 
 	limit = { 39.0f * map->getTileSize(), 46.0f * map->getTileSize(), 0, 0 };
 	initPos = glm::ivec2(45.0f, 7.0f);
-	ZoneEnemy zone3 = {limit, initPos, true };
+	ZoneEnemy zone3 = { limit, initPos, true };
 	zones.push_back(zone3);
 
 	limit = { 54.0f * map->getTileSize(), 66.0f * map->getTileSize(), 0, 0 };
 	initPos = glm::ivec2(65.0f, 6.0f);
-	ZoneEnemy zone4 = {limit, initPos, true };
+	ZoneEnemy zone4 = { limit, initPos, true };
 	zones.push_back(zone4);
 
 	for (auto zone : zones) {
@@ -177,6 +177,7 @@ void LevelScene::update(int deltaTime)
 {
 	//update screenBlocks and screenEnemies
 	insideScreenObj();
+
 
 
 	player->update(deltaTime);
@@ -265,11 +266,11 @@ void LevelScene::render()
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 
 	//background
-	
+
 	bgTexture.use();
 	bgQuad->render();
 	bgMap->render();
-	
+
 	//level
 	map->render();
 	player->render();
@@ -289,7 +290,7 @@ void LevelScene::render()
 
 	boss.render();
 	gameUI.render();
-	
+
 }
 
 void LevelScene::updateCamera()
@@ -308,13 +309,13 @@ void LevelScene::updateCamera()
 
 	// Constrain the camera within the map boundaries
 	float maxCameraX = map->getMapSize().x * map->getTileSize() - zoomScreenWidth;
-	float maxCameraY = map->getMapSize().y * map->getTileSize() - zoomScreenHeight+50;
+	float maxCameraY = map->getMapSize().y * map->getTileSize() - zoomScreenHeight + 50;
 
 	if (cameraPosition.x < 0) cameraPosition.x = 0;
 	if (cameraPosition.y < 0) cameraPosition.y = 0;
 	if (cameraPosition.x > maxCameraX) cameraPosition.x = maxCameraX;
 	if (cameraPosition.y > maxCameraY) cameraPosition.y = maxCameraY;
-	cam = { cameraPosition.x, cameraPosition.x + zoomScreenWidth, 
+	cam = { cameraPosition.x, cameraPosition.x + zoomScreenWidth,
 		cameraPosition.y + zoomScreenHeight, cameraPosition.y };
 
 	// Update projection matrix to account for camera movement

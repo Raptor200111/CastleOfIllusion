@@ -59,11 +59,10 @@ private:
 	TileMap* bgMap;
 
 
-	 GameUI gameUI;
-	 BossDragon boss;
+	GameUI gameUI;
+	BossDragon boss;
 };
 
 #endif // _LEVEL_SCENE_INCLUDE
-
 
 
