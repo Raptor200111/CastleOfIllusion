@@ -13,7 +13,7 @@
 #define SCREEN_Y 16
 
 #define INIT_PLAYER_X_TILES 2//+35+36// 4+20
-#define INIT_PLAYER_Y_TILES 44//+8+2 //20
+#define INIT_PLAYER_Y_TILES 8//44//+8+2 //20
 
 LevelScene::LevelScene()
 {
@@ -179,7 +179,7 @@ void LevelScene::update(int deltaTime)
 	insideScreenObj();
 
 
-
+	CollisionManager::instance().update(screenBlocks);
 	player->update(deltaTime);
 	updateCamera();
 
