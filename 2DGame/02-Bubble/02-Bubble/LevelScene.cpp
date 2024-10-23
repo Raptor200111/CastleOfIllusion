@@ -22,6 +22,10 @@ LevelScene::LevelScene()
 	zoomLevel = 2.5f;
 	bgMap = NULL;
 	bgQuad = NULL;
+	screenEnemies = std::map<string, Enemy*>();
+	screenBlocks = std::map<string, Block*>();
+	playrunMovBlocks = std::map<string, Block*>();
+
 }
 
 LevelScene::~LevelScene() 
@@ -34,13 +38,16 @@ LevelScene::~LevelScene()
 		delete bgQuad;
 
 	//quitar
-	for (auto block : blocksObj) {
+	for (auto block : allBlocks) {
 		delete block;
 	}
-	blocksObj.clear();
-	for (auto e : enemiesObj)
+	playrunBlocks.clear();
+	screenBlocks.clear();
+	playrunMovBlocks.clear();
+	for (auto e : allEnemies)
 		delete e;
-	enemiesObj.clear();
+	playrunEnemies.clear();
+	screenEnemies.clear();
 }
 
 void LevelScene::init()
@@ -67,9 +74,10 @@ void LevelScene::init()
 		b->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, block.type);
 		b->setPosition(glm::ivec2(block.pos.x * map->getTileSize(), block.pos.y * map->getTileSize()));
 		b->setTileMap(map);
-		blocksObj.push_back(b);
+		allBlocks.push_back(b);
 	}
-	CollisionManager::instance().sceneInit(cam,blocksObj, enemiesObj);
+	playrunBlocks = allBlocks;
+	playrunEnemies = allEnemies;
 	
 	//background
 	bgMap = TileMap::createTileMap("levels/bgTileMap.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -84,10 +92,11 @@ void LevelScene::init()
 
 
 	Zone limit = { 4.0f * map->getTileSize(), 22.0f * map->getTileSize(), 0, 0 };
-	glm::ivec2 initPos = glm::ivec2(10.0f, 38.0f);
-	ZoneEnemy zone1 = { limit, initPos, false };
+	glm::ivec2 finalPosBoss = glm::ivec2(10.0f * map->getTileSize(), 38.0f * map->getTileSize());
+	ZoneEnemy zone1 = { limit, finalPosBoss, false };
 	boss.initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone1);
-	boss.setBossPosition(glm::ivec2(zone1.initPos.x * map->getTileSize(), zone1.initPos.y * map->getTileSize()));
+	glm::ivec2 initPos = glm::ivec2(finalPosBoss.x, finalPosBoss.y - 110);
+	boss.setBossPosition(initPos);
 	boss.setTileMap(map);
 	//211ms
 
@@ -121,7 +130,7 @@ void LevelScene::initZoneEnemyTree()
 		enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone);
 		enemy->setPosition(glm::ivec2(zone.initPos.x * map->getTileSize(), zone.initPos.y * map->getTileSize()));
 		enemy->setTileMap(map);
-		enemiesObj.push_back(enemy);
+		allEnemies.push_back(enemy);
 
 	}
 }
@@ -159,20 +168,87 @@ void LevelScene::initZoneEnemyBug()
 		enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone);
 		enemy->setPosition(glm::ivec2(zone.initPos.x * map->getTileSize(), zone.initPos.y * map->getTileSize()));
 		enemy->setTileMap(map);
-		enemiesObj.push_back(enemy);
+		allEnemies.push_back(enemy);
 
 	}
 }
 
 void LevelScene::update(int deltaTime)
 {
+	//update screenBlocks and screenEnemies
+	insideScreenObj();
+
 
 	player->update(deltaTime);
-
 	updateCamera();
-	
-	
-	CollisionManager::instance().update(deltaTime, cam);
+
+	/*
+	//??? PLAYRUN (screen, playrun+alive or screen+alive)
+	for (auto playrunEnemy : playrunEnemies) {
+		playrunEnemy->update(deltaTime);
+	}
+
+	Block* a = player->PickedUpBlock();
+	if (a != NULL)
+	{
+		//search a in playrunBlocks
+		//remove it from playrunBlocks
+	}
+	//PULLING TO CHECK IF PLAYER THREW ANY BLOCK
+	Block* b = player->ThrownBlock();
+	if (b != NULL) {
+		//search b in allBlocks
+		//once found add it to movBlocks
+	}
+
+	//collisions enemies: blocks, tiles, player
+	for (auto& itEnemy = screenEnemies.begin(); itEnemy != screenEnemies.end(); ++itEnemy)
+	{
+		//--- only alive enemies
+		if (CollisionManager::instance().checkCollisionObject(player, itEnemy->second)) {
+			if (Player::instance().killEnemy()) {
+				it = enemies.erase(it);
+				break;
+			}
+		}
+
+		for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
+		{
+			if (CollisionManager::instance().checkCollisionBlockVertical(itEnemy->second, itBlock->second))
+			{
+				break;
+			}
+			if (CollisionManager::instance().checkCollisionBlockHorizontal(itEnemy->second, itBlock->second))
+			{
+				break;
+			}
+		}
+		if (CollisionManager::instance().checkCollisionVertical(itEnemy->second))
+		{
+		}
+		//---
+	}
+
+	//Collision Moving Blocks: enemies, tiles
+	for (auto& itMovBlock = playrunMovBlocks.begin(); itMovBlock != playrunMovBlocks.end(); ++itMovBlock)
+	{
+		for (auto& itPlayrunEnemy : playrunEnemies) {
+			if (CollisionManager::instance().checkCollisionObject(itPlayrunEnemy, itMovBlock->second))
+			{
+				break;
+			}
+
+		}
+		if (CollisionManager::instance().checkCollisionVertical(itMovBlock->second))
+		{
+		}
+	}
+
+	*/
+	//change condition to when player appears
+	if (gameUI.getTime() < 398)
+		boss.setActive();
+
 	boss.update(deltaTime);
 	gameUI.update(deltaTime);
 }
@@ -197,13 +273,18 @@ void LevelScene::render()
 	//level
 	map->render();
 	player->render();
-	for (const auto& enemy : CollisionManager::instance().enemies) {
-		enemy.second->render();
+	for (const auto& screenEnemy : screenEnemies) {
+		screenEnemy.second->render();
 	}
 
-	for (const auto& block : CollisionManager::instance().blocks)
+	for (const auto& screenBlock : screenBlocks)
 	{
-		block.second->render();
+		screenBlock.second->render();
+	}
+
+	for (const auto& movBlock : playrunMovBlocks)
+	{
+		movBlock.second->render();
 	}
 
 	boss.render();
@@ -244,6 +325,59 @@ void LevelScene::updateCamera()
 
 }
 
+
+void LevelScene::insideScreenObj()
+{
+	int tileSize = map->getTileSize();
+	for (auto& playrunEnemy : playrunEnemies)
+	{
+		glm::ivec2 posEnemyId = playrunEnemy->getInitPos();
+		glm::ivec2 posEnemy = playrunEnemy->getPosition();
+		glm::ivec2 posEnemyToCompare = glm::ivec2(posEnemyId.x * tileSize, posEnemyId.y * tileSize);
+		string idEnemy = std::to_string(posEnemyId.x) + " " + std::to_string(posEnemyId.y);
+		if (insideScreen(posEnemyToCompare))
+		{
+			if (screenEnemies.find(idEnemy) == screenEnemies.end())
+			{
+				screenEnemies.insert(std::pair<string, Enemy*>(idEnemy, playrunEnemy));
+			}
+		}
+		else
+		{
+			if (screenEnemies.find(idEnemy) != screenEnemies.end()) {
+				screenEnemies.erase(idEnemy);
+			}
+		}
+	}
+	for (auto& playrunBlock : playrunBlocks)
+	{
+		glm::ivec2 posBlock = playrunBlock->getPosition();
+		string idBlock = std::to_string(posBlock.x) + " " + std::to_string(posBlock.y);
+		if (insideScreen(posBlock))
+		{
+			if (screenBlocks.find(idBlock) == screenBlocks.end())
+			{
+				screenBlocks.insert(std::pair<string, Block*>(idBlock, playrunBlock));
+			}
+		}
+		else
+		{
+			if (screenBlocks.find(idBlock) != screenBlocks.end()) {
+				screenBlocks.erase(idBlock);
+			}
+		}
+	}
+
+}
+
+bool LevelScene::insideScreen(const glm::ivec2& pos)
+{
+
+	if (cam.left < pos.x && pos.x < cam.right && cam.top < pos.y && pos.y < cam.bottom) {
+		return true;
+	}
+	return false;
+}
 
 void LevelScene::initShaders()
 {
