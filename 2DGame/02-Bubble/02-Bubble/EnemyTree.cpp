@@ -45,37 +45,63 @@ void EnemyTree::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgr
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }
 
+//if enemy is dying activate die sequence that lasts x time
+//		start counting until timeDyingAnim
+//once dying seq ends, set dead to true;
+//if enemy tree and dead, regenerates after x time
+		//start counting until timeToRegenerate
 void EnemyTree::update(int deltaTime)
 {
 	glm::vec2 aux = sprite->updateDiffSize(deltaTime);
 	if (aux != glm::vec2(0.f))
 		sizeObject = aux;
-	enemyTreeState = WALK_RIGHT;
-	moveHorizontal(left, WALK_SPEED);
-	//if outside limit
-	if (position.x < initParams.limit.min_x || initParams.limit.max_x < position.x) {
-		position = initParams.initPos* map->getTileSize();
+	elapsedTime += deltaTime;
+	if (entityState == Dying) {
+		enemyTreeState = DIE_RIGHT;
+		if (elapsedTime >= timeDyingAnim)
+		{
+			entityState = Dead;
+			elapsedTime = 0;
+		}
 	}
+	else if (entityState == Dead) {
+		if (elapsedTime >= timeToRegenerate)
+		{
+			entityState = Alive;
+			elapsedTime = 0;
+			position = initParams.initPos * map->getTileSize();
+			left = initParams.left;
+		}
+	}
+	else {
+		elapsedTime = 0;
+		enemyTreeState = WALK_RIGHT;
+		moveHorizontal(left, WALK_SPEED);
 
-	velocity += GRAVITY;
-	position.y += int(velocity);
+		//change: if enemy outside screen start waiting period to restart
+		//if outside limit
+		if (position.x < initParams.limit.min_x || initParams.limit.max_x < position.x) {
+			position = initParams.initPos* map->getTileSize();
+			left = initParams.left;
+		}
 
+		velocity += GRAVITY;
+		position.y += int(velocity);
+	}
 	sprite->setLeft(left);
 	if (sprite->animation() != enemyTreeState) {
 		glm::vec2 aux = sprite->changeAnimationDiffSize(enemyTreeState);
 		if (aux != glm::vec2(0.f))
 			sizeObject = aux;
 	}
-
-	if (sizeObject.y > 33) {
-		std::cout << "ERROR \n";
-	}
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }
 
 void EnemyTree::render()
 {
-	sprite->render();
+	if (entityState != Dead) {
+		sprite->render();
+	}
 }
 
 void EnemyTree::collideVertical()
@@ -84,11 +110,10 @@ void EnemyTree::collideVertical()
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }
 
-void EnemyTree::collideHorizontal()
+void EnemyTree::collideHorizontal(Block* b)
 {
-	position = initParams.initPos;
-	left = initParams.left;
-	moveHorizontal(left, WALK_SPEED);
+	//trees can jump over blocks;
+	position.y = b->getPosition().y - sizeObject.y;
 	sprite->setLeft(left);
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));	
 }

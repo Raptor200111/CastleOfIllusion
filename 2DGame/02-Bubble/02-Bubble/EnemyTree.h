@@ -17,9 +17,11 @@ public:
 	void update(int deltaTime) override;
 	void render() override;
 	void collideVertical() override;
-	void collideHorizontal() override;
+	void collideHorizontal(Block* b) override;
 private:
-	
+	int elapsedTime = 0;
+	int timeDyingAnim = 500; //0,5 s
+	int timeToRegenerate = 2000; //2s
 	EnemyTreeStates enemyTreeState = EnemyTreeStates::WALK_RIGHT;
 
 };

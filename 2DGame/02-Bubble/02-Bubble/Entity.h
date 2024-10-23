@@ -21,7 +21,11 @@ public:
 	void setPositionY(int y) { position.y = y; }
 	bool getLeft() { return left; }
 
+	EntityState getEntityState() { return entityState; }
+	void setEntityState(EntityState s) { entityState = s; }
+
 protected:
+	EntityState entityState = Alive;
 	bool left;
 	Texture spritesheet;
 	Sprite* sprite;

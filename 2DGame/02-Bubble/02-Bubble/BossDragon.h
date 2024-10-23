@@ -30,7 +30,7 @@ public:
 	}
 
 	void collideVertical() override {}
-	void collideHorizontal() override {}
+	void collideHorizontal(Block* b) override {}
 
 	vector<BossShoot*> getShoots() { return shoots; }
 

@@ -17,6 +17,13 @@ enum EnemyType
 	Bug,
 };
 
+enum EntityState
+{
+	Alive,
+	Dead,
+	Dying
+};
+
 enum CollisionType
 {
 	None,
