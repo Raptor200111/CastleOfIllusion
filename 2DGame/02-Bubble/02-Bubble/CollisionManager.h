@@ -18,28 +18,31 @@ public:
 		return CM;
 	}
 	void init(TileMap* tileMap);
-	void sceneInit(Cam camera, const std::vector<Block*>& blocksObj, const vector<Enemy*>& enemiesObj);
 	bool checkCollisionObject(Entity* objectA, Entity* objectB);
 	CollisionType checkCollisionHorizontal(Entity* entity);
 	CollisionType checkCollisionVertical(Entity* entity);
-
-	void update(int deltaTime, Cam camera);
-	
-	Block* collisionEntityBlockH(Entity* entity);
-	Block* collisionEntityBlockV(Entity* entity);
-
-	bool checkCollisionStairs(Entity* entity);
-	std::map<string, Enemy*> enemies;
-	std::map<string, Block*> blocks;
-private:
 	VColType checkCollisionBlockVertical(Entity* objectA, Entity* objectB);
 	HColType checkCollisionBlockHorizontal(Entity* objectA, Entity* objectB);
-	void insideScreenObj(Cam cam);
-	bool insideScreen(glm::ivec2 pos, Cam cam);
+	
 
-	bool correctRamp(Entity* entity);
-	vector<Enemy*> enemiesObj;
-	vector<Block*> blocksObj;
+//---shoud disappear
+	void update(const std::map<string, Block*>& screenBlocks);
+
+	//functions check collision that player calls
+	Block* collisionEntityBlockH(Entity* entity);
+	Block* collisionEntityBlockV(Entity* entity);
+//---
+
+
+private:
+	int correctRampPos(int tileX, int tileY, int sizeY, glm::ivec2 pos, bool left);
+
+
+//---shoud disappear
+	std::map<string, Block*> screenBlocks;
+//---
+
+
 	int tileSize;
 	TileMap* tileMap;
 	glm::ivec2 mapSize;
