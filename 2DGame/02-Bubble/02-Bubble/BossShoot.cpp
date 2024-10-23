@@ -1,9 +1,12 @@
+#define _USE_MATH_DEFINES
+
 #include "BossShoot.h"
 #include <cmath>
 #include <iostream>
+
 void BossShoot::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
-	velocity = glm::vec2(1.0f);
+	endDirection = glm::vec2(1.0f);
 
 	setShootAnimations(shaderProgram);
 	tileMapDispl = tileMapPos;
@@ -12,31 +15,36 @@ void BossShoot::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 }
 void BossShoot::update(int deltaTime) {
 	sprite->updateDiffSize(deltaTime);
-	
 	if (active) {
 		float deltaSeconds = deltaTime / 1000.0f;
-		float aux = speed * deltaSeconds;
-		glm::ivec2 add = glm::ivec2(std::ceill(velocity.x * aux), std::ceill(velocity.y * aux));
-		position += add;
-		//cout << "Shoot" << position.x << " " << position.y << "\n";
+		glm::vec2 direction = glm::vec2(endDirection - glm::vec2(position));
+		glm::vec2 normalizedDirection = glm::normalize(direction);
+		glm::vec2 movement = normalizedDirection * speed * deltaSeconds;
+		position += glm::ivec2(glm::round(movement));
+		//cout << "ShootV" << velocity.x << " " << velocity.y << "\n";
+		//cout << "ShootAdd" << add.x << " " <<z add.y << "\n";
 		if(position.x < 0 || position.x > 96*16 || position.y < 0 || position.y> 736)
 		{
 			elapsedTime = 0;
 			active = false;
 		}
 	}
-
+	if (sprite->animation() != shootState) {
+		glm::vec2 aux = sprite->changeAnimationDiffSize(shootState);
+		if (aux != glm::vec2(0.f))
+			sizeObject = aux;
+	}
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }
+
 void BossShoot::render() {
 	if(active)
 		sprite->render();
 }
 
-void BossShoot::setAngle(float angle)
+void BossShoot::setDirection(glm::vec2 direction)
 {
-	float angleRadians = glm::radians(angle);
-	velocity.x = std::cos(angleRadians);
-	velocity.y = std::sin(angleRadians);
+	this->endDirection = direction;
 }
 void BossShoot::setShootAnimations(ShaderProgram& shaderProgram)
 

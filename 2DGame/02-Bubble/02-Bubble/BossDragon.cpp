@@ -31,9 +31,9 @@ void BossDragon::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProg
 	this->initParams = initParams;
 	states = { BOSS_LEFT, BOSS_LEFT_DOWN, BOSS_DOWN, BOSS_RIGHT_DOWN, BOSS_DOWN, BOSS_LEFT_DOWN };
 	angleShoots = vector<vector<float>> {
-		{0.f, 15.f, 30.f},
-		{45.f, 60.f, 75.f},
-		{90.f, 105.f, 120.f} };
+		{185.f, 160.f, 140.f},
+		{130.f, 110.f, 90.f},
+		{85.f, 70.f, 35.f} };
 	setBodyAnimations(shaderProgram);
 	
 	setHeadAnimations(shaderProgram);
@@ -263,27 +263,30 @@ void BossDragon::shoot(int deltaTime)
 	glm::ivec2 direction = Player::instance().getPosition() - posHead;
 	float angle = atan2(direction.y, direction.x);  // Invert y-axis since we're interested in the bottom half.
 	float angleDegrees = glm::degrees(angle);
-	//cout << angleDegrees << "\n";
 	if (angleDegrees < 0) angleDegrees += 180;  // Ensure the angle is positive
 	BossDragonStates objective;
-	angleDegrees = 130;
 	if (angleDegrees >= 135 && angleDegrees < 180) {
 		objective = BOSS_LEFT ;
-		indexAngleShoot = 135;
+		indexQuadrantShoot = 0;
 	}
 	else if (angleDegrees >= 90 && angleDegrees < 135) {
 		objective = BOSS_LEFT_DOWN;
-		indexAngleShoot = 90;
+		indexQuadrantShoot = 1;
 	}
 	else {
 		//(angleDegrees0-90
 		objective = BOSS_RIGHT_DOWN;
-		indexAngleShoot = 45;
+		indexQuadrantShoot = 2;
 	}
+	indexAngleShoot++;
+	indexAngleShoot %= MaxShoots;
+	cout << "indexAngleShoot"<< indexAngleShoot << "\n";
 	changeHeadState(objective);
 	setHeadSpritePos();
-	//cout << "shootAngle" << indexAngleShoot + (shootCount * 1.3) << "\n";
-	shoots[shootCount]->setPosition(positionStartShoot);
-	shoots[shootCount]->setAngle(indexAngleShoot + (shootCount*1.3));
-	shoots[shootCount]->setActive();
+	shoots[indexAngleShoot]->setPosition(positionStartShoot);
+	float a = angleShoots[indexQuadrantShoot][indexAngleShoot];
+	a = glm::radians(a);
+	glm::vec2 dir = glm::vec2(positionStartShoot.x + 350 * cos(a), positionStartShoot.y+ 350 * sin(a));
+	shoots[indexAngleShoot]->setDirection(dir);
+	shoots[indexAngleShoot]->setActive();
 }
