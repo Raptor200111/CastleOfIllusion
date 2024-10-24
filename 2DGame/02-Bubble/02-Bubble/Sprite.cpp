@@ -2,7 +2,7 @@
 #include <GL/gl.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Sprite.h"
-
+#include <iostream>
 
 Sprite *Sprite::createSprite(const glm::vec2 &quadSize, const glm::vec2 &sizeInSpritesheet, Texture *spritesheet, ShaderProgram *program)
 {
@@ -34,11 +34,13 @@ Sprite::Sprite(const glm::vec2 &quadSize, const glm::vec2 &sizeInSpritesheet, Te
 	position = glm::vec2(0.f);
 	size = quadSize;
 	left = false;
+	playingOnce = false;
+	playingNow = false;
 }
 
 void Sprite::update(int deltaTime)
 {
-	if(currentAnimation >= 0)
+	if(playingNow)
 	{
 		timeAnimation += deltaTime;
 		while(timeAnimation > animations[currentAnimation].millisecsPerKeyframe)
@@ -47,6 +49,11 @@ void Sprite::update(int deltaTime)
 			currentKeyframe = (currentKeyframe + 1) % animations[currentAnimation].keyframeDispl.size();
 		}
 		texCoordDispl = animations[currentAnimation].keyframeDispl[currentKeyframe];
+		if (playingOnce && (currentKeyframe == (animations[currentAnimation].keyframeDispl.size() - 1)))
+		{
+			playingOnce = false;
+			playingNow = false;
+		}
 	}
 }
 
@@ -95,18 +102,22 @@ void Sprite::addKeyframe(int animId, const glm::vec2 &displacement)
 
 void Sprite::changeAnimation(int animId)
 {
-	if(animId < int(animations.size()))
+	if (animId < int(animations.size()))
 	{
+		playingNow = true;
 		currentAnimation = animId;
 		currentKeyframe = 0;
 		timeAnimation = 0.f;
 		texCoordDispl = animations[animId].keyframeDispl[0];
 	}
+	else
+		playingNow = false;
 }
 
 //Added
-void Sprite::updateDiffSize(int deltaTime)
+glm::vec2 Sprite::updateDiffSize(int deltaTime)
 {
+	glm::vec2 quadsize = glm::vec2(0.f);
 	if (currentAnimation >= 0)
 	{
 		timeAnimation += deltaTime;
@@ -120,7 +131,9 @@ void Sprite::updateDiffSize(int deltaTime)
 
 		}
 		texCoordDispl = animations[currentAnimation].keyframeDispl[currentKeyframe];
+		quadsize = animations[currentAnimation].quadSizes[currentKeyframe];
 	}
+	return quadsize;
 }
 
 void Sprite::addKeyframeDiffSize(int animId, const glm::vec2& displacement, const glm::vec2& quadSize, const glm::vec2& sizeInSpritesheet)
@@ -136,8 +149,9 @@ void Sprite::addKeyframeDiffSize(int animId, const glm::vec2& displacement, cons
 	}
 }
 
-void Sprite::changeAnimationDiffSize(int animId)
+glm::vec2 Sprite::changeAnimationDiffSize(int animId)
 {
+	glm::vec2 quadsize = glm::vec2(0.f);
 	if (animId < int(animations.size()))
 	{
 		currentAnimation = animId;
@@ -149,7 +163,9 @@ void Sprite::changeAnimationDiffSize(int animId)
 		currentQuadSize = animations[animId].quadSizes[0];  
 		currentSpriteSheetSize = animations[animId].spriteSheetSizes[0];
 		updateVertexData(currentQuadSize, currentSpriteSheetSize);
+		quadsize = currentQuadSize;
 	}
+	return quadsize;
 }
 
 void Sprite::updateVertexData(const glm::vec2& quadSize, const glm::vec2& sizeInSpritesheet)
@@ -165,6 +181,33 @@ void Sprite::updateVertexData(const glm::vec2& quadSize, const glm::vec2& sizeIn
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), vertices, GL_STATIC_DRAW);
 
+}
+
+void Sprite::setPlayingOnce(bool playingOnce)
+{
+	this->playingOnce = playingOnce;
+}
+
+bool Sprite::getPlayingNow()
+{
+	return playingNow;
+}
+
+void Sprite::play()
+{
+	if (currentAnimation >= 0)
+		playingNow = true;
+}
+
+void Sprite::stop()
+{
+	playingNow = false;
+}
+
+void Sprite::playOnce()
+{
+	playingOnce = true;
+	play();
 }
 
 int Sprite::animation() const

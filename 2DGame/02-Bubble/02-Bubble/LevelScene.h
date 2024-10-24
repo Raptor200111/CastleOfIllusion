@@ -1,9 +1,5 @@
 #pragma once
 
-struct Cam {
-	float left, right, bottom, top;
-};
-
 #ifndef _LEVEL_SCENE_INCLUDE
 #define _LEVEL_SCENE_INCLUDE
 
@@ -12,8 +8,9 @@ struct Cam {
 #include "Player.h"
 #include "Enemy.h"
 #include "Block.h"
-#include <map>
+#include <vector>
 #include "GameUI.h"
+#include "BossDragon.h"
 
 class LevelScene : public Scene
 {
@@ -29,24 +26,32 @@ private:
 	void updateCamera();
 	void initZoneEnemyTree();
 	void initZoneEnemyBug();
-	void insideEnemyTreeZone(glm::ivec2& posPlayer);
+
+
+
+	void insideScreenObj();
+	bool insideScreen(const glm::ivec2& pos);
+
+	vector<Enemy*> playrunEnemies;
+	vector<Block*> playrunBlocks;
+
+	vector<Enemy*> allEnemies;
+	vector<Block*> allBlocks;
+
+	std::map<string, Enemy*> screenEnemies;
+	std::map<string, Block*> screenBlocks;
+	std::map<string, Block*>  playrunMovBlocks;
+	vector<BossShoot*> shoots;
 
 	TileMap* map;
 	Player* player;
-	std::map<int, std::vector<Block*>> blocksByType; //key == typeBlock
-	ShaderProgram texProgram;
+
 	float currentTime;
 	glm::mat4 projection;
-
+	ShaderProgram texProgram;
 	float zoomLevel;
 	glm::vec2 cameraPosition;
-
-	//activeEnemies
-	std::map<int,Enemy*> enemies;
-
-	//all enemies
-	vector<InitEnemy> enemyZones;
-	InitEnemy debug;
+	Cam cam;
 
 
 	//background
@@ -55,10 +60,11 @@ private:
 	TileMap* bgMap;
 
 
-	 GameUI gameUI;
+	GameUI gameUI;
+	BossDragon boss;
+	bool insideBossRoom= false;
 };
 
 #endif // _LEVEL_SCENE_INCLUDE
-
 
 

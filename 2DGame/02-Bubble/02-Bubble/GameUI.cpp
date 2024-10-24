@@ -46,7 +46,6 @@ void GameUI::init()
 	bgTexture.setMagFilter(GL_NEAREST);
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH), float(SCREEN_HEIGHT), 0.f);
-	currentTime = 0.0f;
 
 	// Select which font you want to use
 		//if (!text.init("fonts/OpenSans-Regular.ttf"))
@@ -54,13 +53,19 @@ void GameUI::init()
 		//if(!text.init("fonts/DroidSerif.ttf"))
 	if (!text.init("fonts/retro_computer_personal_use.ttf"))
 		cout << "Could not load font!!!" << endl;
+
 		
 }
 
 void GameUI::update(int deltaTime)
 {
-	currentTime += deltaTime;
-	time -= (deltaTime/ 1000000.0f);
+	elapsedTime += deltaTime;
+	if (elapsedTime >= maxTime) {
+		//die maximum time;
+		Game::instance().onExceededTimeLimit();
+		elapsedTime = 0;
+	}
+	time = (maxTime-elapsedTime)/1000;
 }
 
 void GameUI::render()
@@ -89,6 +94,7 @@ void GameUI::render()
 	texProgram.setUniformMatrix4f("modelview", modelview);
 	bg->render(bgTexture);
 
+	int stars = Game::instance().getStars();
 	for (int i = 0; i < stars; i++)
 	{
 		modelview = glm::mat4(1.0f);
@@ -101,10 +107,10 @@ void GameUI::render()
 	}
 
 	text.render("0", glm::vec2(295, SCREEN_HEIGHT - 20), textSize, glm::vec4(1, 1, 1, 1));
-	text.render(std::to_string(tries), glm::vec2(295+ textSize, SCREEN_HEIGHT - 20), textSize, glm::vec4(1, 1, 1, 1));
+	text.render(std::to_string(Game::instance().getTries()), glm::vec2(295+ textSize, SCREEN_HEIGHT - 20), textSize, glm::vec4(1, 1, 1, 1));
 
 	std::ostringstream oss;
-	oss << std::setw(6) << std::setfill('0') << points;
+	oss << std::setw(6) << std::setfill('0') << Game::instance().getScore();
 	std::string numStr = oss.str();
 	text.render(numStr, glm::vec2(380, SCREEN_HEIGHT - 20), textSize, glm::vec4(1, 1, 1, 1));
 

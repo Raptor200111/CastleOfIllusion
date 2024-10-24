@@ -4,28 +4,31 @@
 #include <cmath>
 #include "Scene.h"
 #include "Game.h"
+#include "Enemy.h"
 #include "EnemyTree.h"
 #include "EnemyBug.h"
-
+#include "CollisionManager.h"
 
 #define SCREEN_X 32
 #define SCREEN_Y 16
 
 #define INIT_PLAYER_X_TILES 2//+35+36// 4+20
-#define INIT_PLAYER_Y_TILES 8//+8+2 //20
+#define INIT_PLAYER_Y_TILES 44//+8+2 //20
 
 LevelScene::LevelScene()
 {
 	map = NULL;
 	player = NULL;
-	blocksByType = std::map<int, std::vector<Block*>>();
-	enemies = std::map<int, Enemy*>();
 	zoomLevel = 2.5f;
 	bgMap = NULL;
 	bgQuad = NULL;
+	screenEnemies = std::map<string, Enemy*>();
+	screenBlocks = std::map<string, Block*>();
+	playrunMovBlocks = std::map<string, Block*>();
+
 }
 
-LevelScene::~LevelScene() 
+LevelScene::~LevelScene()
 {
 	if (map != NULL)
 		delete map;
@@ -37,140 +40,304 @@ LevelScene::~LevelScene()
 		delete bgMap;
 	if (bgQuad != NULL)
 		delete bgQuad;
-	for (auto blockTypes : blocksByType) {
-		for (auto block : blockTypes.second) {
-			delete block;
-		}
+
+	//quitar
+	for (auto block : allBlocks) {
+		delete block;
 	}
-	for (auto& pair : enemies)
-	{
-		delete pair.second;
-	}
-	enemies.clear();
+	playrunBlocks.clear();
+	screenBlocks.clear();
+	playrunMovBlocks.clear();
+	for (auto e : allEnemies)
+		delete e;
+	playrunEnemies.clear();
+	screenEnemies.clear();
 }
 
 void LevelScene::init()
 {
 	initShaders();
+	//sound
+	SoundManager::instance().setMusicVolume(64);
+	SoundManager::instance().playMusic("level", -1);
 
 	//level
 	map = TileMap::createTileMap("levels/levelMatrix.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	CollisionManager::instance().init(map);
 	player = &Player::instance();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	player->setPosition(glm::vec2((INIT_PLAYER_X_TILES)*map->getTileSize(), (INIT_PLAYER_Y_TILES)*map->getTileSize()));
 	player->setTileMap(map);
-
+	updateCamera();
 	initZoneEnemyTree();
 	initZoneEnemyBug();
+
+	for (auto block : map->getBlocksPos()) {
+		Block* b = new Block();
+		//cout << block.pos.x << " " << block.pos.y << "\n";
+		b->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, block.type);
+		b->setPosition(glm::ivec2(block.pos.x * map->getTileSize(), block.pos.y * map->getTileSize()));
+		b->setTileMap(map);
+		allBlocks.push_back(b);
+	}
+	playrunBlocks = allBlocks;
+	playrunEnemies = allEnemies;
 
 	//background
 	bgMap = TileMap::createTileMap("levels/bgTileMap.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 
 	bgTexture.loadFromFile("images/portada.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	bgQuad = Sprite::createSprite(glm::vec2(map->getMapSize() * map->getTileSize()), glm::vec2(1.f, 1.f), &bgTexture, &texProgram);
-	
-	std::map<int, std::vector<glm::ivec2>> blocksPosByType = map->getBlocksPos();
+	glm::vec2 bgSize = map->getMapSize() * map->getTileSize();
+	bgQuad = Sprite::createSprite(bgSize, glm::vec2(1.f, 1.f), &bgTexture, &texProgram);
 
-	for (const auto& blockType : blocksPosByType)
-	{
-		for (const auto& blockPos : blockType.second) {
-			Block* block = new Block();
-			block->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, blockType.first);
-			block->setPosition(glm::vec2((blockPos.x) * map->getTileSize(), (blockPos.y) * map->getTileSize()));
-			block->setTileMap(map);
-
-			auto it = blocksByType.find(blockType.first);
-			if (it == blocksByType.end()) {
-				std::vector<Block*> auxItem = { block };  // Initialize vector with the item
-				blocksByType.emplace(blockType.first, auxItem);
-			}
-			else {
-				it->second.push_back(block);
-			}
-		}
-	}
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH), float(SCREEN_HEIGHT), 0.f);
 	currentTime = 0.0f;
 	gameUI.init();
+	gameUI.setMaxTime(400 * 1000);
+
+
+	Zone limit = { 4.0f * map->getTileSize(), 22.0f * map->getTileSize(), 0, 0 };
+	glm::ivec2 finalPosBoss = glm::ivec2(10.0f * map->getTileSize(), 38.0f * map->getTileSize());
+	ZoneEnemy zone1 = { limit, finalPosBoss, false };
+	boss.initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone1);
+	glm::ivec2 initPos = glm::ivec2(finalPosBoss.x, finalPosBoss.y - 110);
+	boss.setBossPosition(initPos);
+	boss.setTileMap(map);
+	//211ms
+
 }
 
 void LevelScene::initZoneEnemyTree()
 {
-	EnemyType enemyTree = EnemyType::Tree;
-	Zone limit = { 4.0f * map->getTileSize(), 22.0f * map->getTileSize(), 0, 0 };
+	vector<ZoneEnemy> zones;
+	Zone limit = { 3.0f * map->getTileSize(), 22.0f * map->getTileSize(), 0, 12 };
 	glm::ivec2 initPos = glm::ivec2(20.0f, 7.0f);
-	InitEnemy zone1 = {1, enemyTree, limit, initPos, true };
+	ZoneEnemy zone1 = { limit, initPos, true };
+	zones.push_back(zone1);
 
-	limit = { 26.0f * map->getTileSize(), 38.0f * map->getTileSize(), 0, 0 };
-	initPos = glm::ivec2(37.0f, 6.0f);
-	InitEnemy zone2 = { 2, enemyTree, limit, initPos, true };
-
-	limit = { 39.0f * map->getTileSize(), 46.0f * map->getTileSize(), 0, 0 };
+	limit = { 28.0f * map->getTileSize(), 46.0f * map->getTileSize(), 0, 12 };
 	initPos = glm::ivec2(45.0f, 7.0f);
-	InitEnemy zone3 = { 3, enemyTree, limit, initPos, true };
+	ZoneEnemy zone3 = { limit, initPos, true };
+	zones.push_back(zone3);
 
-	limit = { 54.0f * map->getTileSize(), 66.0f * map->getTileSize(), 0, 0 };
+	limit = { 28.0f * map->getTileSize(), 53.0f * map->getTileSize(), 0, 12 };
+	initPos = glm::ivec2(45+7.0f, 6-4.0f);
+	ZoneEnemy zone2 = { limit, initPos, true };
+	zones.push_back(zone2);
+
+	limit = { 54.0f * map->getTileSize(), 66.0f * map->getTileSize(), 0, 12 };
 	initPos = glm::ivec2(65.0f, 6.0f);
-	InitEnemy zone4 = { 4, enemyTree, limit, initPos, true };
-	
-	enemyZones.push_back(zone1);
-	enemyZones.push_back(zone2);
-	enemyZones.push_back(zone3);
-	enemyZones.push_back(zone4);
+	ZoneEnemy zone4 = { limit, initPos, true };
+	zones.push_back(zone4);
+
+	for (auto zone : zones) {
+		EnemyTree* enemy = new EnemyTree();
+		enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone);
+		enemy->setPosition(glm::ivec2(zone.initPos.x * map->getTileSize(), zone.initPos.y * map->getTileSize()));
+		enemy->setTileMap(map);
+		allEnemies.push_back(enemy);
+
+	}
 }
 void LevelScene::initZoneEnemyBug()
 {
-	EnemyType enemyBug = EnemyType::Bug;
+	vector<ZoneEnemy> zones;
 
 	Zone limit = { 34.0f * map->getTileSize(), 46.0f * map->getTileSize(), 17, 20 };
 	glm::ivec2 initPos = glm::ivec2(35.0f, 17.0f);
-	InitEnemy zoneBug1 = { 10, enemyBug, limit, initPos, false };
+	ZoneEnemy zoneBug1 = { limit, initPos, false };
+	zones.push_back(zoneBug1);
 
 	limit = { 76.0f * map->getTileSize(), 89.0f * map->getTileSize(), 20, 20 };
 	initPos = glm::ivec2(88.0f, 20.0f);
-	InitEnemy zoneBug2 = { 20, enemyBug, limit, initPos, false };
+	ZoneEnemy zoneBug2 = { limit, initPos, false };
+	zones.push_back(zoneBug2);
 
 	limit = { 69.0f * map->getTileSize(), 81.0f * map->getTileSize(), 31, 31 };
 	initPos = glm::ivec2(80.0f, 31.0f);
-	InitEnemy zoneBug3 = { 30, enemyBug, limit, initPos, false };
+	ZoneEnemy zoneBug3 = { limit, initPos, false };
+	zones.push_back(zoneBug3);
 
 	limit = { 26.0f * map->getTileSize(), 37.0f * map->getTileSize(), 32, 32 };
 	initPos = glm::ivec2(26.0f, 32.0f);
-	InitEnemy zoneBug4 = { 40, enemyBug, limit, initPos, false };
+	ZoneEnemy zoneBug4 = { limit, initPos, false };
+	zones.push_back(zoneBug4);
 
 	limit = { 14.0f * map->getTileSize(), 24.0f * map->getTileSize(), 30, 32 };
 	initPos = glm::ivec2(14.0f, 30.0f);
-	InitEnemy zoneBug5 = { 50, enemyBug, limit, initPos, false };
+	ZoneEnemy zoneBug5 = { limit, initPos, false };
+	zones.push_back(zoneBug5);
 
-	enemyZones.push_back(zoneBug1);
-	enemyZones.push_back(zoneBug2);
-	enemyZones.push_back(zoneBug3);
-	enemyZones.push_back(zoneBug4);
-	enemyZones.push_back(zoneBug5);
+	for (auto zone : zones) {
+		EnemyBug* enemy = new EnemyBug();
+		enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone);
+		enemy->setPosition(glm::ivec2(zone.initPos.x * map->getTileSize(), zone.initPos.y * map->getTileSize()));
+		enemy->setTileMap(map);
+		allEnemies.push_back(enemy);
+
+	}
 }
 
 void LevelScene::update(int deltaTime)
 {
-	insideEnemyTreeZone(player->getPosition());
-	
-	for (const auto& enemy : enemies) {
-		EnemyBug* enemyBug = dynamic_cast<EnemyBug*>(enemy.second);
-		if (enemyBug)
-			enemyBug->update(deltaTime, player->getPosition());
-		else
-			enemy.second->update(deltaTime);
-	}
-	
+	//update screenBlocks and screenEnemies
+	insideScreenObj();
 
+
+	CollisionManager::instance().update(screenBlocks);
 	player->update(deltaTime);
-	/*
-	therefore i need posPlayer, sizePlayer, isAttacking, posEnemy, sizeEnemy
-	// if collision (posPlayer, sizePlayer,posEnemy, sizeEnemy)
-	//		if isAttacking ==> enemy die
-	//		else		   ==> player "die"; --star;
-	*/
-
 	updateCamera();
+
+	/*SHOULD playrunBlocks+allBlocks BE MAP????
+	Block* a = player->PickedUpBlock();
+	if (a != NULL)
+	{
+		//search a in playrunBlocks
+		//remove it from playrunBlocks
+	}
+	//PULLING TO CHECK IF PLAYER THREW ANY BLOCK
+	Block* b = player->ThrownBlock();
+	if (b != NULL) {
+		//search b in allBlocks
+		//once found add it to movBlocks
+	}
+	*/
+	if (insideBossRoom) {
+		boss.update(deltaTime);
+		for (auto shoot : boss.getShoots())
+		{
+			shoot->update(deltaTime);
+			if (shoot->getEntityState() == Alive) {
+				if (CollisionManager::instance().checkCollisionObject(player, shoot)) {
+					shoot->setEntityState(Dying);
+				}
+			}
+			
+			if (shoot->getEntityState() == Alive){
+				glm::ivec2 posShoot = shoot->getPosition();
+				if(CollisionManager::instance().checkCollisionVertical(shoot) != None || CollisionManager::instance().checkCollisionHorizontal(shoot) != None)
+					shoot->setEntityState(Dying);
+			}
+			
+			if (shoot->getEntityState() == Alive) {
+				for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
+				{
+					VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(shoot, itBlock->second);
+					if (CollisionManager::instance().checkCollisionBlockVertical(shoot, itBlock->second) != NoVcol || CollisionManager::instance().checkCollisionBlockHorizontal(shoot, itBlock->second) != NoHcol)
+					{
+						shoot->setEntityState(Dying);
+						break;
+					}
+				}
+			}			
+		}
+	}
+	else {
+		for (auto screenEnemy : screenEnemies) {
+			//enemy is alive, dying or deadTree waiting to regenerate
+			screenEnemy.second->update(deltaTime);
+		}
+		//collisions alive enemies: blocks, tiles, player
+		for (auto& itEnemy = screenEnemies.begin(); itEnemy != screenEnemies.end(); ++itEnemy)
+		{
+			if (itEnemy->second->getEntityState() == Alive) {
+				if (player->getEntityState()== Alive && CollisionManager::instance().checkCollisionObject(player, itEnemy->second)) {
+					//if (Player::instance().killEnemy()) {
+					itEnemy->second->setEntityState(Dying);
+					//} else
+					//game onPlayerKilled
+					//player to dying
+				}
+				else {
+					//enemy can collide with max 2 blocks
+					int countBlockCollisions = 0;
+					for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
+					{
+						bool collided = false;
+						VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(itEnemy->second, itBlock->second);
+						if (vBlockCollision != NoVcol)
+						{
+							itEnemy->second->collideVertical();
+							collided = true;
+							countBlockCollisions += 1;
+						}
+						else if (!collided)
+						{
+							HColType hBlockCollision = CollisionManager::instance().checkCollisionBlockHorizontal(itEnemy->second, itBlock->second);
+							if (hBlockCollision != NoHcol) {
+								itEnemy->second->collideHorizontal(itBlock->second);
+								countBlockCollisions += 1;
+							}
+						}
+						if (countBlockCollisions >= 2) {
+							break;
+						}
+					}
+					if (CollisionManager::instance().checkCollisionVertical(itEnemy->second) == Tile)
+					{
+						itEnemy->second->collideVertical();
+					}
+				}
+			}
+		}
+	}
+	/*Collision Moving Blocks : enemies, tiles
+	//remember movingBlocks will always be inside screen: player cannot throw them far enough
+	for (auto& itMovBlock = playrunMovBlocks.begin(); itMovBlock != playrunMovBlocks.end(); ++itMovBlock)
+	{
+		EntityState movBlockState = itMovBlock->second->getEntityState();
+		if(movBlockState == Alive){
+			if(insideBossRoom){
+				if (boss.getEntityState() == Alive && CollisionManager::instance().checkCollisionObject(boss, itMovBlock->second))
+				{
+					
+				}
+			}
+			else
+			{
+				for (auto& screenEnemy : screenEnemies) {
+					if (screenEnemy->second->getEntityState() == Alive && CollisionManager::instance().checkCollisionObject(screenEnemy->second, itMovBlock->second))
+					{
+						screenEnemy->second->setEntityState(Dying);
+						//if destroyable
+						//itMovBlock->second->setEntityState(Dying);
+						break;
+					}
+
+				}
+			}
+			//add for check collision movBlocks with all screenBlocks 
+
+			if (itMovBlock->second->getEntityState() && CollisionManager::instance().checkCollisionVertical(itMovBlock->second))
+			{
+				//movBlock exists in allBlocks, notExists in playrunBlocks, screenBlocks
+				//if destroyable
+					itMovBlock->second->setEntityState(Dying);
+					//moving block will start DyingAnimation,
+					//once finished if Destroyable->Dead, 
+			}
+			if (itMovBlock->second->getEntityState() && CollisionManager::instance().checkCollisionHorizontal(itMovBlock->second))
+			{
+				//movBlock exists in allBlocks, notExists in playrunBlocks, screenBlocks
+				//if destroyable
+					itMovBlock->second->setEntityState(Dying);
+					//moving block will start DyingAnimation,
+					//once finished if Destroyable->Dead,
+			}
+			//if(itMovBlock is NonDestroyable && itMovBlock no longer moves){
+				//add it to playrunBlocks
+			//}
+
+		}
+		else if(movBlockState == Dead) {
+			//only destroyable blocks can be dead
+			//once dead it can be removed from movingBlocks
+			//ultimately it will only exist in allBlocks
+		}
+	}
+
+	*/
+	
 	gameUI.update(deltaTime);
 }
 
@@ -186,6 +353,7 @@ void LevelScene::render()
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 
 	//background
+
 	bgTexture.use();
 	bgQuad->render();
 	bgMap->render();
@@ -193,17 +361,32 @@ void LevelScene::render()
 	//level
 	map->render();
 	player->render();
-	for (const auto& enemy : enemies) {
-		enemy.second->render();
-	}
-
-	for (const auto& blockTypes : blocksByType)
-	{
-		for (auto block : blockTypes.second) {
-			block->render();
+	if (insideBossRoom) {
+		boss.render();
+		for (auto shoot : shoots)
+		{
+			if(shoot->getEntityState() != Dead)
+				shoot->render();
 		}
 	}
+	else
+	{
+		for (const auto& screenEnemy : screenEnemies) {
+			screenEnemy.second->render();
+		}
+	}
+	for (const auto& screenBlock : screenBlocks)
+	{
+		screenBlock.second->render();
+	}
+
+	for (const auto& movBlock : playrunMovBlocks)
+	{
+		movBlock.second->render();
+	}
+
 	gameUI.render();
+
 }
 
 void LevelScene::updateCamera()
@@ -222,62 +405,134 @@ void LevelScene::updateCamera()
 
 	// Constrain the camera within the map boundaries
 	float maxCameraX = map->getMapSize().x * map->getTileSize() - zoomScreenWidth;
-	float maxCameraY = map->getMapSize().y * map->getTileSize() - zoomScreenHeight;
+	float maxCameraY = map->getMapSize().y * map->getTileSize() - zoomScreenHeight + 50;
 
 	if (cameraPosition.x < 0) cameraPosition.x = 0;
 	if (cameraPosition.y < 0) cameraPosition.y = 0;
 	if (cameraPosition.x > maxCameraX) cameraPosition.x = maxCameraX;
 	if (cameraPosition.y > maxCameraY) cameraPosition.y = maxCameraY;
+	cam = { cameraPosition.x, cameraPosition.x + zoomScreenWidth,
+		cameraPosition.y + zoomScreenHeight, cameraPosition.y };
 
 	// Update projection matrix to account for camera movement
-	projection = glm::ortho(cameraPosition.x, cameraPosition.x + zoomScreenWidth,
-		cameraPosition.y + zoomScreenHeight, cameraPosition.y);
+	projection = glm::ortho(cam.left, cam.right,
+		cam.bottom, cam.top);
+
+	cam = { cam.left - 50, cam.right + 50, cam.bottom + 50, cam.top - 50 };
+
 }
 
 
-void LevelScene::insideEnemyTreeZone(glm::ivec2& posPlayer)
+void LevelScene::insideScreenObj()
 {
-	for (const auto& enemyZone : enemyZones) {
-		if (enemyZone.limit.max_y< posPlayer.y+ 50+SCREEN_HEIGHT/2  && enemyZone.limit.min_y> posPlayer.y - 50 - SCREEN_HEIGHT / 2
-			&& enemyZone.limit.max_x > posPlayer.x && posPlayer.x >= enemyZone.limit.min_x)
+	int tileSize = map->getTileSize();
+	glm::ivec2 posP = player->getPosition();
+	int tilesize = map->getTileSize();
+	Cam bossRoom = { 0, map->getMapSize().x * tilesize, map->getMapSize().y * tilesize, 35 * tilesize };
+	if (bossRoom.left < posP.x && posP.x < bossRoom.right && bossRoom.top < posP.y && posP.y < bossRoom.bottom) {
+		insideBossRoom = true;
+		boss.setEntityState(Alive);
+		shoots.clear();
+		for (const auto& shoot : boss.getShoots())
 		{
-			if (enemies.find(enemyZone.id) == enemies.end()) {
-				Enemy* enemy;
-				bool right = posPlayer.x > enemyZone.initPos.x * map->getTileSize();
-				if (enemyZone.enemyType == EnemyType::Tree)
+			if (shoot->getEntityState() != Dead)
+				shoots.push_back(shoot);
+		}
+	}
+	else {
+		for (auto& playrunEnemy : playrunEnemies)
+		{
+			glm::ivec2 posEnemyId = playrunEnemy->getInitPos();
+			glm::ivec2 posEnemy = playrunEnemy->getPosition();
+			glm::ivec2 posEnemyToCompare = glm::ivec2(posEnemyId.x * tileSize, posEnemyId.y * tileSize);
+			string idEnemy = std::to_string(posEnemyId.x) + " " + std::to_string(posEnemyId.y);
+			EntityState enemyState = playrunEnemy->getEntityState();
+			if (enemyState == Dying) {
+				if (insideScreen(posEnemyToCompare)) {
+					if (screenEnemies.find(idEnemy) == screenEnemies.end())
+					{
+						screenEnemies.insert(std::pair<string, Enemy*>(idEnemy, playrunEnemy));
+					}
+				}
+				else {
+					playrunEnemy->setEntityState(Alive);
+					auto it = screenEnemies.find(idEnemy);
+					if (it != screenEnemies.end()) {
+						it->second = NULL;
+						screenEnemies.erase(it);
+					}
+				}
+			}
+			//only trees can be dead aka waiting to regenerate
+			else if (enemyState == Dead)
+			{
+				EnemyTree* enemyTree = dynamic_cast<EnemyTree*>(playrunEnemy);
+				if (enemyTree && insideScreen(posEnemyToCompare)) {
+					if (screenEnemies.find(idEnemy) == screenEnemies.end())
+					{
+						screenEnemies.insert(std::pair<string, Enemy*>(idEnemy, playrunEnemy));
+					}
+				}
+				else if (!insideScreen(posEnemyToCompare)) {
+					playrunEnemy->setEntityState(Alive);
+					auto it = screenEnemies.find(idEnemy);
+					if (it != screenEnemies.end()) {
+						it->second = NULL;
+						screenEnemies.erase(it);
+					}
+				}
+
+			}
+			else {
+				if (insideScreen(posEnemyToCompare))
 				{
-					enemy = new EnemyTree();
+					if (screenEnemies.find(idEnemy) == screenEnemies.end())
+					{
+						screenEnemies.insert(std::pair<string, Enemy*>(idEnemy, playrunEnemy));
+					}
 				}
 				else
 				{
-					enemy = new EnemyBug();
+					auto it = screenEnemies.find(idEnemy);
+					if (it != screenEnemies.end()) {
+						it->second = NULL;
+						screenEnemies.erase(it);
+					}
 				}
-				ZoneEnemy initParams = { enemyZone.limit, enemyZone.initPos, !right };
-				enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, initParams);
-				enemy->setPosition(glm::vec2(enemyZone.initPos * map->getTileSize()));
-				enemy->setTileMap(map);
-				enemies.insert(std::pair<int, Enemy*>(enemyZone.id, enemy));
-				cout << "INSERTING \n";
-				cout << "Enemy x " << enemy->getEnemyPos().x << " y " << enemy->getEnemyPos().y << "\n";
-				cout << "ZoneLimit x " << enemyZone.limit.min_x << "  max: " << enemyZone.limit.max_x << "\n";
-				cout << "player x " << posPlayer.x << " y " << posPlayer.y << "\n";
-				debug = enemyZone;
-			}
-		}
-		else {
-			auto it = enemies.find(enemyZone.id);
-			if (it != enemies.end())
-			{
-				cout << "DELETING \n";
-				cout << "Enemy x " << it->second->getEnemyPos().x << " y " << it->second->getEnemyPos().y << "\n";
-				cout << "ZoneLimit x " << enemyZone.limit.min_x << "  max: " << enemyZone.limit.max_x << "\n";
-				cout << "player x " << posPlayer.x << " y " << posPlayer.y << "\n";
-				enemies.erase(enemyZone.id);
 			}
 		}
 	}
+	for (auto& playrunBlock : playrunBlocks)
+	{
+		glm::ivec2 posBlock = playrunBlock->getPosition();
+		string idBlock = std::to_string(posBlock.x) + " " + std::to_string(posBlock.y);
+		if (insideScreen(posBlock))
+		{
+			if (screenBlocks.find(idBlock) == screenBlocks.end())
+			{
+				screenBlocks.insert(std::pair<string, Block*>(idBlock, playrunBlock));
+			}
+		}
+		else
+		{
+			auto it = screenBlocks.find(idBlock);
+			if (it != screenBlocks.end()) {
+				it->second = NULL;
+				screenBlocks.erase(it);
+			}
+		}
+	}
+
 }
 
+bool LevelScene::insideScreen(const glm::ivec2& pos)
+{
+
+	if (cam.left < pos.x && pos.x < cam.right && cam.top < pos.y && pos.y < cam.bottom) {
+		return true;
+	}
+	return false;
+}
 
 void LevelScene::initShaders()
 {

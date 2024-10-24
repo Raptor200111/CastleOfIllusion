@@ -4,6 +4,11 @@
 
 using namespace std;
 
+#define MAX_STARS 5
+#define INIT_STARS 3
+#define ENEMY_POINTS 50
+#define COIN_POINTS 100
+
 struct Zone
 {
 	float min_x;
@@ -17,6 +22,40 @@ enum EnemyType
 	Bug,
 };
 
+enum EntityState
+{
+	Alive,
+	Dead,
+	Dying
+};
+
+enum CollisionType
+{
+	None,
+	Tile,
+	Stairs,
+	TileStairs
+};
+
+enum VColType
+{
+	NoVcol,
+	Down,
+	Up,
+};
+
+enum HColType
+{
+	NoHcol,
+	Left,
+	Right,
+};
+struct BlockObj
+{
+	int type;
+	glm::ivec2 pos;
+};
+
 struct ZoneEnemy
 {
 	Zone limit;
@@ -24,9 +63,12 @@ struct ZoneEnemy
 	bool left;
 };
 
+struct Cam {
+	float left, right, bottom, top;
+};
+
 struct InitEnemy
 {
-	int id;
 	EnemyType enemyType;
 	Zone limit;
 	glm::ivec2 initPos;

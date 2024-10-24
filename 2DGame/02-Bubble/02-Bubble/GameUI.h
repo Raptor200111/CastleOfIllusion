@@ -14,26 +14,23 @@ public:
 	void init() override;
 	void update(int deltaTime) override;
 	void render() override;
-	void setStars(int newStars) { stars = newStars; }
-	void setPoints(int newPoints) { points = newPoints; }
-	void setTries(int newTries) { tries = newTries; }
+	void setMaxTime(int level_maxTime) { maxTime = level_maxTime; time = maxTime / 1000; }
 
 private:
 	void initShaders();
 	Quad* quad;
 
-	int stars = 5; int starSize = 40; int time = 400;
-	int tries = 3;
-	int points = 153;
+	int starSize = 40;
+	int time;
+	int maxTime; 
 	Texture starTexture;
 	TexturedQuad* star;
 
 	Texture bgTexture;
 	TexturedQuad* bg;
 	ShaderProgram simpleProgram, texProgram;
-	float currentTime;
+	int elapsedTime = 0;
 	glm::mat4 projection;
 	int textSize = 25;
 	Text text;
 };
-

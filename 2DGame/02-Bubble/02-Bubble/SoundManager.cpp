@@ -14,6 +14,10 @@ bool SoundManager::init() {
         return false;
     }
 
+    SoundManager::instance().loadMusic("menu", "sound/01_Intro.mp3");
+    SoundManager::instance().loadMusic("level", "sound/03_Enchanted_Forest.mp3");
+
+
     return true;
 }
 
