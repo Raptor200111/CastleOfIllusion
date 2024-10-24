@@ -13,7 +13,7 @@
 #define SCREEN_Y 16
 
 #define INIT_PLAYER_X_TILES 2//+35+36// 4+20
-#define INIT_PLAYER_Y_TILES 8//44//+8+2 //20
+#define INIT_PLAYER_Y_TILES 44//+8+2 //20
 
 LevelScene::LevelScene()
 {
@@ -89,6 +89,7 @@ void LevelScene::init()
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH), float(SCREEN_HEIGHT), 0.f);
 	currentTime = 0.0f;
 	gameUI.init();
+	gameUI.setMaxTime(400 * 1000);
 
 
 	Zone limit = { 4.0f * map->getTileSize(), 22.0f * map->getTileSize(), 0, 0 };
@@ -183,11 +184,6 @@ void LevelScene::update(int deltaTime)
 	player->update(deltaTime);
 	updateCamera();
 
-	for (auto screenEnemy : screenEnemies) {
-		//enemy is alive, dying or deadTree waiting to regenerate
-		screenEnemy.second->update(deltaTime);
-	}
-
 	/*SHOULD playrunBlocks+allBlocks BE MAP????
 	Block* a = player->PickedUpBlock();
 	if (a != NULL)
@@ -202,65 +198,114 @@ void LevelScene::update(int deltaTime)
 		//once found add it to movBlocks
 	}
 	*/
-
-
-	//collisions alive enemies: blocks, tiles, player
-	for (auto& itEnemy = screenEnemies.begin(); itEnemy != screenEnemies.end(); ++itEnemy)
-	{
-		if (itEnemy->second->getEntityState() == Alive) {
-			if (CollisionManager::instance().checkCollisionObject(player, itEnemy->second)) {
-				//if (Player::instance().killEnemy()) {
-					itEnemy->second->setEntityState(Dying);
-				//}
-			} 
-			else{
-				//enemy can collide with max 2 blocks
-				int countBlockCollisions = 0;
-				for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
-				{
-					bool collided = false;
-					VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(itEnemy->second, itBlock->second);
-					if (vBlockCollision != NoVcol)
-					{
-						itEnemy->second->collideVertical();
-						collided = true;
-						countBlockCollisions += 1;
+	if (insideBossRoom) {
+		boss.update(deltaTime);
+		for (auto shoot : boss.getShoots())
+		{
+			EntityState shootState = shoot->getEntityState();
+			if (shootState != Dead) {
+				shoot->update(deltaTime);
+				bool dying = false;
+				if (shoot->getEntityState() == Alive) {
+					if (CollisionManager::instance().checkCollisionObject(player, shoot)) {
+						shoot->setEntityState(Dying);
+						dying = true;
 					}
-					else if (!collided)
+				}/*
+				if (!dying && (CollisionManager::instance().checkCollisionVertical(shoot) != NoVcol || CollisionManager::instance().checkCollisionHorizontal(shoot) != NoHcol))
+				{
+					shoot->setEntityState(Dying);
+				}
+				
+				if (!dying) {
+					for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
 					{
-						HColType hBlockCollision = CollisionManager::instance().checkCollisionBlockHorizontal(itEnemy->second, itBlock->second);
-						if (hBlockCollision != NoHcol) {
-							itEnemy->second->collideHorizontal(itBlock->second);
-							countBlockCollisions += 1;
+						VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(shoot, itBlock->second);
+						if (CollisionManager::instance().checkCollisionBlockVertical(shoot, itBlock->second) != NoVcol || CollisionManager::instance().checkCollisionBlockHorizontal(shoot, itBlock->second) != NoHcol)
+						{
+							shoot->setEntityState(Dying);
+							dying = true;
+							break;
 						}
 					}
-					if (countBlockCollisions >= 2) {
-						break;
-					}
 				}
-				if (CollisionManager::instance().checkCollisionVertical(itEnemy->second) == Tile)
-				{
-					itEnemy->second->collideVertical();
+				*/
+			}
+		}
+	}
+	else {
+		for (auto screenEnemy : screenEnemies) {
+			//enemy is alive, dying or deadTree waiting to regenerate
+			screenEnemy.second->update(deltaTime);
+		}
+		//collisions alive enemies: blocks, tiles, player
+		for (auto& itEnemy = screenEnemies.begin(); itEnemy != screenEnemies.end(); ++itEnemy)
+		{
+			if (itEnemy->second->getEntityState() == Alive) {
+				if (player->getEntityState()== Alive && CollisionManager::instance().checkCollisionObject(player, itEnemy->second)) {
+					//if (Player::instance().killEnemy()) {
+					itEnemy->second->setEntityState(Dying);
+					//} else
+					//game onPlayerKilled
+					//player to dying
+				}
+				else {
+					//enemy can collide with max 2 blocks
+					int countBlockCollisions = 0;
+					for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
+					{
+						bool collided = false;
+						VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(itEnemy->second, itBlock->second);
+						if (vBlockCollision != NoVcol)
+						{
+							itEnemy->second->collideVertical();
+							collided = true;
+							countBlockCollisions += 1;
+						}
+						else if (!collided)
+						{
+							HColType hBlockCollision = CollisionManager::instance().checkCollisionBlockHorizontal(itEnemy->second, itBlock->second);
+							if (hBlockCollision != NoHcol) {
+								itEnemy->second->collideHorizontal(itBlock->second);
+								countBlockCollisions += 1;
+							}
+						}
+						if (countBlockCollisions >= 2) {
+							break;
+						}
+					}
+					if (CollisionManager::instance().checkCollisionVertical(itEnemy->second) == Tile)
+					{
+						itEnemy->second->collideVertical();
+					}
 				}
 			}
 		}
 	}
-
 	/*Collision Moving Blocks : enemies, tiles
 	//remember movingBlocks will always be inside screen: player cannot throw them far enough
 	for (auto& itMovBlock = playrunMovBlocks.begin(); itMovBlock != playrunMovBlocks.end(); ++itMovBlock)
 	{
 		EntityState movBlockState = itMovBlock->second->getEntityState();
 		if(movBlockState == Alive){
-			for (auto& screenEnemy : screenEnemies) {
-				if (screenEnemy->second->getEntityState() == Alive && CollisionManager::instance().checkCollisionObject(screenEnemy->second, itMovBlock->second))
+			if(insideBossRoom){
+				if (boss.getEntityState() == Alive && CollisionManager::instance().checkCollisionObject(boss, itMovBlock->second))
 				{
-					screenEnemy->second->setEntityState(Dying);
-					//if destroyable
-					//itMovBlock->second->setEntityState(Dying);
-					break;
+					
 				}
+			}
+			else
+			{
+				for (auto& screenEnemy : screenEnemies) {
+					if (screenEnemy->second->getEntityState() == Alive && CollisionManager::instance().checkCollisionObject(screenEnemy->second, itMovBlock->second))
+					{
+						screenEnemy->second->setEntityState(Dying);
+						//if destroyable
+						//itMovBlock->second->setEntityState(Dying);
+						break;
+					}
 
+				}
 			}
 			//add for check collision movBlocks with all screenBlocks 
 
@@ -294,11 +339,6 @@ void LevelScene::update(int deltaTime)
 
 	*/
 	
-	//change condition to when player appears
-	if (gameUI.getTime() < 398) {
-		boss.setActive();
-	}
-	//boss.update(deltaTime);
 	gameUI.update(deltaTime);
 }
 
@@ -322,10 +362,20 @@ void LevelScene::render()
 	//level
 	map->render();
 	player->render();
-	for (const auto& screenEnemy : screenEnemies) {
-		screenEnemy.second->render();
+	if (insideBossRoom) {
+		boss.render();
+		for (auto shoot : boss.getShoots())
+		{
+			if(shoot->getEntityState() != Dead)
+				shoot->render();
+		}
 	}
-
+	else
+	{
+		for (const auto& screenEnemy : screenEnemies) {
+			screenEnemy.second->render();
+		}
+	}
 	for (const auto& screenBlock : screenBlocks)
 	{
 		screenBlock.second->render();
@@ -336,7 +386,6 @@ void LevelScene::render()
 		movBlock.second->render();
 	}
 
-	boss.render();
 	gameUI.render();
 
 }
@@ -378,63 +427,72 @@ void LevelScene::updateCamera()
 void LevelScene::insideScreenObj()
 {
 	int tileSize = map->getTileSize();
-	for (auto& playrunEnemy : playrunEnemies)
-	{
-		glm::ivec2 posEnemyId = playrunEnemy->getInitPos();
-		glm::ivec2 posEnemy = playrunEnemy->getPosition();
-		glm::ivec2 posEnemyToCompare = glm::ivec2(posEnemyId.x * tileSize, posEnemyId.y * tileSize);
-		string idEnemy = std::to_string(posEnemyId.x) + " " + std::to_string(posEnemyId.y);
-		EntityState enemyState = playrunEnemy->getEntityState();
-		if (enemyState == Dying) {
-			if (insideScreen(posEnemyToCompare)) {
-				if (screenEnemies.find(idEnemy) == screenEnemies.end())
-				{
-					screenEnemies.insert(std::pair<string, Enemy*>(idEnemy, playrunEnemy));
+	glm::ivec2 posP = player->getPosition();
+	int tilesize = map->getTileSize();
+	Cam bossRoom = { 0, map->getMapSize().x * tilesize, map->getMapSize().y * tilesize, 35 * tilesize };
+	if (bossRoom.left < posP.x && posP.x < bossRoom.right && bossRoom.top < posP.y && posP.y < bossRoom.bottom) {
+		insideBossRoom = true;
+		boss.setEntityState(Alive);
+	}
+	else {
+		for (auto& playrunEnemy : playrunEnemies)
+		{
+			glm::ivec2 posEnemyId = playrunEnemy->getInitPos();
+			glm::ivec2 posEnemy = playrunEnemy->getPosition();
+			glm::ivec2 posEnemyToCompare = glm::ivec2(posEnemyId.x * tileSize, posEnemyId.y * tileSize);
+			string idEnemy = std::to_string(posEnemyId.x) + " " + std::to_string(posEnemyId.y);
+			EntityState enemyState = playrunEnemy->getEntityState();
+			if (enemyState == Dying) {
+				if (insideScreen(posEnemyToCompare)) {
+					if (screenEnemies.find(idEnemy) == screenEnemies.end())
+					{
+						screenEnemies.insert(std::pair<string, Enemy*>(idEnemy, playrunEnemy));
+					}
 				}
+				else {
+					playrunEnemy->setEntityState(Alive);
+					auto it = screenEnemies.find(idEnemy);
+					if (it != screenEnemies.end()) {
+						it->second = NULL;
+						screenEnemies.erase(it);
+					}
+				}
+			}
+			//only trees can be dead aka waiting to regenerate
+			else if (enemyState == Dead)
+			{
+				EnemyTree* enemyTree = dynamic_cast<EnemyTree*>(playrunEnemy);
+				if (enemyTree && insideScreen(posEnemyToCompare)) {
+					if (screenEnemies.find(idEnemy) == screenEnemies.end())
+					{
+						screenEnemies.insert(std::pair<string, Enemy*>(idEnemy, playrunEnemy));
+					}
+				}
+				else if (!insideScreen(posEnemyToCompare)) {
+					playrunEnemy->setEntityState(Alive);
+					auto it = screenEnemies.find(idEnemy);
+					if (it != screenEnemies.end()) {
+						it->second = NULL;
+						screenEnemies.erase(it);
+					}
+				}
+
 			}
 			else {
-				playrunEnemy->setEntityState(Alive);
-				auto it = screenEnemies.find(idEnemy);
-				if (it != screenEnemies.end()) {
-					it->second = NULL;
-					screenEnemies.erase(it);
-				}
-			}
-		}
-		//only trees can be dead aka waiting to regenerate
-		else if (enemyState == Dead)
-		{
-			EnemyTree* enemyTree = dynamic_cast<EnemyTree*>(playrunEnemy);
-			if (enemyTree && insideScreen(posEnemyToCompare)) {
-				if (screenEnemies.find(idEnemy) == screenEnemies.end())
+				if (insideScreen(posEnemyToCompare))
 				{
-					screenEnemies.insert(std::pair<string, Enemy*>(idEnemy, playrunEnemy));
+					if (screenEnemies.find(idEnemy) == screenEnemies.end())
+					{
+						screenEnemies.insert(std::pair<string, Enemy*>(idEnemy, playrunEnemy));
+					}
 				}
-			}
-			else if(!insideScreen(posEnemyToCompare)) {
-				playrunEnemy->setEntityState(Alive);
-				auto it = screenEnemies.find(idEnemy);
-				if (it != screenEnemies.end()) {
-					it->second = NULL;
-					screenEnemies.erase(it);
-				}
-			}
-
-		}
-		else {
-			if (insideScreen(posEnemyToCompare))
-			{
-				if (screenEnemies.find(idEnemy) == screenEnemies.end())
+				else
 				{
-					screenEnemies.insert(std::pair<string, Enemy*>(idEnemy, playrunEnemy));
-				}
-			}
-			else
-			{
-				auto it = screenEnemies.find(idEnemy);
-				if (it != screenEnemies.end()) {
-					it->second = NULL;
-					screenEnemies.erase(it);
+					auto it = screenEnemies.find(idEnemy);
+					if (it != screenEnemies.end()) {
+						it->second = NULL;
+						screenEnemies.erase(it);
+					}
 				}
 			}
 		}

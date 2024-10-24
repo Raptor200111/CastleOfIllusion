@@ -60,5 +60,53 @@ bool Game::getKey(int key) const
 	return keys[key];
 }
 
+void Game::onPlayerFallDownHole() {
+	if (godMode) return;
+	stars = 0;
+	tries -= 1;
+	if (tries <= 0) {
+		looseGame();
+	}
+	else {
+		//restart level
+	}
+}
 
+void Game::onPlayerKilled() 
+{
+	if (godMode) return;
+	if (stars > 0)
+	{
+		stars -= 1;
+	}
+	if (stars <= 0)
+	{
+		stars = INIT_STARS;
+		tries -= 1;
+		//restart level
+	}
+	if (tries <= 0)
+	{
+		looseGame();
+	}
+}
 
+void Game::onExceededTimeLimit()
+{
+	looseGame();
+}
+
+void Game::onPracticeLevelWon()
+{
+	stars = INIT_STARS;
+	currentScene = &levelScene;
+}
+
+void Game::onLevelWon()
+{
+	//winGame();
+}
+
+void Game::looseGame()
+{
+}

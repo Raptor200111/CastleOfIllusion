@@ -61,6 +61,7 @@ private:
 
 	GameUI gameUI;
 	BossDragon boss;
+	bool insideBossRoom= false;
 };
 
 #endif // _LEVEL_SCENE_INCLUDE
