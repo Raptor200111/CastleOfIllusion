@@ -6,22 +6,21 @@
 #include <GL/glew.h>
 #include "Sprite.h"
 #include "TileMap.h"
+#include "Entity.h"
 
-class ParticleEfect
+class ParticleEfect : public Entity
 {
 public:
-	void init(const glm::ivec2& tileMapPos, glm::ivec2& pos, glm::ivec2& siz, ShaderProgram& shaderProgram, string file, int frameRate, glm::vec2 weirdSize, glm::vec2* framesArray);
+	//~ParticleEfect();
+	void init(const glm::ivec2& tileMapPos, glm::ivec2& pos, glm::ivec2& siz, ShaderProgram& shaderProgram, string file, glm::vec2 weirdSize, int numAnims);
 	void update(int deltaTime);
 	void render();
 
-	void setTileMap(TileMap* tileMap);
-	void setPosition(const glm::vec2& pos);
-	void play(const glm::vec2& pos);
+	void addAnimation(int frameRate, glm::vec2* framesArray, int length);
+	void play(const glm::vec2& pos, int anim);
 
 private:
-	glm::ivec2 tileMapDispl, position, size;
-	Texture spritesheet;
-	Sprite* sprite;
-	TileMap* map;
+	//glm::ivec2 tileMapDispl, position, size;
+	int numAnims;
 };
 #endif
