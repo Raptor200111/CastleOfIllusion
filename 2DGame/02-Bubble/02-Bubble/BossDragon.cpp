@@ -29,6 +29,7 @@ void BossDragon::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProg
 	tileMapDispl = tileMapPos;
 	this->left = initParams.left;
 	this->initParams = initParams;
+	entityState = Dead;
 	states = { BOSS_LEFT, BOSS_LEFT_DOWN, BOSS_DOWN, BOSS_RIGHT_DOWN, BOSS_DOWN, BOSS_LEFT_DOWN };
 	angleShoots = vector<vector<float>>{
 		{185.f, 160.f, 140.f},
@@ -130,7 +131,7 @@ void BossDragon::setHeadAnimations(ShaderProgram& shaderProgram)
 
 void BossDragon::update(int deltaTime)
 {
-	if (!active) return;
+	if (entityState == Dead) return;
 	glm::vec2 aux = sprite->updateDiffSize(deltaTime);
 	if (aux != glm::vec2(0.f))
 		sizeObjHead = aux;
@@ -182,9 +183,6 @@ void BossDragon::update(int deltaTime)
 			timeSinceLastShoot = 0;       // Reset movement timer
 		}
 
-		for (auto s : shoots)
-			s->update(deltaTime);
-
 	}
 	if (bossDragonState != sprite->animation())
 	{
@@ -198,12 +196,9 @@ void BossDragon::update(int deltaTime)
 }
 void BossDragon::render()
 {
-	if (!active) return;
+	if (entityState == Dead) return;
 	bodySprite->render();
 	sprite->render();
-	for (auto s : shoots)
-		s->render();
-
 }
 
 void BossDragon::setHeadSpritePos()
@@ -292,7 +287,7 @@ void BossDragon::shoot(int deltaTime)
 	}
 	indexAngleShoot++;
 	indexAngleShoot %= MaxShoots;
-	std::cout << "indexAngleShoot" << indexAngleShoot << "\n";
+	//std::cout << "indexAngleShoot" << indexAngleShoot << "\n";
 	changeHeadState(objective);
 	setHeadSpritePos();
 	shoots[indexAngleShoot]->setPosition(positionStartShoot);
@@ -300,5 +295,5 @@ void BossDragon::shoot(int deltaTime)
 	a = glm::radians(a);
 	glm::vec2 dir = glm::vec2(positionStartShoot.x + 350 * cos(a), positionStartShoot.y + 350 * sin(a));
 	shoots[indexAngleShoot]->setDirection(dir);
-	shoots[indexAngleShoot]->setActive();
+	shoots[indexAngleShoot]->setEntityState(Alive);
 }

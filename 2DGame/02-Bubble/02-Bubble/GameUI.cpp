@@ -53,6 +53,7 @@ void GameUI::init()
 		//if(!text.init("fonts/DroidSerif.ttf"))
 	if (!text.init("fonts/retro_computer_personal_use.ttf"))
 		cout << "Could not load font!!!" << endl;
+
 		
 }
 
@@ -61,6 +62,7 @@ void GameUI::update(int deltaTime)
 	elapsedTime += deltaTime;
 	if (elapsedTime >= maxTime) {
 		//die maximum time;
+		Game::instance().onExceededTimeLimit();
 		elapsedTime = 0;
 	}
 	time = (maxTime-elapsedTime)/1000;
@@ -92,6 +94,7 @@ void GameUI::render()
 	texProgram.setUniformMatrix4f("modelview", modelview);
 	bg->render(bgTexture);
 
+	int stars = Game::instance().getStars();
 	for (int i = 0; i < stars; i++)
 	{
 		modelview = glm::mat4(1.0f);
@@ -104,10 +107,10 @@ void GameUI::render()
 	}
 
 	text.render("0", glm::vec2(295, SCREEN_HEIGHT - 20), textSize, glm::vec4(1, 1, 1, 1));
-	text.render(std::to_string(tries), glm::vec2(295+ textSize, SCREEN_HEIGHT - 20), textSize, glm::vec4(1, 1, 1, 1));
+	text.render(std::to_string(Game::instance().getTries()), glm::vec2(295+ textSize, SCREEN_HEIGHT - 20), textSize, glm::vec4(1, 1, 1, 1));
 
 	std::ostringstream oss;
-	oss << std::setw(6) << std::setfill('0') << points;
+	oss << std::setw(6) << std::setfill('0') << Game::instance().getScore();
 	std::string numStr = oss.str();
 	text.render(numStr, glm::vec2(380, SCREEN_HEIGHT - 20), textSize, glm::vec4(1, 1, 1, 1));
 

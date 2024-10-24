@@ -118,7 +118,7 @@ CollisionType CollisionManager::checkCollisionHorizontal(Entity* entity)
 	bool stairs = false;
 	bool tile = false;
 	// Check the tiles around the entity for collisions
-	for (int i = xLeft; i <= xRight; i += inc) {
+	for (int i = xLeft; i <= xRight; i += 1) {
 		for (int j = y0; j < y1; ++j) {
 			int tileType = tileMap->getTileType(i, j);
 			if (tileType != 0 && tileType != 7 && tileType != 8) {
@@ -246,6 +246,7 @@ Block* CollisionManager::collisionEntityBlockH(Entity* entity) {
 			break;
 		}
 	}
+	return NULL;
 }
 
 Block* CollisionManager::collisionEntityBlockV(Entity* entity) {
@@ -256,4 +257,5 @@ Block* CollisionManager::collisionEntityBlockV(Entity* entity) {
 			break;
 		}
 	}
+	return NULL;
 }

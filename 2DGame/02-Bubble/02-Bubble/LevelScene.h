@@ -41,6 +41,7 @@ private:
 	std::map<string, Enemy*> screenEnemies;
 	std::map<string, Block*> screenBlocks;
 	std::map<string, Block*>  playrunMovBlocks;
+	vector<BossShoot*> shoots;
 
 	TileMap* map;
 	Player* player;
@@ -61,6 +62,7 @@ private:
 
 	GameUI gameUI;
 	BossDragon boss;
+	bool insideBossRoom= false;
 };
 
 #endif // _LEVEL_SCENE_INCLUDE

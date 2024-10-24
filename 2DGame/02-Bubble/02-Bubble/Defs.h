@@ -4,6 +4,11 @@
 
 using namespace std;
 
+#define MAX_STARS 5
+#define INIT_STARS 3
+#define ENEMY_POINTS 50
+#define COIN_POINTS 100
+
 struct Zone
 {
 	float min_x;
