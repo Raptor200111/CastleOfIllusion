@@ -27,6 +27,8 @@
     <ClInclude Include="MenuScene.h" />
     <ClInclude Include="ParticleEfect.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PlayScene.h" />
+    <ClInclude Include="PracticePlayScene.h" />
     <ClInclude Include="Quad.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Scene.h" />
@@ -55,6 +57,8 @@
     <ClCompile Include="MenuScene.cpp" />
     <ClCompile Include="ParticleEfect.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayScene.cpp" />
+    <ClCompile Include="PracticePlayScene.cpp" />
     <ClCompile Include="Quad.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />

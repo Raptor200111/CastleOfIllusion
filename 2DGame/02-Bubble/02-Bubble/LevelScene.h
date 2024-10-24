@@ -3,66 +3,25 @@
 #ifndef _LEVEL_SCENE_INCLUDE
 #define _LEVEL_SCENE_INCLUDE
 
-#include "Scene.h"
-#include "TileMap.h"
-#include "Player.h"
-#include "Enemy.h"
-#include "Block.h"
-#include <vector>
-#include "GameUI.h"
+#include "PlayScene.h"
 #include "BossDragon.h"
 
-class LevelScene : public Scene
+class LevelScene : public PlayScene
 {
 public:
 	LevelScene();
 	~LevelScene();
-	void init() override;
-	void update(int deltaTime) override;
-	void render() override;
+	void init() override;   // Initialize NormalPlayScene-specific elements
 
-private:
-	void initShaders();
-	void updateCamera();
+protected:
+	// Override these methods to handle boss logic and room detection for NormalPlayScene
+	void updateCollisionsWithBoss(int deltaTime) override;
+	bool checkIfInsideBossRoom() override;
+	void renderBoss() override;
 	void initZoneEnemyTree();
 	void initZoneEnemyBug();
-
-
-
-	void insideScreenObj();
-	bool insideScreen(const glm::ivec2& pos);
-
-	vector<Enemy*> playrunEnemies;
-	vector<Block*> playrunBlocks;
-
-	vector<Enemy*> allEnemies;
-	vector<Block*> allBlocks;
-
-	std::map<string, Enemy*> screenEnemies;
-	std::map<string, Block*> screenBlocks;
-	std::map<string, Block*>  playrunMovBlocks;
-	vector<BossShoot*> shoots;
-
-	TileMap* map;
-	Player* player;
-
-	float currentTime;
-	glm::mat4 projection;
-	ShaderProgram texProgram;
-	float zoomLevel;
-	glm::vec2 cameraPosition;
-	Cam cam;
-
-
-	//background
-	Sprite* bgQuad;
-	Texture bgTexture;
-	TileMap* bgMap;
-
-
-	GameUI gameUI;
 	BossDragon boss;
-	bool insideBossRoom= false;
+	vector<BossShoot*> shoots;
 };
 
 #endif // _LEVEL_SCENE_INCLUDE

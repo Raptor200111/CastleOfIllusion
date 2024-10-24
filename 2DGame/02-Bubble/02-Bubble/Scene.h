@@ -12,7 +12,7 @@
 class Scene
 {
 public:
-    //Scene();
+    Scene() {}
     virtual ~Scene() {}
 
     // Virtual methods for initialization, update, and render
