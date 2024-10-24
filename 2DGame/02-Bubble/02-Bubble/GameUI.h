@@ -14,9 +14,11 @@ public:
 	void init() override;
 	void update(int deltaTime) override;
 	void render() override;
-	void setStars(int newStars) { stars = newStars; }
-	void setPoints(int newPoints) { points = newPoints; }
+	void addStar() { stars += 1; }
+	void substractStar() { stars -= 1; }
+	void addPoints(int addPoints) { points += addPoints; }
 	void setTries(int newTries) { tries = newTries; }
+	int getTime() { return time; }
 
 private:
 	void initShaders();
@@ -31,9 +33,9 @@ private:
 	Texture bgTexture;
 	TexturedQuad* bg;
 	ShaderProgram simpleProgram, texProgram;
-	float currentTime;
+	int maxTime = 400 * 1000;
+	int elapsedTime = 0;
 	glm::mat4 projection;
 	int textSize = 25;
 	Text text;
 };
-

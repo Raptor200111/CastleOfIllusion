@@ -1,5 +1,7 @@
 #include "EnemyBug.h"
 #include "CollisionManager.h"
+#include "Player.h"
+
 #define WALK_SPEED 1
 #define GRAVITY 0.5f
 
@@ -42,55 +44,52 @@ void EnemyBug::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgra
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 
 }
-void EnemyBug::update(int deltaTime, const glm::ivec2& posPlayer)
+void EnemyBug::update(int deltaTime)
 {
 	glm::vec2 aux = sprite->updateDiffSize(deltaTime);
 	if (aux != glm::vec2(0.f))
 		sizeObject = aux;
-	int min_x_attack = position.x - attackDistance;
-	int max_x_attack = position.x + attackDistance;
 
-	if (posPlayer.x< min_x_attack || max_x_attack < posPlayer.x) {
-		attackSpeed = WALK_SPEED;
-		enemyBugState = BUG_WALK_RIGHT;
-		moveHorizontal(left, WALK_SPEED);
-	}
-	//player inside attack range rols x2_Speed
-	else
-	{
-		attackSpeed =1;
-		enemyBugState = BUG_ROLL_RIGHT;
-		//change to dash
-		moveHorizontal(left, attackSpeed);
-	}
-	
-	//if after mov enemy outside limits, turn around
-	if (position.x < initParams.limit.min_x || initParams.limit.max_x < position.x) {
-		//add if collision tile or block (no stair nor ramp)
-		enemyBugState = BUG_WALK_RIGHT;
-		left = !left;
-		moveHorizontal(left, WALK_SPEED);
-	}
-
-
-	velocity += GRAVITY;
-	position.y += int(velocity);
-
-	for (auto block : CollisionManager::instance().blocks)
-	{
-		if (CollisionManager::instance().checkCollisionBlockVertical(this, block.second) == Down) {
-			position.y = block.second->getPosition().y - sizeObject.y;
-			velocity = 0.f;
+	elapsedTime += deltaTime;
+	if (entityState == Dying) {
+		enemyBugState = BUG_DIE;
+		if (elapsedTime >= timeDyingAnim)
+		{
+			entityState = Dead;
+			elapsedTime = 0;
 		}
-		if (CollisionManager::instance().checkCollisionBlockHorizontal(this, block.second) != NoHcol) {
+	}
+	//!dying=animDying ended && !dead=alive
+	else if (entityState == Alive) {
+		elapsedTime = 0;
+		int min_x_attack = position.x - attackDistance;
+		int max_x_attack = position.x + attackDistance;
+		glm::ivec2 posPlayer = Player::instance().getPosition();
+		if (posPlayer.x < min_x_attack || max_x_attack < posPlayer.x) {
+			attackSpeed = WALK_SPEED;
+			enemyBugState = BUG_WALK_RIGHT;
+			moveHorizontal(left, WALK_SPEED);
+		}
+		//player inside attack range rols x2_Speed
+		else
+		{
+			attackSpeed = 1;
+			enemyBugState = BUG_ROLL_RIGHT;
+			//change to dash
+			moveHorizontal(left, attackSpeed);
+		}
+
+		//if after mov enemy outside limits, turn around
+		if (position.x < initParams.limit.min_x || initParams.limit.max_x < position.x) {
+			//add if collision tile or block (no stair nor ramp)
+			enemyBugState = BUG_WALK_RIGHT;
 			left = !left;
 			moveHorizontal(left, WALK_SPEED);
 		}
-	}
 
-	if (CollisionManager::instance().checkCollisionVertical(this) == Tile)
-	{
-		velocity = 0.f;
+
+		velocity += GRAVITY;
+		position.y += int(velocity);
 	}
 	sprite->setLeft(left);
 	if (sprite->animation() != enemyBugState) {
@@ -102,5 +101,22 @@ void EnemyBug::update(int deltaTime, const glm::ivec2& posPlayer)
 }
 void EnemyBug::render()
 {
-	sprite->render();
+	if (entityState!=Dead) {
+		sprite->render();
+	}
+}
+
+
+void EnemyBug::collideVertical()
+{
+	velocity = 0;
+}
+
+void EnemyBug::collideHorizontal(Block* b)
+{
+	left = !left;
+	moveHorizontal(left, WALK_SPEED);
+	sprite->setLeft(left);
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
+
 }

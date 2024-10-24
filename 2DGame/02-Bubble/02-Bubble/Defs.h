@@ -17,11 +17,19 @@ enum EnemyType
 	Bug,
 };
 
+enum EntityState
+{
+	Alive,
+	Dead,
+	Dying
+};
+
 enum CollisionType
 {
 	None,
 	Tile,
 	Stairs,
+	TileStairs
 };
 
 enum VColType
@@ -41,7 +49,6 @@ struct BlockObj
 {
 	int type;
 	glm::ivec2 pos;
-
 };
 
 struct ZoneEnemy

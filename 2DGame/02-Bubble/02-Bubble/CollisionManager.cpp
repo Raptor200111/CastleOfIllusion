@@ -10,21 +10,14 @@
 CollisionManager::CollisionManager()
 {
 	tileMap = NULL;
-	blocks = std::map<string, Block*>();
-	enemies = std::map<string, Enemy*>();
+	screenBlocks = std::map<string, Block*>();
 }
 
 CollisionManager::~CollisionManager()
-{/*
-	for (auto block : blocksObj) {
-			delete block;
-	}
-	blocksObj.clear();
-	blocks.clear();
-	for (auto e : enemiesObj)
-		delete e;
-	enemiesObj.clear();
-	enemies.clear();*/
+{
+	for (auto& screenBlock : screenBlocks)
+		screenBlock.second = NULL;
+	screenBlocks.clear();
 }
 
 
@@ -33,19 +26,11 @@ void CollisionManager::init(TileMap* tileMap)
 	this->tileMap = tileMap;
 	tileSize = tileMap->getTileSize();
 	mapSize = tileMap->getMapSize();
-/*	cout << "Collision\n";
-
-	for (auto block : blocksObj)
-	{
-		cout << block->getPosition().x/16 << " " << block->getPosition().y/16 << "\n";
-	}*/
 }
 
-void CollisionManager::sceneInit(Cam camera, const std::vector<Block*>& blocksObj, const vector<Enemy*>& enemiesObj)
+void CollisionManager::update(const std::map<string, Block*>& screenBlocks)
 {
-	this->blocksObj = blocksObj;
-	this->enemiesObj = enemiesObj;
-	cout << tileSize;
+	this->screenBlocks = screenBlocks;
 }
 
 
@@ -75,11 +60,13 @@ VColType CollisionManager::checkCollisionBlockVertical(Entity* objectA, Entity* 
 
 	// Check if the player's bottom side is colliding with the block's top side
 	if (size1.y > pos2.y && pos1.y < pos2.y) {
-		return Down; 
+		objectA->setPositionY(pos2.y - objectA->getSize().y);
+		return Down;
 	}
 
 	// Check if the player's top side is colliding with the block's bottom side
 	if (pos1.y < size2.y && size1.y > size2.y) {
+		objectA->setPositionY(size2.y);
 		return Up;
 	}
 
@@ -128,24 +115,30 @@ CollisionType CollisionManager::checkCollisionHorizontal(Entity* entity)
 	int y1 = (pos.y + size.y - 1) / tileSize;
 	int inc = xRight - xLeft;
 	CollisionType value = None;
+	bool stairs = false;
+	bool tile = false;
 	// Check the tiles around the entity for collisions
-	for (int i = xLeft; i <= xRight; i+=inc) {
+	for (int i = xLeft; i <= xRight; i += inc) {
 		for (int j = y0; j < y1; ++j) {
 			int tileType = tileMap->getTileType(i, j);
 			if (tileType != 0 && tileType != 7 && tileType != 8) {
 				if (tileType == 9)
 				{
-					value = Stairs;
-					return value;
+					stairs = true;
 				}
-				else {
-					value = Tile;
-					return value;
+				if (tileType != 0 && tileType != 9) {
+					tile = true;
 				}
 			}
 		}
 	}
-	return value;
+	if (stairs && tile)
+		return TileStairs;
+	else if (stairs)
+		return Stairs;
+	else if (tile)
+		return Tile;
+	return None;
 }
 
 
@@ -158,171 +151,109 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 	int x0 = pos.x / tileSize;
 	int x1 = (pos.x + size.x - 1) / tileSize;
 
-	vector<int> upDown= vector<int> (2, 0);
+	vector<int> upDown = vector<int>(2, 0);
 	int yUp = pos.y / tileSize;						upDown[0] = yUp;
 	int yDown = (pos.y + size.y - 1) / tileSize;	upDown[1] = yDown;
 
+	bool stairs = false;
+	bool tile = false;
 	// Check the tiles around the entity for collisions
 	for (int i = x0; i <= x1; ++i) {
-		for (int j : upDown) {
+		for (int j = yUp; j <= yDown; j++) {
 			int tileType = tileMap->getTileType(i, j);
 			if (tileType != 0) {
 				if (tileType == 9)
-					return Stairs;
-				
-				if (tileType == 7 || tileType == 8)
+					stairs = true;
+
+				if (j == yDown)
 				{
-					int correctedY = correctRampPos(i, j, size.y, pos, entity->getLeft());
-					if (correctedY != -1)
-					{
-						entity->setPositionY(correctedY);
-						
-					}
-					return Tile;
-				}
-				//Down collision
-				else if (j == yDown)
-				{
-					
+
 					if (pos.y + size.y > tileSize * j)
 					{
 						int posY = tileSize * j - size.y;
 						entity->setPositionY(posY);
-						return Tile;
+						tile = true;
 					}
 
 				}
 				//Up collision
 				else if (j == yUp && pos.y < tileSize * (j + 1))
 				{
-					int posY = tileSize * (j + 1);
-					entity->setPositionY(posY);
-					return Tile;
+					if (!stairs) {
+						int posY = tileSize * (j + 1);
+						entity->setPositionY(posY);
+					}
+					tile = true;
 				}
 			}
 		}
 	}
+	if (correctRamp(entity))
+		tile = true;
+
+	if (tile && stairs)
+		return TileStairs;
+	else if (tile)
+		return Tile;
+	else if (stairs)
+		return Stairs;
 	return None;
 }
-/*
-int CollisionManager::correctRampPos(int tileX, int tileY, int sizeY, glm::ivec2 pos)
+
+bool CollisionManager::correctRamp(Entity* entity)
 {
-	int tileLeftX = tileX * tileSize;
-	int tileLocalX = pos.x - tileLeftX;
-	int tileBottomY = (tileY + 1) * tileSize;
-	int correctY = tileBottomY - tileLocalX;
-	if (pos.y + sizeY > correctY) {
-		return correctY - sizeY;
-	}
-	return -1;
-}
-*/
+	glm::ivec2 pos = entity->getPosition();
+	glm::ivec2 size = entity->getSize();
+	bool left = entity->getLeft();
+	bool tile = false;
 
-int CollisionManager::correctRampPos(int tileX, int tileY, int sizeY, glm::ivec2 pos, bool left)
-{
-	int yOnRamp;
-	int correctedY = -1;
-	int xInTile = pos.x % tileSize;
-	if (xInTile == 0)
-		xInTile = 16;
-	//if (tileType == 8) {
-	if(!left) {
-		// Ramp that goes up from left to right (\)
-		yOnRamp = tileSize - xInTile;  // Higher y when x is smaller
-	}
-	//else if (tileType == 7) {
-	else if (left) {
-		// Ramp that goes up from right to left (/)
-		yOnRamp = xInTile;  // Higher y when x is larger
-	}
-
-	// Correct the y position of the entity to sit on the ramp
-	correctedY = tileSize * tileY + yOnRamp - sizeY;
-	return correctedY;
-
-}
-
-
-void CollisionManager::insideScreenObj(Cam cam)
-{
-	
-	for (auto& enemyObj : enemiesObj)
+	int playerFeetX = (pos.x + size.x / 2.0f) / tileSize;
+	//i dont put -1 cause before it already corrected it
+	int y = (pos.y + size.y) / tileSize;
+	int correctedY;
+	if (left)
 	{
-		glm::ivec2 posEnemyId = enemyObj->getInitPos();
-		glm::ivec2 posEnemy = enemyObj->getPosition();
-		glm::ivec2 posEnemyToCompare = glm::ivec2(posEnemyId.x * tileSize, posEnemyId.y * tileSize);
-		string idEnemy = std::to_string(posEnemyId.x) + " " + std::to_string(posEnemyId.y);
-		if (insideScreen(posEnemyToCompare, cam))
-		{
-			if (enemies.find(idEnemy) == enemies.end())
-			{
-				enemies.insert(std::pair<string, Enemy*>(idEnemy, enemyObj));
-			}
-		}
-		else
-		{
-			/*
-			cout << posEnemy.x << " " << posEnemy.y << "\n";
-			cout << cam.left << " " << cam.right << " " << cam.bottom << "  " << cam.top << "\n";
-			*/
-			if (enemies.find(idEnemy) != enemies.end()) {
-				enemies.erase(idEnemy);
-			}
+		int x = pos.x / tileSize;
+		int tileInFront = tileMap->getTileType(x, y - 1);
+		if (tileInFront == 7 || tileInFront == 8) {
+			int xInTile = tileSize - (pos.x % tileSize);
+			correctedY = y * tileSize - size.y - xInTile;
+			entity->setPositionY(correctedY);
+			tile = true;
 		}
 	}
-	for (auto& blockObj : blocksObj)
+	else
 	{
-		glm::ivec2 posBlock = blockObj->getPosition();
-		string idBlock = std::to_string(posBlock.x) + " " + std::to_string(posBlock.y);
-		if (insideScreen(posBlock, cam))
-		{
-			if (blocks.find(idBlock) == blocks.end())
-			{
-				blocks.insert(std::pair<string, Block*>(idBlock, blockObj));
-			}
-		}
-		else
-		{
-			if (blocks.find(idBlock) != blocks.end()) {
-				blocks.erase(idBlock);
-			}
+		//this option if only heels touch ramp
+		int x = (pos.x) / tileSize;
+		int tileBelow = tileMap->getTileType(x, y);
+		if (tileBelow == 7 || tileBelow == 8) {
+			int xInTile = pos.x % tileSize;
+			correctedY = y * tileSize - size.y + xInTile;
+			entity->setPositionY(correctedY);
+			tile = true;
 		}
 	}
+	return tile;
 
 }
 
-bool CollisionManager::insideScreen(glm::ivec2 pos, Cam cam)
-{
+Block* CollisionManager::collisionEntityBlockH(Entity* entity) {
+	for (auto& it = screenBlocks.begin(); it != screenBlocks.end(); ++it) {
+		if (checkCollisionBlockHorizontal(entity, it->second) != NoHcol) {
 
-	if (cam.left < pos.x && pos.x < cam.right && cam.top < pos.y && pos.y < cam.bottom) {
-		/*cout << left << " " << right << "\n";
-		cout << pos.x << "\n";*/
-		return true;
-	}
-	return false;
-}
-
-// Implementation of the callback function
-void CollisionManager::update(int deltaTime, Cam camera)
-{
-	// Update enemies
-	insideScreenObj(camera);
-
-	for (auto& it = enemies.begin(); it != enemies.end(); ++it) {
-		EnemyBug* enemyBug = dynamic_cast<EnemyBug*>(it->second);
-		if (enemyBug)
-			enemyBug->update(deltaTime, Player::instance().getPosition());
-		else
-			it->second->update(deltaTime);
-
-		if (checkCollisionObject(&Player::instance(), it->second)) {
-			/*
-			if (Player::instance().killEnemy()) {
-				it = enemies.erase(it);
-				break;
-			}*/
-
+			return it->second;
+			break;
 		}
 	}
+}
 
+Block* CollisionManager::collisionEntityBlockV(Entity* entity) {
+	for (auto& it = screenBlocks.begin(); it != screenBlocks.end(); ++it) {
+		VColType vColType = checkCollisionBlockVertical(entity, it->second);
+		if (vColType != NoVcol) {
+			return it->second;
+			break;
+		}
+	}
 }

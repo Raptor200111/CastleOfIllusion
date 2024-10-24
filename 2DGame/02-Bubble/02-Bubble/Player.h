@@ -10,8 +10,6 @@
 #include "Entity.h"
 #include "CollisionManager.h"
 
-// Player is basically a Sprite that represents the player. As such it has
-// all properties it needs to track its movement, jumping, and collisions.
 
 enum PlayerStates
 {
@@ -20,12 +18,9 @@ enum PlayerStates
 
 class Player : public Entity
 {
-
 public:
-	static Player& instance()
-	{
+	static Player& instance() {
 		static Player P;
-
 		return P;
 	}
 
@@ -35,16 +30,16 @@ public:
 
 private:
 	bool bClimbing, bTouchBlock, bJumping;
-	float velocity;
+	float yAxisSpeed;
 	PlayerStates oldState, newState;
 	ParticleEfect particleEfect;
 
 	void leftMove();
 	void rightMove();
-	void jump(int speed);
-	void setSize(glm::ivec2 newSize);
+	void changeToClimb();
+	bool stopFallingCollision(Block*& block, CollisionType& colType);
+	bool stairCollision();
 };
-
 
 #endif // _PLAYER_INCLUDE
 
