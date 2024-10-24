@@ -275,7 +275,6 @@ void BossDragon::shoot(int deltaTime)
 	glm::ivec2 direction = Player::instance().getPosition() - posHead;
 	float angle = atan2(direction.y, direction.x);  // Invert y-axis since we're interested in the bottom half.
 	float angleDegrees = glm::degrees(angle);
-
 	if (angleDegrees < 0) angleDegrees += 180;  // Ensure the angle is positive
 	BossDragonStates objective;
 	if (angleDegrees >= 135 && angleDegrees < 180) {

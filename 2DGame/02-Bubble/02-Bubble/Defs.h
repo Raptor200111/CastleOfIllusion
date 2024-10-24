@@ -49,7 +49,6 @@ struct BlockObj
 {
 	int type;
 	glm::ivec2 pos;
-
 };
 
 struct ZoneEnemy

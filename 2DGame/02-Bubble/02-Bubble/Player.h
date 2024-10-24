@@ -1,13 +1,11 @@
 #ifndef _PLAYER_INCLUDE
 #define _PLAYER_INCLUDE
 
-
-#include "Entity.h"
 #include <cmath>
-
-
-// Player is basically a Sprite that represents the player. As such it has
-// all properties it needs to track its movement, jumping, and collisions.
+#include <iostream>
+#include <GL/glew.h>
+#include "Entity.h"
+#include "CollisionManager.h"
 
 enum PlayerStates
 {
@@ -16,12 +14,9 @@ enum PlayerStates
 
 class Player : public Entity
 {
-
 public:
-	static Player& instance()
-	{
+	static Player& instance() {
 		static Player P;
-
 		return P;
 	}
 	void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram);
@@ -30,16 +25,15 @@ public:
 
 private:
 	bool bClimbing, bTouchBlock, bJumping;
-	float velocity;
-
+	float yAxisSpeed;
 	PlayerStates oldState, newState;
 
 	void leftMove();
 	void rightMove();
-	void jump(int v);
-	void setSize(glm::ivec2 newSize);
+	void changeToClimb();
+	bool stopFallingCollision(Block*& block, CollisionType& colType);
+	bool stairCollision();
 };
-
 
 #endif // _PLAYER_INCLUDE
 
