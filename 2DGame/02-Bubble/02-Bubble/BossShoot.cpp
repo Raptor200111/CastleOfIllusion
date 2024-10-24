@@ -26,18 +26,16 @@ void BossShoot::update(int deltaTime) {
 		}
 	}
 	else if (entityState == Alive) {
+		shootState = BOSS_SHOOT_START;
 		float deltaSeconds = deltaTime / 1000.0f;
 		glm::vec2 direction = glm::vec2(endDirection - glm::vec2(position));
 		glm::vec2 normalizedDirection = glm::normalize(direction);
 		glm::vec2 movement = normalizedDirection * speed * deltaSeconds;
+		glm::ivec2 newPosition = position + glm::ivec2(glm::round(movement));
 		position += glm::ivec2(glm::round(movement));
 		//cout << "ShootV" << velocity.x << " " << velocity.y << "\n";
-		//cout << "ShootAdd" << add.x << " " <<z add.y << "\n";
-		if (position.x < 0 || position.x > 96 * 16 || position.y < 0 || position.y> 736)
-		{
-			elapsedTime = 0;
-			entityState = Dead;
-		}
+		//cout << "ShootAdd" << position.x << " " << position.y << "\n";
+		
 	}
 	
 	if (sprite->animation() != shootState) {
@@ -66,8 +64,8 @@ void BossShoot::setShootAnimations(ShaderProgram& shaderProgram)
 	sizeObject = totalSizeSpriteSheet;
 	glm::vec2 sizeSpriteSheet = glm::vec2(sizeObject.x / totalSizeSpriteSheet.x, sizeObject.y / totalSizeSpriteSheet.y);
 	sprite = Sprite::createSprite(sizeObject, sizeSpriteSheet, &spritesheet, &shaderProgram);
-	//sprite->setNumberAnimations(2);
-	sprite->setNumberAnimations(1);
+
+	sprite->setNumberAnimations(2);
 
 
 	sprite->setAnimationSpeed(BOSS_SHOOT_START, 8);
@@ -96,6 +94,7 @@ void BossShoot::setShootAnimations(ShaderProgram& shaderProgram)
 	frame = glm::vec2(3.f / totalSizeSpriteSheet.x, 20.f / totalSizeSpriteSheet.y);
 	sprite->addKeyframeDiffSize(BOSS_SHOOT_END, frame, sizeObject, sizeSpriteSheet);
 
+	
 	sizeObject = glm::vec2(12.f, 12.f);
 	sizeSpriteSheet = glm::vec2(sizeObject.x / totalSizeSpriteSheet.x, sizeObject.y / totalSizeSpriteSheet.y);
 	frame = glm::vec2(23.f / totalSizeSpriteSheet.x, 23.f / totalSizeSpriteSheet.y);

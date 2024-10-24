@@ -41,6 +41,7 @@ private:
 	std::map<string, Enemy*> screenEnemies;
 	std::map<string, Block*> screenBlocks;
 	std::map<string, Block*>  playrunMovBlocks;
+	vector<BossShoot*> shoots;
 
 	TileMap* map;
 	Player* player;

@@ -202,35 +202,30 @@ void LevelScene::update(int deltaTime)
 		boss.update(deltaTime);
 		for (auto shoot : boss.getShoots())
 		{
-			EntityState shootState = shoot->getEntityState();
-			if (shootState != Dead) {
-				shoot->update(deltaTime);
-				bool dying = false;
-				if (shoot->getEntityState() == Alive) {
-					if (CollisionManager::instance().checkCollisionObject(player, shoot)) {
-						shoot->setEntityState(Dying);
-						dying = true;
-					}
-				}/*
-				if (!dying && (CollisionManager::instance().checkCollisionVertical(shoot) != NoVcol || CollisionManager::instance().checkCollisionHorizontal(shoot) != NoHcol))
-				{
+			shoot->update(deltaTime);
+			if (shoot->getEntityState() == Alive) {
+				if (CollisionManager::instance().checkCollisionObject(player, shoot)) {
 					shoot->setEntityState(Dying);
 				}
-				
-				if (!dying) {
-					for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
+			}
+			
+			if (shoot->getEntityState() == Alive){
+				glm::ivec2 posShoot = shoot->getPosition();
+				if(CollisionManager::instance().checkCollisionVertical(shoot) != None || CollisionManager::instance().checkCollisionHorizontal(shoot) != None)
+					shoot->setEntityState(Dying);
+			}
+			
+			if (shoot->getEntityState() == Alive) {
+				for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
+				{
+					VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(shoot, itBlock->second);
+					if (CollisionManager::instance().checkCollisionBlockVertical(shoot, itBlock->second) != NoVcol || CollisionManager::instance().checkCollisionBlockHorizontal(shoot, itBlock->second) != NoHcol)
 					{
-						VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(shoot, itBlock->second);
-						if (CollisionManager::instance().checkCollisionBlockVertical(shoot, itBlock->second) != NoVcol || CollisionManager::instance().checkCollisionBlockHorizontal(shoot, itBlock->second) != NoHcol)
-						{
-							shoot->setEntityState(Dying);
-							dying = true;
-							break;
-						}
+						shoot->setEntityState(Dying);
+						break;
 					}
 				}
-				*/
-			}
+			}			
 		}
 	}
 	else {
@@ -364,7 +359,7 @@ void LevelScene::render()
 	player->render();
 	if (insideBossRoom) {
 		boss.render();
-		for (auto shoot : boss.getShoots())
+		for (auto shoot : shoots)
 		{
 			if(shoot->getEntityState() != Dead)
 				shoot->render();
@@ -433,6 +428,12 @@ void LevelScene::insideScreenObj()
 	if (bossRoom.left < posP.x && posP.x < bossRoom.right && bossRoom.top < posP.y && posP.y < bossRoom.bottom) {
 		insideBossRoom = true;
 		boss.setEntityState(Alive);
+		shoots.clear();
+		for (const auto& shoot : boss.getShoots())
+		{
+			if (shoot->getEntityState() != Dead)
+				shoots.push_back(shoot);
+		}
 	}
 	else {
 		for (auto& playrunEnemy : playrunEnemies)

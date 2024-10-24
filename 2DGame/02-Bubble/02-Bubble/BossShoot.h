@@ -20,7 +20,7 @@ private:
 	glm::vec2 endDirection;   
 	float speed = 100.0f;
 
-	int timeDyingAnim = 500;
+	int timeDyingAnim = 1000;
 	int maxTime = 160*100;
 	int elapsedTime = 0;
 	BossShootStates shootState = BossShootStates::BOSS_SHOOT_START;
