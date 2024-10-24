@@ -44,6 +44,7 @@ public:
 	void play();
 	void playOnce();
 	void stop();
+	int getCurrentKeyframe() { return currentKeyframe; }
 
 private:
 	Texture* texture;
