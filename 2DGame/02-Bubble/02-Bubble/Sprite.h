@@ -39,6 +39,11 @@ public:
 	glm::vec2 updateDiffSize(int deltaTime);
 	glm::vec2 changeAnimationDiffSize(int animId);
 	void updateVertexData(const glm::vec2& quadSize, const glm::vec2& sizeInSpritesheet);
+	void setPlayingOnce(bool playingOnce);
+	bool getPlayingNow();
+	void play();
+	void playOnce();
+	void stop();
 
 private:
 	Texture* texture;
@@ -52,7 +57,7 @@ private:
 	float timeAnimation;
 	glm::vec2 texCoordDispl;
 	vector<AnimKeyframes> animations;
-	bool left;
+	bool left, playingOnce, playingNow;
 	glm::vec2 currentQuadSize;
 	glm::vec2 currentSpriteSheetSize;
 };

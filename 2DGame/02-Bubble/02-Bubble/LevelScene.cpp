@@ -32,6 +32,10 @@ LevelScene::~LevelScene()
 {
 	if (map != NULL)
 		delete map;
+	/*
+	if (player != NULL)
+		delete player;
+		*/
 	if (bgMap != NULL)
 		delete bgMap;
 	if (bgQuad != NULL)

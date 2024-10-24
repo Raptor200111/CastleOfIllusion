@@ -1,7 +1,6 @@
 #include "Player.h"
 #include "Game.h"
 
-
 #define FALL_STEP 2
 #define WALK_SPEED 2
 #define GRAVITY 0.5f
@@ -18,6 +17,24 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	oldState = newState = IDLE;
 
 	sizeSprite = glm::ivec2(32, 48);
+
+	//AÑADIR ANIMACIONES MAS CHULAS
+	glm::vec2* vec2Array = new glm::vec2[7];
+	
+	vec2Array[0] = glm::vec2(0.066f * 2, 0.f);
+	vec2Array[1] = glm::vec2(0.066f * 3, 0.f);
+	vec2Array[2] = glm::vec2(0.066f * 4, 0.f);
+	vec2Array[3] = glm::vec2(0.066f * 5, 0.f);
+	vec2Array[4] = glm::vec2(0.066f * 6, 0.f);
+	vec2Array[5] = glm::vec2(0.066f * 7, 0.f);
+	vec2Array[6] = glm::vec2(0.066f * 8, 0.f);
+
+	particleEfect.init(tileMapPos, position, sizeSprite, shaderProgram, "images/Mickey_Mouse.png", glm::vec2(0.066, 0.098), 1);
+	particleEfect.addAnimation(8, vec2Array, 7);
+
+	delete vec2Array;
+	
+
 	setSize(glm::ivec2(24, 32));
 	setOffset(glm::ivec2(4, 8));
 
@@ -67,7 +84,6 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	sprite->changeAnimation(IDLE);
 	tileMapDispl = tileMapPos;
 	//setPosition(glm::ivec2(0, 0));
-
 }
 
 void Player::update(int deltaTime)
@@ -284,7 +300,7 @@ void Player::update(int deltaTime)
 			position.y += WALK_SPEED;
 			newState = CLIMB;
 		}
-		if (Game::instance().getKey(GLFW_KEY_L)) {
+		if (Game::instance().getKey(GLFW_KEY_L) && colType == CollisionType::Stairs) {
 			newState = FALL;
 		}
 		break;
@@ -310,7 +326,7 @@ void Player::update(int deltaTime)
 				position.y += WALK_SPEED;
 				newState = CLIMB;
 			}
-			if (Game::instance().getKey(GLFW_KEY_L)) {
+			if (Game::instance().getKey(GLFW_KEY_L) && colType == CollisionType::Stairs) {
 				newState = FALL;
 			}
 			break;
@@ -337,11 +353,20 @@ void Player::update(int deltaTime)
 	setPosition(position);
 	if (Game::instance().getKey(GLFW_KEY_P))
 		cout << position.x << " " << position.y << " - State: " << PlayerStates(oldState) << endl;
+	
+	/* TEBEMOS QUE AÑADIR PARTICULAS CHULAS
+	if (Game::instance().getKey(GLFW_KEY_M))
+	{
+		particleEfect.play(position - glm::ivec2(-32, 0), 0);
+	}
+	*/
+	particleEfect.update(deltaTime);
 }
 
 void Player::render()
 {
 	sprite->render();
+	particleEfect.render();
 }
 
 void Player::leftMove()
@@ -386,6 +411,7 @@ void Player::rightMove()
 			cout << "Take Item" << endl;
 	}
 }
+
 
 void Player::changeToClimb()
 {
