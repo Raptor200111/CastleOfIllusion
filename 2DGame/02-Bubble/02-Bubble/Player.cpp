@@ -86,14 +86,6 @@ void Player::update(int deltaTime)
 	{
 	case IDLE:
 	{
-		if (Game::instance().getKey(GLFW_KEY_A)) {
-			newState = WALK;
-			leftMove();
-		}
-		if (Game::instance().getKey(GLFW_KEY_D)) {
-			newState = WALK;
-			rightMove();
-		}
 		if (stopFallingCollision(block, colType))
 		{
 			if (Game::instance().getKey(GLFW_KEY_K)) {
@@ -116,19 +108,20 @@ void Player::update(int deltaTime)
 		{
 			newState = FALL;
 		}
+
+		if (Game::instance().getKey(GLFW_KEY_A)) {
+			newState = WALK;
+			leftMove();
+		}
+		if (Game::instance().getKey(GLFW_KEY_D)) {
+			newState = WALK;
+			rightMove();
+		}
 		break;
 	}
 	case WALK:
 	{
 		newState = IDLE;
-		if (Game::instance().getKey(GLFW_KEY_A)) {
-			leftMove();
-			newState = WALK;
-		}
-		if (Game::instance().getKey(GLFW_KEY_D)) {
-			rightMove();
-			newState = WALK;
-		}
 
 		if (stopFallingCollision(block, colType))
 		{
@@ -152,7 +145,14 @@ void Player::update(int deltaTime)
 		{
 			newState = FALL;
 		}
-		
+		if (Game::instance().getKey(GLFW_KEY_A)) {
+			leftMove();
+			newState = WALK;
+		}
+		if (Game::instance().getKey(GLFW_KEY_D)) {
+			rightMove();
+			newState = WALK;
+		}
 		break;
 	}
 	case JUMP:
@@ -296,7 +296,7 @@ void Player::update(int deltaTime)
 
 			if (!stairCollision())
 			{
-				newState == FALL;
+				newState = FALL;
 				break;
 			}
 			else
@@ -335,6 +335,8 @@ void Player::update(int deltaTime)
 	}
 
 	setPosition(position);
+	if (Game::instance().getKey(GLFW_KEY_P))
+		cout << position.x << " " << position.y << " - State: " << PlayerStates(oldState) << endl;
 }
 
 void Player::render()
@@ -352,7 +354,7 @@ void Player::leftMove()
 	CollisionType colType = CollisionManager::instance().checkCollisionHorizontal(this);
 	if (colType == CollisionType::Tile)
 		position.x += WALK_SPEED;
-	else if (colType == CollisionType::Stairs && Game::instance().getKey(GLFW_KEY_W))
+	else if ((colType == CollisionType::Stairs || colType == CollisionType::TileStairs) && Game::instance().getKey(GLFW_KEY_W))
 		changeToClimb();
 	
 	Block* b = CollisionManager::instance().collisionEntityBlockH(this);
@@ -373,7 +375,7 @@ void Player::rightMove()
 	CollisionType colType = CollisionManager::instance().checkCollisionHorizontal(this);
 	if (colType == CollisionType::Tile)
 		position.x -= WALK_SPEED;
-	else if (colType == CollisionType::Stairs && Game::instance().getKey(GLFW_KEY_W))
+	else if ((colType == CollisionType::Stairs || colType == CollisionType::TileStairs) && Game::instance().getKey(GLFW_KEY_W))
 		changeToClimb();
 
 	Block* b = CollisionManager::instance().collisionEntityBlockH(this);
@@ -387,7 +389,7 @@ void Player::rightMove()
 
 void Player::changeToClimb()
 {
-	newState = CLIMB;
+	newState = CLIMB_IDLE;
 	//calcular posicion de la escalera
 }
 
