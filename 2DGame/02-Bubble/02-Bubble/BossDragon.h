@@ -29,6 +29,8 @@ public:
 		setHeadSpritePos();
 	}
 
+	void collideVertical() override {}
+	void collideHorizontal(Block* b) override {}
 
 	vector<BossShoot*> getShoots() { return shoots; }
 

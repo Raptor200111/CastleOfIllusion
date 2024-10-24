@@ -23,7 +23,11 @@ public:
 	void setSize(glm::ivec2 size) { sizeObject = size; }
 	void setOffset(glm::ivec2 offset) { this->offset = offset; }
 
+	EntityState getEntityState() { return entityState; }
+	void setEntityState(EntityState s) { entityState = s; }
+
 protected:
+	EntityState entityState = Alive;
 	bool left;
 	Texture spritesheet;
 	Sprite* sprite;
