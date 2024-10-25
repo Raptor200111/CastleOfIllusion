@@ -30,11 +30,16 @@ public:
 	void render();
 
 	//Block* ThrownBlock() { return thrownBlock; }
-	//Block* PickedUpBlock() { return pickedUpBlock; }
+	Block* getPickedUpBlock() { return pickedUpBlock; }
 
 private:
 	//Block* thrownBlock;
 	Block* pickedUpBlock;
+	Block* readyToPickBlock;
+
+	void pickUpBlock();
+	void throwBlock();
+
 
 	bool bClimbing, bTouchBlock, bJumping;
 	float yAxisSpeed;
@@ -53,9 +58,9 @@ private:
 	//Behaviour as in all that happens in every update with the following states:
 	void movementBehaviour();
 	void climbBehaviour();
-	void jumpBehaviour();
-	void fallBehaviour();
 	void buttJumpBehaviour();
+	void blockMovementBehaviour();
+
 };
 
 #endif

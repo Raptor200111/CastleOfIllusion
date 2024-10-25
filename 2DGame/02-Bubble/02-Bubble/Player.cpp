@@ -137,12 +137,46 @@ void Player::update(int deltaTime)
 		}
 		case JUMP:
 		{
-			jumpBehaviour();
+			if (Game::instance().getKey(GLFW_KEY_A)) {
+				leftMove();
+			}
+			if (Game::instance().getKey(GLFW_KEY_D)) {
+				rightMove();
+			}
+			if (Game::instance().getKey(GLFW_KEY_S)) {
+				newState = BUTT_FALL;
+			}
+			if ((stopFallingCollision(block, colType) && yAxisSpeed < 0) || yAxisSpeed > 0)
+			{
+				yAxisSpeed = 0;
+				newState = FALL;
+			}
+			if (colType == CollisionType::Stairs && Game::instance().getKey(GLFW_KEY_W))
+			{
+				changeToClimb();
+			}
 			break;
 		}
 		case FALL:
 		{
-			fallBehaviour();
+			if (Game::instance().getKey(GLFW_KEY_A)) {
+				leftMove();
+			}
+			if (Game::instance().getKey(GLFW_KEY_D)) {
+				rightMove();
+			}
+			if (Game::instance().getKey(GLFW_KEY_S)) {
+				newState = BUTT_FALL;
+			}
+			if (stopFallingCollision(block, colType))
+			{
+				yAxisSpeed = 0;
+				newState = IDLE;
+			}
+			if (colType == CollisionType::Stairs && Game::instance().getKey(GLFW_KEY_W))
+			{
+				changeToClimb();
+			}
 			break;
 		}
 		case DODGE:
@@ -174,6 +208,11 @@ void Player::update(int deltaTime)
 		}
 		case READY_TO_PICK:
 		{
+			newState = READY_TO_PICK;
+			movementBehaviour();
+			if (Game::instance().getKey(GLFW_KEY_L)) {
+				pickUpBlock();
+			}
 			break;
 		}
 		case CLIMB_IDLE:
@@ -189,27 +228,55 @@ void Player::update(int deltaTime)
 		}
 		case B_PICK:
 		{
+			newState = B_IDLE;
 			break;
 		}
 		case B_IDLE:
 		{
-			movementBehaviour();
+			blockMovementBehaviour();
 			break;
 		}
 		case B_WALK:
 		{
 			newState = B_IDLE;
-			movementBehaviour();
+			blockMovementBehaviour();
 			break;
 		}
 		case B_JUMP:
 		{
-			jumpBehaviour();
+			if (Game::instance().getKey(GLFW_KEY_A)) {
+				leftMove();
+			}
+			if (Game::instance().getKey(GLFW_KEY_D)) {
+				rightMove();
+			}
+			if (Game::instance().getKey(GLFW_KEY_L)) {
+				throwBlock();
+			}
+			if ((stopFallingCollision(block, colType) && yAxisSpeed < 0) || yAxisSpeed > 0)
+			{
+				yAxisSpeed = 0;
+				newState = B_FALL;
+			}
 			break;
 		}
 		case B_FALL:
 		{
-			fallBehaviour();
+			if (Game::instance().getKey(GLFW_KEY_A)) {
+				leftMove();
+			}
+			if (Game::instance().getKey(GLFW_KEY_D)) {
+				rightMove();
+			}
+			if (Game::instance().getKey(GLFW_KEY_L)) {
+				//newState = BUTT_FALL;
+				throwBlock();
+			}
+			if (stopFallingCollision(block, colType))
+			{
+				yAxisSpeed = 0;
+				newState = B_IDLE;
+			}
 			break;
 		}
 	}
@@ -234,10 +301,6 @@ void Player::update(int deltaTime)
 	setPosition(position);
 	if (Game::instance().getKey(GLFW_KEY_P))
 		cout << position.x << " " << position.y << " - State: " << PlayerStates(oldState) << endl;
-	
-  else if (Game::instance().getKey(GLFW_KEY_L) && newState == WALK) {
-			//grab item
-		}
 	/* TEBEMOS QUE AÑADIR PARTICULAS CHULAS
 	if (Game::instance().getKey(GLFW_KEY_M))
 	{
@@ -245,12 +308,50 @@ void Player::update(int deltaTime)
 	}
 	*/
 	particleEfect.update(deltaTime);
+	if (pickedUpBlock != nullptr)
+	{
+		//pickedUpBlock->update(deltaTime);//hacemos el update (hay que cambiarle la posicion)
+		//pickedUpBlock->setPosition(position);
+	}
 }
 
 void Player::render()
 {
 	sprite->render();
 	particleEfect.render();
+	//if (pickedUpBlock != nullptr)
+		//pickedUpBlock->render();
+}
+
+void Player::pickUpBlock()
+{
+	newState = B_PICK;
+	pickedUpBlock = readyToPickBlock;
+	readyToPickBlock = nullptr;
+	//collider desconectar block
+	
+	pickedUpBlock->setPosition(glm::ivec2(position.x, position.y - 30));
+}
+
+void Player::throwBlock()
+{
+	//collider atach block
+	pickedUpBlock = nullptr;
+	switch (oldState)
+	{
+	case B_IDLE:
+		newState = IDLE;
+		break;
+	case B_WALK:
+		newState = WALK;
+		break;
+	case B_JUMP:
+		newState = JUMP;
+		break;
+	case B_FALL:
+		newState = FALL;
+		break;
+	}
 }
 
 void Player::leftMove()
@@ -270,8 +371,11 @@ void Player::leftMove()
 	if (b != nullptr)
 	{
 		position.x += WALK_SPEED;
-		if (Game::instance().getKey(GLFW_KEY_L))
-			cout << "Take Item" << endl;
+		if (oldState == WALK || oldState == READY_TO_PICK)
+		{
+			newState = READY_TO_PICK;
+			readyToPickBlock = b;
+		}
 	}
 }
 
@@ -291,8 +395,12 @@ void Player::rightMove()
 	if (b != nullptr)
 	{
 		position.x -= WALK_SPEED;
-		if (Game::instance().getKey(GLFW_KEY_L))
-			cout << "Take Item" << endl;
+		if (oldState == WALK || oldState == READY_TO_PICK)
+		{
+			newState = READY_TO_PICK;
+			readyToPickBlock = b;
+		}
+			
 	}
 }
 
@@ -338,20 +446,26 @@ void Player::movementBehaviour()
 		if (Game::instance().getKey(GLFW_KEY_K)) {
 			newState = JUMP;
 			yAxisSpeed = JUMP_SPEED;
+			return;
 		}
 		else if (Game::instance().getKey(GLFW_KEY_S)) {
 			if (colType == CollisionType::TileStairs) {
 				changeToClimb();
 				//position.y++;
+				return;
 			}
-			else
+			else {
 				newState = DODGE;
+				return;
+			}
+				
 			// change size, piensatelo: ???
 		}
 	}
 	else
 	{
 		newState = FALL;
+		return;
 	}
 	if (Game::instance().getKey(GLFW_KEY_A)) {
 		newState = WALK;
@@ -365,7 +479,7 @@ void Player::movementBehaviour()
 
 void Player::climbBehaviour()
 {
-	position.y -= int(yAxisSpeed) + 1;
+	position.y -= int(yAxisSpeed);
 	yAxisSpeed = 0;
 
 	if (!stairCollision())
@@ -374,6 +488,7 @@ void Player::climbBehaviour()
 	}
 	else 
 	{
+		position.y--;
 		if (Game::instance().getKey(GLFW_KEY_W)) {
 			position.y -= WALK_SPEED;
 			newState = CLIMB;
@@ -385,50 +500,6 @@ void Player::climbBehaviour()
 		if (Game::instance().getKey(GLFW_KEY_L) && colType == CollisionType::Stairs) {
 			newState = FALL;
 		}
-	}
-}
-
-void Player::jumpBehaviour()
-{
-	if (Game::instance().getKey(GLFW_KEY_A)) {
-		leftMove();
-	}
-	if (Game::instance().getKey(GLFW_KEY_D)) {
-		rightMove();
-	}
-	if (Game::instance().getKey(GLFW_KEY_S)) {
-		newState = BUTT_FALL;
-	}
-	if ((stopFallingCollision(block, colType) && yAxisSpeed < 0) || yAxisSpeed > 0)
-	{
-		yAxisSpeed = 0;
-		newState = FALL;
-	}
-	if (colType == CollisionType::Stairs && Game::instance().getKey(GLFW_KEY_W))
-	{
-		changeToClimb();
-	}
-}
-
-void Player::fallBehaviour()
-{
-	if (Game::instance().getKey(GLFW_KEY_A)) {
-		leftMove();
-	}
-	if (Game::instance().getKey(GLFW_KEY_D)) {
-		rightMove();
-	}
-	if (Game::instance().getKey(GLFW_KEY_S)) {
-		newState = BUTT_FALL;
-	}
-	if (stopFallingCollision(block, colType))
-	{
-		yAxisSpeed = 0;
-		newState = IDLE;
-	}
-	if (colType == CollisionType::Stairs && Game::instance().getKey(GLFW_KEY_W))
-	{
-		changeToClimb();
 	}
 }
 
@@ -452,5 +523,34 @@ void Player::buttJumpBehaviour()
 		newState = BUTT_JUMP;
 		// destruccion del objeto que devuelve
 		// delete b;
+	}
+}
+
+void Player::blockMovementBehaviour()
+{
+	if (stopFallingCollision(block, colType))
+	{
+		yAxisSpeed = 0;
+		if (Game::instance().getKey(GLFW_KEY_K)) {
+			newState = B_JUMP;
+			yAxisSpeed = JUMP_SPEED;
+			return;
+		}
+	}
+	else
+	{
+		newState = B_FALL;
+		return;
+	}
+	if (Game::instance().getKey(GLFW_KEY_A)) {
+		newState = B_WALK;
+		leftMove();
+	}
+	if (Game::instance().getKey(GLFW_KEY_D)) {
+		newState = B_WALK;
+		rightMove();
+	}
+	if (Game::instance().getKey(GLFW_KEY_L)) {
+		throwBlock();
 	}
 }
