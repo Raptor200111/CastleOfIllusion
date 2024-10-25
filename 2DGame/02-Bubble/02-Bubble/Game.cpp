@@ -9,9 +9,9 @@ void Game::init()
 	currentState = MENU;
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	SoundManager::instance().init();
-	menuScene.init();
-	levelScene.init();
-	currentScene = &menuScene;
+	sceneMenu.init();
+	scenePlayLevel.init();
+	currentScene = &sceneMenu;
 }
 
 bool Game::update(int deltaTime)
@@ -32,8 +32,8 @@ void Game::keyPressed(int key)
 	{
 		bPlay = false;
 	}
-	else if (currentScene == &menuScene && key == GLFW_KEY_Z) {
-		currentScene = &levelScene;
+	else if (currentScene == &sceneMenu && key == GLFW_KEY_Z) {
+		currentScene = &scenePlayLevel;
 	}
 	keys[key] = true;
 }
@@ -99,7 +99,7 @@ void Game::onExceededTimeLimit()
 void Game::onPracticeLevelWon()
 {
 	stars = INIT_STARS;
-	currentScene = &levelScene;
+	currentScene = &scenePlayLevel;
 }
 
 void Game::onLevelWon()

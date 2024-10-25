@@ -179,7 +179,7 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 					}
 				}
 				//Up collision
-				else if (j == yUp && pos.y < tileSize * (j + 1))
+				else if (j == yUp && pos.y < tileSize * (j + 1) && tileType != 9)
 				{
 					if (!stairs) {
 						int posY = tileSize * (j + 1);
@@ -266,4 +266,19 @@ Block* CollisionManager::collisionEntityBlockV(Entity* entity) {
 		}
 	}
 	return NULL;
+}
+
+void CollisionManager::attachBlock(Block* b) 
+{
+	string idBlock = std::to_string(b->getPosition().x) + " " + std::to_string(b->getPosition().y);
+	auto it = screenBlocks.find(idBlock);
+	if (it == screenBlocks.end())
+		screenBlocks.insert(std::pair<string, Block*>(idBlock, b));
+}
+void CollisionManager::disAttachBlock(Block* b)
+{
+	string idBlock = std::to_string(b->getPosition().x) + " " + std::to_string(b->getPosition().y);
+	auto it = screenBlocks.find(idBlock);
+	if (it != screenBlocks.end())
+		screenBlocks.erase(it);
 }
