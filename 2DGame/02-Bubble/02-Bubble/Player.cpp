@@ -310,8 +310,8 @@ void Player::update(int deltaTime)
 	particleEfect.update(deltaTime);
 	if (pickedUpBlock != nullptr)
 	{
-		//pickedUpBlock->update(deltaTime);//hacemos el update (hay que cambiarle la posicion)
-		//pickedUpBlock->setPosition(position);
+		pickedUpBlock->update(deltaTime);//hacemos el update (hay que cambiarle la posicion)
+		pickedUpBlock->setPosition(glm::ivec2(position.x, position.y - 30));
 	}
 }
 
@@ -319,8 +319,8 @@ void Player::render()
 {
 	sprite->render();
 	particleEfect.render();
-	//if (pickedUpBlock != nullptr)
-		//pickedUpBlock->render();
+	if (pickedUpBlock != nullptr)
+		pickedUpBlock->render();
 }
 
 void Player::pickUpBlock()
@@ -329,13 +329,14 @@ void Player::pickUpBlock()
 	pickedUpBlock = readyToPickBlock;
 	readyToPickBlock = nullptr;
 	//collider desconectar block
-	
+	CollisionManager::instance().disAttachBlock(pickedUpBlock);
 	pickedUpBlock->setPosition(glm::ivec2(position.x, position.y - 30));
 }
 
 void Player::throwBlock()
 {
 	//collider atach block
+	CollisionManager::instance().attachBlock(pickedUpBlock);
 	pickedUpBlock = nullptr;
 	switch (oldState)
 	{
