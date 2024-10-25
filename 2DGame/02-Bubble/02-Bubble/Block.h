@@ -6,12 +6,12 @@
 class Block : public Entity
 {
 public:
-	void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, int numBlock);
+	virtual void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) = 0;
 	void update(int deltaTime);
 	void render();
 
 
-private:
-
+protected:
+	BlockType blockType;
 };
 

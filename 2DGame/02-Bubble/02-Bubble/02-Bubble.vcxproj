@@ -12,6 +12,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimKeyframes.h" />
+    <ClInclude Include="BlockCake.h" />
+    <ClInclude Include="BlockChest.h" />
+    <ClInclude Include="BlockCoin.h" />
+    <ClInclude Include="BlockDestroyable.h" />
+    <ClInclude Include="BlockNonDestroyable.h" />
     <ClInclude Include="BossDragon.h" />
     <ClInclude Include="BossShoot.h" />
     <ClInclude Include="CollisionManager.h" />
@@ -23,10 +28,12 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Block.h" />
     <ClInclude Include="GameUI.h" />
-    <ClInclude Include="LevelScene.h" />
-    <ClInclude Include="MenuScene.h" />
+    <ClInclude Include="ScenePlayLevel.h" />
+    <ClInclude Include="SceneMenu.h" />
     <ClInclude Include="ParticleEfect.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="ScenePlay.h" />
+    <ClInclude Include="ScenePlayPractice.h" />
     <ClInclude Include="Quad.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Scene.h" />
@@ -40,6 +47,11 @@
     <ClInclude Include="TileMap.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BlockCake.cpp" />
+    <ClCompile Include="BlockChest.cpp" />
+    <ClCompile Include="BlockCoin.cpp" />
+    <ClCompile Include="BlockDestroyable.cpp" />
+    <ClCompile Include="BlockNonDestroyable.cpp" />
     <ClCompile Include="BossDragon.cpp" />
     <ClCompile Include="BossShoot.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
@@ -50,11 +62,13 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="GameUI.cpp" />
-    <ClCompile Include="LevelScene.cpp" />
+    <ClCompile Include="ScenePlayLevel.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MenuScene.cpp" />
+    <ClCompile Include="SceneMenu.cpp" />
     <ClCompile Include="ParticleEfect.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="ScenePlay.cpp" />
+    <ClCompile Include="PracticePlayScene.cpp" />
     <ClCompile Include="Quad.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />

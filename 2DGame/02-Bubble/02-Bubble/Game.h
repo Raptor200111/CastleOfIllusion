@@ -4,8 +4,8 @@
 
 #include <GLFW/glfw3.h>
 #include "Scene.h"
-#include "MenuScene.h"
-#include "LevelScene.h"
+#include "SceneMenu.h"
+#include "ScenePlayLevel.h"
 
 
 #define SCREEN_WIDTH 640 
@@ -61,6 +61,7 @@ public:
 	void onGetCoin() { score += COIN_POINTS; }
 	void onExceededTimeLimit();
 	void onHeal() { stars = INIT_STARS; }
+	bool isOnGodMode() { return godMode; }
 
 private:
 	void looseGame();
@@ -70,8 +71,8 @@ private:
 							    // we can have access at any time
 	Scene* currentScene;
 	GameState currentState;
-	MenuScene menuScene;
-	LevelScene levelScene;
+	SceneMenu sceneMenu;
+	ScenePlayLevel scenePlayLevel;
 
 	int score = 0;
 	int tries = 3;

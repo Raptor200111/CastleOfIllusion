@@ -6,6 +6,8 @@
 #include "EnemyBug.h"
 #include "Player.h"
 #include <string>
+#include <algorithm> // for std::remove
+
 
 CollisionManager::CollisionManager()
 {
@@ -28,9 +30,11 @@ void CollisionManager::init(TileMap* tileMap)
 	mapSize = tileMap->getMapSize();
 }
 
-void CollisionManager::update(const std::map<string, Block*>& screenBlocks)
+void CollisionManager::update(const std::map<string, Block*>& screenBlocks, std::map<string, Block*>& screenMovBlocks, vector<Block*>& playrunBlocks)
 {
 	this->screenBlocks = screenBlocks;
+	this->screenMovBlocks = screenMovBlocks;
+	this->playrunBlocks = playrunBlocks;
 }
 
 
@@ -119,14 +123,14 @@ CollisionType CollisionManager::checkCollisionHorizontal(Entity* entity)
 	bool tile = false;
 	// Check the tiles around the entity for collisions
 	for (int i = xLeft; i <= xRight; i += 1) {
-		for (int j = y0; j < y1; ++j) {
+		for (int j = y0; j <= y1; ++j) {
 			int tileType = tileMap->getTileType(i, j);
 			if (tileType != 0 && tileType != 7 && tileType != 8) {
 				if (tileType == 9)
 				{
 					stairs = true;
 				}
-				if (tileType != 0 && tileType != 9) {
+				else if (tileType != 0) {
 					tile = true;
 				}
 			}
@@ -155,6 +159,8 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 	int yUp = pos.y / tileSize;						upDown[0] = yUp;
 	int yDown = (pos.y + size.y - 1) / tileSize;	upDown[1] = yDown;
 
+	bool correctPos = false;
+	int tileToCorrect = 0;
 	bool stairs = false;
 	bool tile = false;
 	// Check the tiles around the entity for collisions
@@ -167,14 +173,14 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 
 				if (j == yDown && tileType != 9)
 				{
-
 					if (pos.y + size.y > tileSize * j)
 					{
-						int posY = tileSize * j - size.y;
-						entity->setPositionY(posY);
+						//int posY = tileSize * j - size.y;
+						//entity->setPositionY(posY);
 						tile = true;
+						correctPos = true;
+						tileToCorrect = j;
 					}
-
 				}
 				//Up collision
 				else if (j == yUp && pos.y < tileSize * (j + 1) && tileType != 9)
@@ -188,9 +194,15 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 			}
 		}
 	}
+	if (tile && correctPos) {
+		int posY = tileSize * tileToCorrect - size.y;
+		entity->setPositionY(posY);
+	}
+	else if (stairs) {
+		entity->setPosition(pos);
+	}
 	if (correctRamp(entity))
 		tile = true;
-
 	if (tile && stairs)
 		return TileStairs;
 	else if (tile)
@@ -258,4 +270,24 @@ Block* CollisionManager::collisionEntityBlockV(Entity* entity) {
 		}
 	}
 	return NULL;
+}
+
+void CollisionManager::attachBlock(Block* b) 
+{
+	string idBlock = std::to_string(b->getPosition().x) + " " + std::to_string(b->getPosition().y);
+	auto it = screenBlocks.find(idBlock);
+	if (it == screenBlocks.end()) {
+		screenMovBlocks.insert(std::pair<string, Block*>(idBlock, b));
+	}
+}
+void CollisionManager::disAttachBlock(Block* b)
+{
+	string idBlock = std::to_string(b->getPosition().x) + " " + std::to_string(b->getPosition().y);
+	auto it = screenBlocks.find(idBlock);
+	if (it != screenBlocks.end())
+	{
+		screenBlocks.erase(it);
+		playrunBlocks.erase(std::remove(playrunBlocks.begin(), playrunBlocks.end(), b), playrunBlocks.end());
+
+	}
 }

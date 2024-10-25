@@ -29,6 +29,14 @@ enum EntityState
 	Dying
 };
 
+enum BlockType
+{
+	Destroyable,
+	NonDestroyable,
+	Chest,
+	Coin,
+	Cake
+};
 enum CollisionType
 {
 	None,
