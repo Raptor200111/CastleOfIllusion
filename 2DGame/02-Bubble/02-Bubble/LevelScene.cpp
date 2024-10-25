@@ -6,6 +6,11 @@
 #include "Enemy.h"
 #include "EnemyTree.h"
 #include "EnemyBug.h"
+#include "BlockCake.h"
+#include "BlockCoin.h"
+#include "BlockChest.h"
+#include "BlockDestroyable.h"
+#include "BlockNonDestroyable.h"
 #include "CollisionManager.h"
 
 #define INIT_PLAYER_X_TILES 2//+35+36// 4+20
@@ -26,7 +31,7 @@ void LevelScene::init()
 	PlayScene::init();
 	//sound
 	SoundManager::instance().setMusicVolume(64);
-	SoundManager::instance().playMusic("level", -1);
+	//SoundManager::instance().playMusic("level", -1);
 
 	//level
 	map = TileMap::createTileMap("levels/levelMatrix.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -43,9 +48,19 @@ void LevelScene::init()
 	initZoneEnemyBug();
 
 	for (auto block : map->getBlocksPos()) {
-		Block* b = new Block();
-		//cout << block.pos.x << " " << block.pos.y << "\n";
-		b->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, block.type);
+		Block* b;
+		switch(block.type){
+		case 1:
+			b = new BlockChest;
+			break;
+		case 3:
+			b = new BlockDestroyable;
+			break;
+		case 7:
+			b = new BlockNonDestroyable;
+			break;
+		}
+		b->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 		b->setPosition(glm::ivec2(block.pos.x * tileSize, block.pos.y * tileSize));
 		b->setTileMap(map);
 		allBlocks.push_back(b);
