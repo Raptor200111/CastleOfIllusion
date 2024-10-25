@@ -30,10 +30,11 @@ void CollisionManager::init(TileMap* tileMap)
 	mapSize = tileMap->getMapSize();
 }
 
-void CollisionManager::update(const std::map<string, Block*>& screenBlocks, std::map<string, Block*>& screenMovBlocks)
+void CollisionManager::update(const std::map<string, Block*>& screenBlocks, std::map<string, Block*>& screenMovBlocks, vector<Block*>& playrunBlocks)
 {
 	this->screenBlocks = screenBlocks;
 	this->screenMovBlocks = screenMovBlocks;
+	this->playrunBlocks = playrunBlocks;
 }
 
 

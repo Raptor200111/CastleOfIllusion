@@ -28,7 +28,9 @@ public:
 	//---Coupling: functions needed by player
 	//functions level calls bcs coupling
 	std::map<string, Block*> getScreenBlocks() { return screenBlocks; }
-	void update(const std::map<string, Block*>& screenBlocks, std::map<string, Block*>& screenMovBlocks);
+	std::map<string, Block*> getMovBlocks() { return screenMovBlocks; }
+	vector<Block*> getPlayrunBlocks() { return playrunBlocks; }
+	void update(const std::map<string, Block*>& screenBlocks, std::map<string, Block*>& screenMovBlocks, vector<Block*>& playrunBlocks);
 
 	//functions check collision that player calls
 	Block* collisionEntityBlockH(Entity* entity);

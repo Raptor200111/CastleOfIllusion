@@ -69,24 +69,13 @@ void ScenePlay::update(int deltaTime) {
 	insideScreenObj();
 
 
-	CollisionManager::instance().update(screenBlocks);
+	CollisionManager::instance().update(screenBlocks, playrunMovBlocks, playrunBlocks);
 	player->update(deltaTime);
 	updateCamera();
 	screenBlocks = CollisionManager::instance().getScreenBlocks();
-	/*SHOULD playrunBlocks+allBlocks BE MAP????
-	Block* a = player->PickedUpBlock();
-	if (a != NULL)
-	{
-		//search a in playrunBlocks
-		//remove it from playrunBlocks
-	}
-	//PULLING TO CHECK IF PLAYER THREW ANY BLOCK
-	Block* b = player->ThrownBlock();
-	if (b != NULL) {
-		//search b in allBlocks
-		//once found add it to movBlocks
-	}
-	*/
+	playrunMovBlocks = CollisionManager::instance().getMovBlocks();
+	playrunBlocks = CollisionManager::instance().getPlayrunBlocks();
+
 	if (insideBossRoom) {
 		updateCollisionsWithBoss(deltaTime);
 	}
