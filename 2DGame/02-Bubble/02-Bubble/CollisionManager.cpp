@@ -165,7 +165,7 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 				if (tileType == 9)
 					stairs = true;
 
-				if (j == yDown)
+				if (j == yDown && tileType != 9)
 				{
 
 					if (pos.y + size.y > tileSize * j)
@@ -177,7 +177,7 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 
 				}
 				//Up collision
-				else if (j == yUp && pos.y < tileSize * (j + 1))
+				else if (j == yUp && pos.y < tileSize * (j + 1) && tileType != 9)
 				{
 					if (!stairs) {
 						int posY = tileSize * (j + 1);
