@@ -13,10 +13,6 @@ void ScenePlayPractice::init() {
     // Initialize specific enemies, blocks, player settings for NormalPlayScene
 }
 
-bool ScenePlayPractice::checkIfInsideBossRoom() {
-    return false;
-}
-
 void ScenePlayPractice::updateCollisionsWithBoss(int deltaTime) {
 }
 

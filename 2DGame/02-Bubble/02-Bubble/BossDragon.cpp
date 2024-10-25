@@ -297,3 +297,11 @@ void BossDragon::shoot(int deltaTime)
 	shoots[indexAngleShoot]->setDirection(dir);
 	shoots[indexAngleShoot]->setEntityState(Alive);
 }
+
+
+void BossDragon::Damaged()
+{
+	actualLives -= 1;
+	if(actualLives <= 0)
+		entityState = Dying;
+}

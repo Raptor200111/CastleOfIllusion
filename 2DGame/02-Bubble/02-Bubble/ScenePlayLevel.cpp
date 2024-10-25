@@ -51,13 +51,13 @@ void ScenePlayLevel::init()
 		Block* b;
 		switch(block.type){
 		case 1:
-			b = new BlockChest;
+			b = new BlockChest();
 			break;
 		case 3:
-			b = new BlockDestroyable;
+			b = new BlockDestroyable();
 			break;
 		case 7:
-			b = new BlockNonDestroyable;
+			b = new BlockNonDestroyable();
 			break;
 		}
 		b->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
