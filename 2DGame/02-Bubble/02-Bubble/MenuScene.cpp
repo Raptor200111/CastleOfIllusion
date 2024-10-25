@@ -19,7 +19,7 @@ MenuScene::~MenuScene()
 void MenuScene::init()
 {
 	SoundManager::instance().setMusicVolume(64);
-	SoundManager::instance().playMusic("menu", -1); 
+	//SoundManager::instance().playMusic("menu", -1); 
 	initShaders();
     menuTexture.loadFromFile("images/portada.png", TEXTURE_PIXEL_FORMAT_RGBA);
     menuQuad = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1.f, 1.f), &menuTexture, &texProgram);

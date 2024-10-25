@@ -22,6 +22,7 @@ public:
     virtual void update(int deltaTime) override; // Common update logic
     virtual void render() override; // Common rendering logic
 
+    void reStart();
 protected:
     void initShaders();
     void updateCamera();
@@ -32,6 +33,7 @@ protected:
     virtual void updateCollisionsWithBoss(int deltaTime) = 0;
     virtual void renderBoss() = 0;
     virtual bool checkIfInsideBossRoom() = 0;
+    virtual void reStartLevelSpecific() = 0;
     vector<Enemy*> playrunEnemies;
     vector<Block*> playrunBlocks;
 
