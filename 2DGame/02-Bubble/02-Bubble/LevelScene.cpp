@@ -31,9 +31,12 @@ void LevelScene::init()
 	//level
 	map = TileMap::createTileMap("levels/levelMatrix.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	CollisionManager::instance().init(map);
+	glm::ivec2 mapSize = map->getMapSize();
+	int tileSize = map->getTileSize();
+
 	player = &Player::instance();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	player->setPosition(glm::vec2((INIT_PLAYER_X_TILES)*map->getTileSize(), (INIT_PLAYER_Y_TILES)*map->getTileSize()));
+	player->setPosition(glm::vec2((INIT_PLAYER_X_TILES)*tileSize, (INIT_PLAYER_Y_TILES)*tileSize));
 	player->setTileMap(map);
 	updateCamera();
 	initZoneEnemyTree();
@@ -43,7 +46,7 @@ void LevelScene::init()
 		Block* b = new Block();
 		//cout << block.pos.x << " " << block.pos.y << "\n";
 		b->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, block.type);
-		b->setPosition(glm::ivec2(block.pos.x * map->getTileSize(), block.pos.y * map->getTileSize()));
+		b->setPosition(glm::ivec2(block.pos.x * tileSize, block.pos.y * tileSize));
 		b->setTileMap(map);
 		allBlocks.push_back(b);
 	}
@@ -54,7 +57,7 @@ void LevelScene::init()
 	bgMap = TileMap::createTileMap("levels/bgTileMap.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 
 	bgTexture.loadFromFile("images/portada.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	glm::vec2 bgSize = map->getMapSize() * map->getTileSize();
+	glm::vec2 bgSize = map->getMapSize() * tileSize;
 	bgQuad = Sprite::createSprite(bgSize, glm::vec2(1.f, 1.f), &bgTexture, &texProgram);
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH), float(SCREEN_HEIGHT), 0.f);
@@ -63,13 +66,14 @@ void LevelScene::init()
 	gameUI.setMaxTime(400 * 1000);
 
 
-	Zone limit = { 4.0f * map->getTileSize(), 22.0f * map->getTileSize(), 0, 0 };
-	glm::ivec2 finalPosBoss = glm::ivec2(10.0f * map->getTileSize(), 38.0f * map->getTileSize());
+	Zone limit = { 4.0f * tileSize, 22.0f * tileSize, 0, 0 };
+	glm::ivec2 finalPosBoss = glm::ivec2(10.0f * tileSize, 38.0f * tileSize);
 	ZoneEnemy zone1 = { limit, finalPosBoss, false };
 	boss.initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone1);
 	glm::ivec2 initPos = glm::ivec2(finalPosBoss.x, finalPosBoss.y - 110);
 	boss.setBossPosition(initPos);
 	boss.setTileMap(map);
+	bossRoom = { 0, float(mapSize.x * tileSize), float(mapSize.y * tileSize), float(35 * tileSize) };
 	//211ms
 
 }
@@ -147,10 +151,7 @@ void LevelScene::initZoneEnemyBug()
 
 bool LevelScene::checkIfInsideBossRoom() {
 	bool inside = false;
-	int tileSize = map->getTileSize();
 	glm::ivec2 posP = player->getPosition();
-	glm::ivec2 mapSize = map->getMapSize();
-	Cam bossRoom = { 0, mapSize.x * tileSize, mapSize.y * tileSize, 35 * tileSize };
 	if (bossRoom.left < posP.x && posP.x < bossRoom.right && bossRoom.top < posP.y && posP.y < bossRoom.bottom) {
 		inside = true;
 		boss.setEntityState(Alive);
@@ -172,6 +173,7 @@ void LevelScene::updateCollisionsWithBoss(int deltaTime) {
 	for (auto shoot : boss.getShoots())
 	{
 		shoot->update(deltaTime);
+		//add if !godMode
 		if (shoot->getEntityState() == Alive) {
 			if (CollisionManager::instance().checkCollisionObject(player, shoot)) {
 				shoot->setEntityState(Dying);

@@ -61,6 +61,7 @@ public:
 	void onGetCoin() { score += COIN_POINTS; }
 	void onExceededTimeLimit();
 	void onHeal() { stars = INIT_STARS; }
+	bool isOnGodMode() { return godMode; }
 
 private:
 	void looseGame();

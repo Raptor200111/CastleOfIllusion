@@ -54,6 +54,16 @@ void PlayScene::init() {
 	initShaders();
 }
 
+void PlayScene::reStart()
+{
+	playrunEnemies = allEnemies;
+	playrunBlocks = allBlocks;
+	screenEnemies.clear();
+	screenBlocks.clear();
+	playrunMovBlocks.clear();
+	reStartLevelSpecific();
+}
+
 void PlayScene::update(int deltaTime) {
 	//update screenBlocks and screenEnemies
 	insideScreenObj();
@@ -89,6 +99,7 @@ void PlayScene::update(int deltaTime) {
 		for (auto& itEnemy = screenEnemies.begin(); itEnemy != screenEnemies.end(); ++itEnemy)
 		{
 			if (itEnemy->second->getEntityState() == Alive) {
+				//add if !godMode
 				if (player->getEntityState() == Alive && CollisionManager::instance().checkCollisionObject(player, itEnemy->second)) {
 					//if (Player::instance().killEnemy()) {
 					itEnemy->second->setEntityState(Dying);
