@@ -1,16 +1,13 @@
 #pragma once
 
-#ifndef _LEVEL_SCENE_INCLUDE
-#define _LEVEL_SCENE_INCLUDE
-
-#include "PlayScene.h"
+#include "ScenePlay.h"
 #include "BossDragon.h"
 
-class LevelScene : public PlayScene
+class ScenePlayLevel : public ScenePlay
 {
 public:
-	LevelScene();
-	~LevelScene();
+	ScenePlayLevel();
+	~ScenePlayLevel();
 	void init() override;   // Initialize NormalPlayScene-specific elements
 
 protected:
@@ -25,7 +22,4 @@ protected:
 	Cam bossRoom;
 	vector<BossShoot*> shoots;
 };
-
-#endif // _LEVEL_SCENE_INCLUDE
-
 

@@ -1,4 +1,4 @@
-#include "LevelScene.h"
+#include "ScenePlayLevel.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <cmath>
@@ -16,19 +16,19 @@
 #define INIT_PLAYER_X_TILES 2//+35+36// 4+20
 #define INIT_PLAYER_Y_TILES 8//44//+8+2 //20
 
-LevelScene::LevelScene()
+ScenePlayLevel::ScenePlayLevel()
 {
 	shoots = vector<BossShoot*>();
 }
 
-LevelScene::~LevelScene()
+ScenePlayLevel::~ScenePlayLevel()
 {
 	shoots.clear();
 }
 
-void LevelScene::init()
+void ScenePlayLevel::init()
 {
-	PlayScene::init();
+	ScenePlay::init();
 	//sound
 	SoundManager::instance().setMusicVolume(64);
 	//SoundManager::instance().playMusic("level", -1);
@@ -93,7 +93,7 @@ void LevelScene::init()
 
 }
 
-void LevelScene::initZoneEnemyTree()
+void ScenePlayLevel::initZoneEnemyTree()
 {
 	vector<ZoneEnemy> zones;
 	Zone limit = { 3.0f * map->getTileSize(), 22.0f * map->getTileSize(), 0, 12 };
@@ -125,7 +125,7 @@ void LevelScene::initZoneEnemyTree()
 
 	}
 }
-void LevelScene::initZoneEnemyBug()
+void ScenePlayLevel::initZoneEnemyBug()
 {
 	vector<ZoneEnemy> zones;
 
@@ -164,7 +164,7 @@ void LevelScene::initZoneEnemyBug()
 	}
 }
 
-bool LevelScene::checkIfInsideBossRoom() {
+bool ScenePlayLevel::checkIfInsideBossRoom() {
 	bool inside = false;
 	glm::ivec2 posP = player->getPosition();
 	if (bossRoom.left < posP.x && posP.x < bossRoom.right && bossRoom.top < posP.y && posP.y < bossRoom.bottom) {
@@ -183,7 +183,7 @@ bool LevelScene::checkIfInsideBossRoom() {
 		return false;
 }
 
-void LevelScene::updateCollisionsWithBoss(int deltaTime) {
+void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 	boss.update(deltaTime);
 	for (auto shoot : boss.getShoots())
 	{
@@ -215,7 +215,7 @@ void LevelScene::updateCollisionsWithBoss(int deltaTime) {
 	}
 }
 
-void LevelScene::renderBoss() {
+void ScenePlayLevel::renderBoss() {
 	boss.render();
 	for (auto shoot : shoots)
 	{

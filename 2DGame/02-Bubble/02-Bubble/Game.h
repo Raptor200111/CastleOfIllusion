@@ -4,8 +4,8 @@
 
 #include <GLFW/glfw3.h>
 #include "Scene.h"
-#include "MenuScene.h"
-#include "LevelScene.h"
+#include "SceneMenu.h"
+#include "ScenePlayLevel.h"
 
 
 #define SCREEN_WIDTH 640 
@@ -71,8 +71,8 @@ private:
 							    // we can have access at any time
 	Scene* currentScene;
 	GameState currentState;
-	MenuScene menuScene;
-	LevelScene levelScene;
+	SceneMenu sceneMenu;
+	ScenePlayLevel scenePlayLevel;
 
 	int score = 0;
 	int tries = 3;

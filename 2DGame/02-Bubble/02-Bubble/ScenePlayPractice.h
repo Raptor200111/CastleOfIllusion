@@ -1,12 +1,12 @@
 #pragma once
 
-#include "PlayScene.h"
+#include "ScenePlay.h"
 
-class PracticePlayScene : public PlayScene
+class ScenePlayPractice : public ScenePlay
 {
 public:
-    PracticePlayScene() = default;
-    ~PracticePlayScene() = default;
+    ScenePlayPractice() = default;
+    ~ScenePlayPractice() = default;
 
     void init() override;   // Initialize NormalPlayScene-specific elements
 

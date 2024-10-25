@@ -5,11 +5,11 @@
 #include "Sprite.h"
 #include "Texture.h"
 
-class MenuScene : public Scene
+class SceneMenu : public Scene
 {
 public:
-    MenuScene();
-    ~MenuScene();
+    SceneMenu();
+    ~SceneMenu();
     void init() override;
     void update(int deltaTime) override;
     void render() override;
