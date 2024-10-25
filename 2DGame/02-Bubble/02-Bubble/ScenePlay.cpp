@@ -8,7 +8,6 @@
 #include "EnemyBug.h"
 #include "CollisionManager.h"
 
-<<<<<<< HEAD:2DGame/02-Bubble/02-Bubble/LevelScene.cpp
 #define SCREEN_X 32
 #define SCREEN_Y 16
 
@@ -16,9 +15,7 @@
 #define INIT_PLAYER_Y_TILES 8//44//+8+2 //20
 
 LevelScene::LevelScene()
-=======
 ScenePlay::ScenePlay()
->>>>>>> f6427ed94ef57a300365313f593c720472254ec1:2DGame/02-Bubble/02-Bubble/ScenePlay.cpp
 {
     map = NULL;
     player = NULL;
