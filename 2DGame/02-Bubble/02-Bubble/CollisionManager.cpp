@@ -6,6 +6,8 @@
 #include "EnemyBug.h"
 #include "Player.h"
 #include <string>
+#include <algorithm> // for std::remove
+
 
 CollisionManager::CollisionManager()
 {
@@ -28,9 +30,11 @@ void CollisionManager::init(TileMap* tileMap)
 	mapSize = tileMap->getMapSize();
 }
 
-void CollisionManager::update(const std::map<string, Block*>& screenBlocks)
+void CollisionManager::update(const std::map<string, Block*>& screenBlocks, std::map<string, Block*>& screenMovBlocks, vector<Block*>& playrunBlocks)
 {
 	this->screenBlocks = screenBlocks;
+	this->screenMovBlocks = screenMovBlocks;
+	this->playrunBlocks = playrunBlocks;
 }
 
 
@@ -179,7 +183,7 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 					}
 				}
 				//Up collision
-				else if (j == yUp && pos.y < tileSize * (j + 1))
+				else if (j == yUp && pos.y < tileSize * (j + 1) && tileType != 9)
 				{
 					if (!stairs) {
 						int posY = tileSize * (j + 1);
@@ -266,4 +270,24 @@ Block* CollisionManager::collisionEntityBlockV(Entity* entity) {
 		}
 	}
 	return NULL;
+}
+
+void CollisionManager::attachBlock(Block* b) 
+{
+	string idBlock = std::to_string(b->getPosition().x) + " " + std::to_string(b->getPosition().y);
+	auto it = screenBlocks.find(idBlock);
+	if (it == screenBlocks.end()) {
+		screenMovBlocks.insert(std::pair<string, Block*>(idBlock, b));
+	}
+}
+void CollisionManager::disAttachBlock(Block* b)
+{
+	string idBlock = std::to_string(b->getPosition().x) + " " + std::to_string(b->getPosition().y);
+	auto it = screenBlocks.find(idBlock);
+	if (it != screenBlocks.end())
+	{
+		screenBlocks.erase(it);
+		playrunBlocks.erase(std::remove(playrunBlocks.begin(), playrunBlocks.end(), b), playrunBlocks.end());
+
+	}
 }

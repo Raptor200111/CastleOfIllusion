@@ -1,4 +1,4 @@
-#include "PlayScene.h"
+#include "ScenePlay.h"
 #include "Game.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
@@ -8,7 +8,7 @@
 #include "EnemyBug.h"
 #include "CollisionManager.h"
 
-PlayScene::PlayScene()
+ScenePlay::ScenePlay()
 {
     map = NULL;
     player = NULL;
@@ -24,7 +24,7 @@ PlayScene::PlayScene()
 	allBlocks = playrunBlocks;
 }
 
-PlayScene::~PlayScene()
+ScenePlay::~ScenePlay()
 {
 	if (map != NULL)
 		delete map;
@@ -50,11 +50,11 @@ PlayScene::~PlayScene()
 	screenEnemies.clear();
 }
 
-void PlayScene::init() {
+void ScenePlay::init() {
 	initShaders();
 }
 
-void PlayScene::reStart()
+void ScenePlay::reStart()
 {
 	playrunEnemies = allEnemies;
 	playrunBlocks = allBlocks;
@@ -64,29 +64,18 @@ void PlayScene::reStart()
 	reStartLevelSpecific();
 }
 
-void PlayScene::update(int deltaTime) {
+void ScenePlay::update(int deltaTime) {
 	//update screenBlocks and screenEnemies
 	insideScreenObj();
 
 
-	CollisionManager::instance().update(screenBlocks);
+	CollisionManager::instance().update(screenBlocks, playrunMovBlocks, playrunBlocks);
 	player->update(deltaTime);
 	updateCamera();
+	screenBlocks = CollisionManager::instance().getScreenBlocks();
+	playrunMovBlocks = CollisionManager::instance().getMovBlocks();
+	playrunBlocks = CollisionManager::instance().getPlayrunBlocks();
 
-	/*SHOULD playrunBlocks+allBlocks BE MAP????
-	Block* a = player->PickedUpBlock();
-	if (a != NULL)
-	{
-		//search a in playrunBlocks
-		//remove it from playrunBlocks
-	}
-	//PULLING TO CHECK IF PLAYER THREW ANY BLOCK
-	Block* b = player->ThrownBlock();
-	if (b != NULL) {
-		//search b in allBlocks
-		//once found add it to movBlocks
-	}
-	*/
 	if (insideBossRoom) {
 		updateCollisionsWithBoss(deltaTime);
 	}
@@ -200,7 +189,7 @@ void PlayScene::update(int deltaTime) {
 	gameUI.update(deltaTime);
 }
 
-void PlayScene::render() {
+void ScenePlay::render() {
 	glm::mat4 modelview;
 
 	texProgram.use();
@@ -244,7 +233,7 @@ void PlayScene::render() {
 
 
 
-void PlayScene::updateCamera()
+void ScenePlay::updateCamera()
 {
 	glm::vec2 playerPos = player->getPosition();
 	float zoomScreenWidth = SCREEN_WIDTH / zoomLevel;
@@ -278,7 +267,7 @@ void PlayScene::updateCamera()
 }
 
 
-void PlayScene::insideScreenObj()
+void ScenePlay::insideScreenObj()
 {
 	int tileSize = map->getTileSize();
 	glm::ivec2 posP = player->getPosition();
@@ -370,7 +359,7 @@ void PlayScene::insideScreenObj()
 
 }
 
-bool PlayScene::insideScreen(const glm::ivec2& pos)
+bool ScenePlay::insideScreen(const glm::ivec2& pos)
 {
 
 	if (cam.left < pos.x && pos.x < cam.right && cam.top < pos.y && pos.y < cam.bottom) {
@@ -379,7 +368,7 @@ bool PlayScene::insideScreen(const glm::ivec2& pos)
 	return false;
 }
 
-void PlayScene::initShaders()
+void ScenePlay::initShaders()
 {
 	Shader vShader, fShader;
 

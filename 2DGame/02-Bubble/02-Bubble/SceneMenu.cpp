@@ -1,22 +1,22 @@
-#include "MenuScene.h"
+#include "SceneMenu.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include "Scene.h"
 #include "Game.h"
 #include <iostream>
 #include <cmath>
 
-MenuScene::MenuScene()
+SceneMenu::SceneMenu()
 {
 	menuQuad = NULL;
 }
 
-MenuScene::~MenuScene()
+SceneMenu::~SceneMenu()
 {
 	if (menuQuad != NULL)
 		delete menuQuad;
 }
 
-void MenuScene::init()
+void SceneMenu::init()
 {
 	SoundManager::instance().setMusicVolume(64);
 	//SoundManager::instance().playMusic("menu", -1); 
@@ -26,12 +26,12 @@ void MenuScene::init()
     projection = glm::ortho(0.f, float(SCREEN_WIDTH), float(SCREEN_HEIGHT), 0.f);
 }
 
-void MenuScene::update(int deltaTime)
+void SceneMenu::update(int deltaTime)
 {
     // You can handle any specific menu logic here.
 }
 
-void MenuScene::render()
+void SceneMenu::render()
 {
 	glm::mat4 modelview;
 	texProgram.use();
@@ -46,7 +46,7 @@ void MenuScene::render()
 	menuQuad->render();
 }
 
-void MenuScene::initShaders()
+void SceneMenu::initShaders()
 {
 	Shader vShader, fShader;
 

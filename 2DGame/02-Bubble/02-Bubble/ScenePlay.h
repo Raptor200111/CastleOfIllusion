@@ -12,11 +12,11 @@
 #define SCREEN_X 32
 #define SCREEN_Y 16
 
-class PlayScene : public Scene
+class ScenePlay : public Scene
 {
 public:
-    PlayScene();
-    virtual ~PlayScene();
+    ScenePlay();
+    virtual ~ScenePlay();
 
     virtual void init() override;   // Initialize the scene
     virtual void update(int deltaTime) override; // Common update logic
