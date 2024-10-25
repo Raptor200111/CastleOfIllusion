@@ -104,16 +104,20 @@ void EnemyTree::render()
 	}
 }
 
-void EnemyTree::collideVertical()
-{
+void EnemyTree::collideVertical() {
 	velocity = 0;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }
 
-void EnemyTree::collideHorizontal(Block* b)
+void EnemyTree::collisionBlockHorizontal(Block* b)
 {
 	//trees can jump over blocks;
 	position.y = b->getPosition().y - sizeObject.y;
 	sprite->setLeft(left);
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));	
+}
+
+void EnemyTree::Damaged()
+{
+	entityState = Dying;
 }

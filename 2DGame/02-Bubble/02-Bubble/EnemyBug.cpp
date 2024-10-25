@@ -112,11 +112,16 @@ void EnemyBug::collideVertical()
 	velocity = 0;
 }
 
-void EnemyBug::collideHorizontal(Block* b)
+void EnemyBug::collisionBlockHorizontal(Block* b)
 {
 	left = !left;
 	moveHorizontal(left, WALK_SPEED);
 	sprite->setLeft(left);
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 
+}
+
+void EnemyBug::Damaged()
+{
+	entityState = Dying;
 }

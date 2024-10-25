@@ -29,8 +29,9 @@ public:
 		setHeadSpritePos();
 	}
 
+	void Damaged() override;
 	void collideVertical() override {}
-	void collideHorizontal(Block* b) override {}
+	void collisionBlockHorizontal(Block* b) override {}
 
 	vector<BossShoot*> getShoots() { return shoots; }
 
@@ -70,6 +71,7 @@ private:
 	vector<vector<float>> angleShoots;
 	int indexAngleShoot, indexQuadrantShoot = 0;
 	int MaxShoots = 3;
+	int actualLives = 5;
 
 	BossDragonStates bossDragonState = BossDragonStates::BOSS_LEFT;
 	BossBodyStates bossBodyState = BossBodyStates::BOSS_BODY_IDLE;
