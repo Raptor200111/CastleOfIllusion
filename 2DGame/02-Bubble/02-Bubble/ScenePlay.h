@@ -29,11 +29,17 @@ protected:
 
     void insideScreenObj();
     bool insideScreen(const glm::ivec2& pos);
+    void collisionsEnemies();
+    void collisionsMovingBlocks();;
+
+    virtual void reStartLevelSpecific() = 0;
 
     virtual void updateCollisionsWithBoss(int deltaTime) = 0;
-    virtual void renderBoss() = 0;
     virtual bool checkIfInsideBossRoom() = 0;
-    virtual void reStartLevelSpecific() = 0;
+    virtual void collisionMovBlockInsideBossRoom(Block* movBlock) = 0;
+
+    virtual void renderBoss() = 0;
+
     vector<Enemy*> playrunEnemies;
     vector<Block*> playrunBlocks;
 

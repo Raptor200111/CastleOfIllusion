@@ -12,10 +12,13 @@ public:
 
 protected:
 	// Override these methods to handle boss logic and room detection for NormalPlayScene
+	void reStartLevelSpecific() override {}
+
 	void updateCollisionsWithBoss(int deltaTime) override;
 	bool checkIfInsideBossRoom() override;
+	void collisionMovBlockInsideBossRoom(Block* movBlock) override {}
+
 	void renderBoss() override;
-	void reStartLevelSpecific() override {}
 	void initZoneEnemyTree();
 	void initZoneEnemyBug();
 	BossDragon boss;

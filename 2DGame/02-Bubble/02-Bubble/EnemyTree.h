@@ -16,8 +16,9 @@ public:
 	void initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, const ZoneEnemy& initParams) override;
 	void update(int deltaTime) override;
 	void render() override;
+	void Damaged() override;
 	void collideVertical() override;
-	void collideHorizontal(Block* b) override;
+	void collisionBlockHorizontal(Block* b) override;
 private:
 	int elapsedTime = 0;
 	int timeDyingAnim = 500; //0,5 s
