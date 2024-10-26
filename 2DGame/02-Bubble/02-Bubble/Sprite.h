@@ -44,6 +44,7 @@ public:
 	void play();
 	void playOnce();
 	void stop();
+	glm::ivec2 getCurrentKeyframe() { return glm::ivec2(currentKeyframe, animations[currentAnimation].keyframeDispl.size()); }
 
 private:
 	Texture* texture;

@@ -16,14 +16,14 @@
 
 ScenePlay::ScenePlay()
 {
-    map = NULL;
-    player = NULL;
-    zoomLevel = 2.5f;
-    bgMap = NULL;
-    bgQuad = NULL;
-    screenEnemies = std::map<string, Enemy*>();
-    screenBlocks = std::map<string, Block*>();
-    playrunMovBlocks = std::map<string, Block*>();
+	map = NULL;
+	player = NULL;
+	zoomLevel = 2.5f;
+	bgMap = NULL;
+	bgQuad = NULL;
+	screenEnemies = std::map<string, Enemy*>();
+	screenBlocks = std::map<string, Block*>();
+	playrunMovBlocks = std::map<string, Block*>();
 	playrunEnemies = std::vector<Enemy*>();
 	playrunBlocks = std::vector<Block*>();
 	allEnemies = playrunEnemies;
@@ -208,7 +208,7 @@ void ScenePlay::insideScreenObj()
 	glm::ivec2 posP = player->getPosition();
 	int tilesize = map->getTileSize();
 	insideBossRoom = checkIfInsideBossRoom();
-	if(!insideBossRoom) {
+	if (!insideBossRoom) {
 		for (auto& playrunEnemy : playrunEnemies)
 		{
 			glm::ivec2 posEnemyId = playrunEnemy->getInitPos();
@@ -374,47 +374,47 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 				}
 			}
 		}
-		
+
 		//check collisions with other blocks
 		if (itMovBlock->second->getEntityState() == Alive) {
-				int countBlockCollisions = 0;
-				for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
+			int countBlockCollisions = 0;
+			for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
+			{
+				bool collided = false;
+				const Block* cBlock = itBlock->second;
+				VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(itMovBlock->second, itBlock->second);
+				if (vBlockCollision != NoVcol)
 				{
-					bool collided = false;
-					const Block* cBlock = itBlock->second;
-					VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(itMovBlock->second, itBlock->second);
-					if (vBlockCollision != NoVcol)
-					{
-						itMovBlock->second->collisionBlockVertical(vBlockCollision, cBlock);
-						collided = true;
-						countBlockCollisions += 1;
-					}
+					itMovBlock->second->collisionBlockVertical(vBlockCollision, cBlock);
+					collided = true;
+					countBlockCollisions += 1;
+				}
 
-					HColType hBlockCollision = CollisionManager::instance().checkCollisionBlockHorizontal(itMovBlock->second, itBlock->second);
-					if (hBlockCollision != NoHcol) {
-						itMovBlock->second->collisionBlockHorizontal(hBlockCollision, cBlock);
-						countBlockCollisions += 1;
-					}
+				HColType hBlockCollision = CollisionManager::instance().checkCollisionBlockHorizontal(itMovBlock->second, itBlock->second);
+				if (hBlockCollision != NoHcol) {
+					itMovBlock->second->collisionBlockHorizontal(hBlockCollision, cBlock);
+					countBlockCollisions += 1;
+				}
 
-					if (countBlockCollisions >= 2) {
-						break;
-					}
+				if (countBlockCollisions >= 2) {
+					break;
 				}
 			}
+		}
 
 		//check collision tilemap vertical
-		if (itMovBlock->second->getEntityState() == Alive){
-				CollisionType verticalCollision = CollisionManager::instance().checkCollisionVertical(itMovBlock->second);
-				if(verticalCollision != None)
-					itMovBlock->second->collisionVertical(verticalCollision);
-			}
-		
+		if (itMovBlock->second->getEntityState() == Alive) {
+			CollisionType verticalCollision = CollisionManager::instance().checkCollisionVertical(itMovBlock->second);
+			if (verticalCollision != None)
+				itMovBlock->second->collisionVertical(verticalCollision);
+		}
+
 		//check collision tilemap horizontal
 		if (itMovBlock->second->getEntityState() == Alive) {
-				CollisionType horizontalCollision = CollisionManager::instance().checkCollisionHorizontal(itMovBlock->second);
-				if(horizontalCollision != None)
-					itMovBlock->second->collisionHorizontal(horizontalCollision);
-			}
+			CollisionType horizontalCollision = CollisionManager::instance().checkCollisionHorizontal(itMovBlock->second);
+			if (horizontalCollision != None)
+				itMovBlock->second->collisionHorizontal(horizontalCollision);
+		}
 
 		//block Dead == has stopped moving
 		if (itMovBlock->second->getEntityState() == Dead) {
