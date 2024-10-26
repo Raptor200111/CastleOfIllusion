@@ -120,7 +120,7 @@ void ScenePlay::update(int deltaTime) {
 		collisionsEnemies();
 	}
 
-	collisionsMovingBlocks();
+	collisionsMovingBlocks(deltaTime);
 
 	gameUI.update(deltaTime);
 }
@@ -347,11 +347,12 @@ void ScenePlay::collisionsEnemies()
 	}
 }
 
-void ScenePlay::collisionsMovingBlocks()
+void ScenePlay::collisionsMovingBlocks(int deltaTime)
 {
 	//remember movingBlocks will always be inside screen: player cannot throw them far enough
 	for (auto& itMovBlock = playrunMovBlocks.begin(); itMovBlock != playrunMovBlocks.end(); ++itMovBlock)
 	{
+		itMovBlock->second->update(deltaTime);
 		BlockType blockType = itMovBlock->second->getBlockType();
 		//block alive === moving
 

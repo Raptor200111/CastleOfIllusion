@@ -33,7 +33,7 @@ protected:
     void insideScreenObj();
     bool insideScreen(const glm::ivec2& pos);
     void collisionsEnemies();
-    void collisionsMovingBlocks();;
+    void collisionsMovingBlocks(int deltaTime);
 
     virtual void reStartLevelSpecific() = 0;
 
