@@ -22,6 +22,7 @@ protected:
 	void initZoneEnemyTree();
 	void initZoneEnemyBug();
 	BossDragon boss;
+	glm::ivec2 initPosBoss;
 	Cam bossRoom;
 	vector<BossShoot*> shoots;
 };

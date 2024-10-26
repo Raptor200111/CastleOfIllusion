@@ -18,7 +18,7 @@ ScenePlay::ScenePlay()
 {
     map = NULL;
     player = NULL;
-    zoomLevel = 2.5f;
+    zoomLevel = 1.5f;
     bgMap = NULL;
     bgQuad = NULL;
     screenEnemies = std::map<string, Enemy*>();
@@ -144,7 +144,6 @@ void ScenePlay::render() {
 
 	//level
 	map->render();
-	player->render();
 	if (insideBossRoom) {
 		renderBoss();
 	}
@@ -163,6 +162,7 @@ void ScenePlay::render() {
 	{
 		movBlock.second->render();
 	}
+	player->render();
 
 	gameUI.render();
 

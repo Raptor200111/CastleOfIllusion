@@ -9,8 +9,8 @@
 
 #include "CollisionManager.h"
 
-#define INIT_PLAYER_X_TILES 90//+35+36// 4+20
-#define INIT_PLAYER_Y_TILES 5//44//+8+2 //20
+#define INIT_PLAYER_X_TILES 79//+35+36// 4+20
+#define INIT_PLAYER_Y_TILES 51//44//+8+2 //20
 
 ScenePlayLevel::ScenePlayLevel()
 {
@@ -59,15 +59,18 @@ void ScenePlayLevel::init()
 	gameUI.init();
 	gameUI.setMaxTime(400 * 1000);
 
-
-	Zone limit = { 4.0f * tileSize, 22.0f * tileSize, 0, 0 };
-	glm::ivec2 finalPosBoss = glm::ivec2(10.0f * tileSize, 38.0f * tileSize);
+	Zone limit = { 79.0f * tileSize, mapSize.x * tileSize, 0, 0 };
+	glm::ivec2 finalPosBoss = glm::ivec2(87.0f * tileSize, 45.0f * tileSize);
+	//Zone limit = { (mapSize.x - 19) * tileSize, mapSize.x * tileSize, 0, 0 };
+	//glm::ivec2 finalPosBoss = glm::ivec2((mapSize.x - 9) * tileSize, (mapSize.y-9) * tileSize);
 	ZoneEnemy zone1 = { limit, finalPosBoss, false };
 	boss.initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone1);
-	glm::ivec2 initPos = glm::ivec2(finalPosBoss.x, finalPosBoss.y - 110);
-	boss.setBossPosition(initPos);
+	initPosBoss = glm::ivec2(finalPosBoss.x, finalPosBoss.y - 110);
+	boss.setBossPosition(initPosBoss);
 	boss.setTileMap(map);
-	bossRoom = { 0, float(mapSize.x * tileSize), float(mapSize.y * tileSize), float(35 * tileSize) };
+	//bossRoom = { float((mapSize.x-19) * tileSize), float(mapSize.x * tileSize), float(mapSize.y * tileSize), float(40 * tileSize) };
+	bossRoom = { float(79.0f * tileSize), float(mapSize.x * tileSize), float(mapSize.y * tileSize), float(45 * tileSize) };
+
 	//211ms
 
 }
@@ -80,8 +83,7 @@ void ScenePlayLevel::reStartLevelSpecific()
 	player->setTileMap(map);
 	updateCamera();
 	gameUI.resetTime();
-	glm::ivec2 initPos = glm::ivec2(10.0f * tileSize, 38.0f * tileSize - 110);
-	boss.setBossPosition(initPos);
+	boss.setBossPosition(initPosBoss);
 }
 void ScenePlayLevel::initZoneEnemyTree()
 {
@@ -118,24 +120,23 @@ void ScenePlayLevel::initZoneEnemyTree()
 void ScenePlayLevel::initZoneEnemyBug()
 {
 	vector<ZoneEnemy> zones;
-
-	Zone limit = { 34.0f * map->getTileSize(), 46.0f * map->getTileSize(), 17, 20 };
-	glm::ivec2 initPos = glm::ivec2(35.0f, 17.0f);
+	Zone limit = { 34.0f * map->getTileSize(), 46.0f * map->getTileSize(), 19, 22 };
+	glm::ivec2 initPos = glm::ivec2(35.0f, 19.0f);
 	ZoneEnemy zoneBug1 = { limit, initPos, false };
 	zones.push_back(zoneBug1);
 
-	limit = { 76.0f * map->getTileSize(), 89.0f * map->getTileSize(), 20, 20 };
-	initPos = glm::ivec2(88.0f, 20.0f);
+	limit = { 76.0f * map->getTileSize(), 89.0f * map->getTileSize(), 22, 22 };
+	initPos = glm::ivec2(88.0f, 22.0f);
 	ZoneEnemy zoneBug2 = { limit, initPos, false };
 	zones.push_back(zoneBug2);
 
-	limit = { 69.0f * map->getTileSize(), 81.0f * map->getTileSize(), 31, 31 };
-	initPos = glm::ivec2(80.0f, 31.0f);
+	limit = { 69.0f * map->getTileSize(), 81.0f * map->getTileSize(), 35, 35 };
+	initPos = glm::ivec2(80.0f, 35.0f);
 	ZoneEnemy zoneBug3 = { limit, initPos, false };
 	zones.push_back(zoneBug3);
 
-	limit = { 26.0f * map->getTileSize(), 37.0f * map->getTileSize(), 32, 32 };
-	initPos = glm::ivec2(26.0f, 32.0f);
+	limit = { 26.0f * map->getTileSize(), 37.0f * map->getTileSize(), 36, 36 };
+	initPos = glm::ivec2(26.0f, 36.0f);
 	ZoneEnemy zoneBug4 = { limit, initPos, false };
 	zones.push_back(zoneBug4);
 
@@ -157,7 +158,7 @@ void ScenePlayLevel::initZoneEnemyBug()
 bool ScenePlayLevel::checkIfInsideBossRoom() {
 	bool inside = false;
 	glm::ivec2 posP = player->getPosition();
-	if (bossRoom.left < posP.x && posP.x < bossRoom.right && bossRoom.top < posP.y && posP.y < bossRoom.bottom) {
+	if (bossRoom.left <= posP.x && posP.x < bossRoom.right && bossRoom.top < posP.y && posP.y < bossRoom.bottom) {
 		inside = true;
 		boss.setEntityState(Alive);
 		shoots.clear();
@@ -207,6 +208,7 @@ void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 
 void ScenePlayLevel::renderBoss() {
 	boss.render();
+	//cout << "player: " << player->getPosition().x << " " << player->getPosition().y << "\n";
 	for (auto shoot : shoots)
 	{
 		if (shoot->getEntityState() != Dead)
