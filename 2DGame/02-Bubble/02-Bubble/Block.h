@@ -3,6 +3,12 @@
 #include "Entity.h"
 #include <cmath>
 
+
+enum BlockState
+{
+	STILL, GRABBED, FALLING
+};
+
 class Block : public Entity
 {
 public:
@@ -16,6 +22,14 @@ public:
 	void collisionVertical(CollisionType verticalCollision);
 	void collisionHorizontal(CollisionType horizontalCollision);
 
+	void throwBlock(glm::vec2 speed);
+	void grabbed();
+	void explode();
+
+private:
+	BlockState state;// = BlockState::STILL;
+	glm::vec2 speed;// = glm::vec2(0, 0);
+	
 protected:
 	BlockType blockType;
 };
