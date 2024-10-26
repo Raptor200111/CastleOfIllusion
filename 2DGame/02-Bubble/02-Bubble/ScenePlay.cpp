@@ -13,6 +13,8 @@
 #include "BlockNonDestroyable.h"
 
 #include "CollisionManager.h"
+//debug
+#include <chrono>
 
 ScenePlay::ScenePlay()
 {
@@ -91,11 +93,11 @@ vector<vector<Block*>> ScenePlay::initBlocks()
 		}
 		b->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 		b->setPosition(glm::ivec2(block.pos.x * map->getTileSize(), block.pos.y * map->getTileSize()));
+		b->setOgPosition(glm::ivec2(block.pos.x * map->getTileSize(), block.pos.y * map->getTileSize()));
 		b->setTileMap(map);
 		int floorIndex = calcFloorIndex(block.pos.y);
 		blocks[floorIndex].push_back(b);
 	}
-	cout << blocks[0].size() << "\n";
 	return blocks;
 }
 
@@ -111,9 +113,9 @@ void ScenePlay::reStart()
 
 void ScenePlay::update(int deltaTime) {
 	//update screenBlocks and screenEnemies
+	
 	int floorIndex = calcFloorIndex(player->getPosition().y/map->getTileSize());
 	insideScreenObj(floorIndex);
-
 
 	CollisionManager::instance().update(screenBlocks, playrunMovBlocks, playrunBlocks[floorIndex]);
 	player->update(deltaTime);
@@ -124,7 +126,11 @@ void ScenePlay::update(int deltaTime) {
 
 
 	if (insideBossRoom) {
+		//auto start = std::chrono::high_resolution_clock::now();
 		updateCollisionsWithBoss(deltaTime);
+		//auto end = std::chrono::high_resolution_clock::now();
+		//std::chrono::duration<float, std::milli> duration = end - start;
+		//std::cout << "updateCollisionsWithBoss execution time: " << duration.count() << "ms" << std::endl;
 	}
 	else {
 		collisionsEnemies(deltaTime);
@@ -155,7 +161,11 @@ void ScenePlay::render() {
 	//level
 	map->render();
 	if (insideBossRoom) {
+		//auto start = std::chrono::high_resolution_clock::now();
 		renderBoss();
+		//auto end = std::chrono::high_resolution_clock::now();
+		//std::chrono::duration<float, std::milli> duration = end - start;
+		//std::cout << "renderBoss execution time: " << duration.count() << "ms" << std::endl;
 	}
 	else
 	{
@@ -329,46 +339,58 @@ bool ScenePlay::insideScreen(const glm::ivec2& pos)
 
 void ScenePlay::collisionsEnemies(int deltaTime)
 {
-	for (auto& itEnemy = screenEnemies.begin(); itEnemy != screenEnemies.end(); ++itEnemy)
+	for (auto& itEnemy = screenEnemies.begin(); itEnemy != screenEnemies.end();)
 	{
+		bool reStarted = false;
 		itEnemy->second->update(deltaTime);
 		if (itEnemy->second->getEntityState() == Alive && player->getEntityState() == Alive 
 			&& !Game::instance().isOnGodMode() && CollisionManager::instance().checkCollisionObject(player, itEnemy->second)) {
-			//if (Player::instance().killEnemy()) {
-			itEnemy->second->setEntityState(Dying);
-			Game::instance().onPlayerKilledEnemy();
-			//} else
-			//game onPlayerKilled
-			//player to dying
-		}
-		if (itEnemy->second->getEntityState() == Alive) {
-			int countBlockCollisions = 0;
-			for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
-			{
-				bool collided = false;
-				VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(itEnemy->second, itBlock->second);
-				if (vBlockCollision != NoVcol)
-				{
-					itEnemy->second->collideVertical();
-					collided = true;
-					countBlockCollisions += 1;
-				}
-				else if (!collided)
-				{
-					HColType hBlockCollision = CollisionManager::instance().checkCollisionBlockHorizontal(itEnemy->second, itBlock->second);
-					if (hBlockCollision != NoHcol) {
-						itEnemy->second->collisionBlockHorizontal(itBlock->second);
-						countBlockCollisions += 1;
-					}
-				}
-				if (countBlockCollisions >= 2) {
+			if (player->isAttacking()) {
+				Game::instance().onPlayerKilledEnemy();
+				itEnemy->second->Damaged();
+			}
+			else {
+				string idEnemy = itEnemy->first;
+				Game::instance().onPlayerKilled();
+				player->setEntityState(Dying);
+				if (screenEnemies.find(idEnemy) == screenEnemies.end()) {
+					reStarted = true;
 					break;
 				}
 			}
 		}
-		if (itEnemy->second->getEntityState() == Alive && CollisionManager::instance().checkCollisionVertical(itEnemy->second) == Tile)
-		{
-			itEnemy->second->collideVertical();
+		if (!reStarted) {
+			if (itEnemy->second->getEntityState() == Alive) {
+				int countBlockCollisions = 0;
+				for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
+				{
+					bool collided = false;
+					VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(itEnemy->second, itBlock->second);
+					if (vBlockCollision != NoVcol)
+					{
+						itEnemy->second->collideVertical();
+						collided = true;
+						countBlockCollisions += 1;
+					}
+					else if (!collided)
+					{
+						HColType hBlockCollision = CollisionManager::instance().checkCollisionBlockHorizontal(itEnemy->second, itBlock->second);
+						if (hBlockCollision != NoHcol) {
+							itEnemy->second->collisionBlockHorizontal(itBlock->second);
+							countBlockCollisions += 1;
+						}
+					}
+					if (countBlockCollisions >= 2) {
+						break;
+					}
+				}
+			}
+			if (itEnemy->second->getEntityState() == Alive && CollisionManager::instance().checkCollisionVertical(itEnemy->second) == Tile)
+			{
+				itEnemy->second->collideVertical();
+			}
+
+			++itEnemy;
 		}
 	}
 }
@@ -376,8 +398,9 @@ void ScenePlay::collisionsEnemies(int deltaTime)
 void ScenePlay::collisionsMovingBlocks(int deltaTime)
 {
 	//remember movingBlocks will always be inside screen: player cannot throw them far enough
-	for (auto& itMovBlock = playrunMovBlocks.begin(); itMovBlock != playrunMovBlocks.end(); ++itMovBlock)
+	for (auto& itMovBlock = playrunMovBlocks.begin(); itMovBlock != playrunMovBlocks.end();)
 	{
+		bool elementErased = false;
 		itMovBlock->second->update(deltaTime);
 		BlockType blockType = itMovBlock->second->getBlockType();
 		//block alive === moving
@@ -390,8 +413,10 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 			else
 			{
 				for (auto& screenEnemy : screenEnemies) {
-					if (screenEnemy.second->getEntityState() == Alive && CollisionManager::instance().checkCollisionObject(screenEnemy.second, itMovBlock->second))
+					if (screenEnemy.second->getEntityState() == Alive && 
+						CollisionManager::instance().checkCollisionObject(screenEnemy.second, itMovBlock->second))
 					{
+						Game::instance().onPlayerKilledEnemy();
 						screenEnemy.second->Damaged();
 						itMovBlock->second->collisionEnemy(screenEnemy.second->getPosition());
 						break;
@@ -444,19 +469,18 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 
 		//block Dead == has stopped moving
 		if (itMovBlock->second->getEntityState() == Dead) {
-			if (blockType == Destroyable) {
-				auto it = playrunMovBlocks.find(itMovBlock->first);
-				it->second = NULL;
-				if (it != playrunMovBlocks.end()) {
-					playrunMovBlocks.erase(it);
-					//once dead it can be removed from movingBlocks
-					//ultimately it will only exist in allBlocks
-				}
-			}
-			else if (blockType == NonDestroyable) {
-				int movBlockFloorIndex = calcFloorIndex(itMovBlock->second->getPosition().y/map->getTileSize());
+			if (blockType == NonDestroyable) {
+				int movBlockFloorIndex = calcFloorIndex(itMovBlock->second->getPosition().y / map->getTileSize());
 				playrunBlocks[movBlockFloorIndex].push_back(itMovBlock->second);
 			}
+			elementErased = true;
+			itMovBlock->second = NULL;
+			itMovBlock = playrunMovBlocks.erase(itMovBlock);
+				//once dead it can be removed from movingBlocks
+				//it will only exists in allBlocks
+		}
+		if (elementErased == false) {
+			++itMovBlock;
 		}
 	}
 }

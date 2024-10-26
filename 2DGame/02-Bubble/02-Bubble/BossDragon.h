@@ -19,7 +19,6 @@ class BossDragon : public Enemy
 public:
 	BossDragon();
 	~BossDragon() override;
-	//void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) override {}
 	void update(int deltaTime) override;
 	void initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, const ZoneEnemy& initParams) override;
 	void render() override;
@@ -33,7 +32,7 @@ public:
 	void collideVertical() override {}
 	void collisionBlockHorizontal(Block* b) override {}
 
-	void resetDragon() { active = false; entityState = Alive; actualLives = MAX_LIVES_BOSS; shoots = vector<BossShoot*>();}
+	void resetDragon();
 	bool getActive() { return active; }
 	void appear() { active = true; entityState = Alive; }
 
@@ -55,9 +54,9 @@ private:
 	int timeSinceLastShoot = 0;           // Time accumulator for shoot during move shooting
 	int cycleTime = 0;                   // Total time for the current cycle
 
-	const int idleDuration = 160 * 10;          // 160ms idle period
-	const int stateChangeInterval = 16 * 10;   // 16ms interval for state change during idle
-	const int shootInterval = 8 * 15;          // 8ms interval for each shoot during shooting phase
+	const int idleDuration = 200 * 10;          // 160ms idle period
+	const int stateChangeInterval = 200;   // 16ms interval for state change during idle
+	const int shootInterval = 150;          // 8ms interval for each shoot during shooting phase
 
 	int shootCount = 0;                   // Count the number of shoots made during the shooting phase
 
@@ -76,6 +75,7 @@ private:
 	int indexAngleShoot, indexQuadrantShoot = 0;
 	int MaxShoots = 3;
 	int actualLives = MAX_LIVES_BOSS;
+
 
 	BossDragonStates bossDragonState = BossDragonStates::BOSS_LEFT;
 	BossBodyStates bossBodyState = BossBodyStates::BOSS_BODY_IDLE;

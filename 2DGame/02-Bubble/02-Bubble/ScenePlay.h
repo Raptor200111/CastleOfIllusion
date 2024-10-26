@@ -24,6 +24,7 @@ public:
     virtual void render() override; // Common rendering logic
 
     void reStart();
+
 protected:
     void initShaders();
     vector<vector<Block*>> initBlocks();

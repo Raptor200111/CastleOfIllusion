@@ -110,6 +110,24 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	//setPosition(glm::ivec2(0, 0));
 }
 
+void Player::reStartStatePlayer()
+{
+	jumpAvailable = true;
+	objInteractionAvailable = true;
+	yAxisSpeed = 0.f;
+	oldState = newState = IDLE;
+
+	pickedUpBlock = nullptr;
+	readyToPickBlock = nullptr;
+	block = nullptr;
+	colType = CollisionType::None;
+	sizeSprite = glm::ivec2(32, 48);
+	setSize(glm::ivec2(24, 32));
+	setOffset(glm::ivec2(4, 8));
+	sprite->changeAnimation(IDLE);
+
+}
+
 void Player::update(int deltaTime)
 {
 	sprite->update(deltaTime);
@@ -119,6 +137,17 @@ void Player::update(int deltaTime)
 
 	colType = CollisionType::None;
 	block = nullptr;
+
+	if (entityState == Dying) {
+		elapsedTime += deltaTime;
+		if (elapsedTime >= timeDyingAnim) {
+			elapsedTime = 0;
+			if (Game::instance().getStars() > 0)
+				entityState = Alive;
+			else
+				entityState = Dead;
+		}
+	}
 
 	switch (oldState)
 	{

@@ -53,6 +53,12 @@ void ScenePlayPractice::reStartLevelSpecific()
 {
     int tileSize = map->getTileSize();
     CollisionManager::instance().init(map);
+    Block* b = player->getPickedUpBlock();
+    if (b) {
+        glm::ivec2 ogPosB = b->getOgPosition();
+        b->setPosition(ogPosB);
+    }
+    player->reStartStatePlayer();
     player->setPosition(glm::vec2((PRACTICE_INIT_PLAYER_X_TILES)*tileSize, (PRACTICE_INIT_PLAYER_Y_TILES)*tileSize));
     player->setTileMap(map);
     updateCamera();

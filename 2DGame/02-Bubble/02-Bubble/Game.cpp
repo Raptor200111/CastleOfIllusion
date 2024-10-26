@@ -42,10 +42,12 @@ void Game::keyPressed(int key)
 	}
 	else if (currentScene == &sceneMenu && key == GLFW_KEY_Z) {
 		currentScene = &scenePlayPractice;
+		tries = 3;
 		scenePlayPractice.reStart();
 	}
 	else if (currentScene == &scenePlayPractice && key == GLFW_KEY_0) {
 		currentScene = &scenePlayLevel;
+		tries = 8;
 		scenePlayLevel.reStart();
 	}
 	keys[key] = true;
@@ -126,7 +128,6 @@ void Game::onPracticeLevelWon()
 
 void Game::onLevelWon()
 {
-	//winGame();
 	currentScene = &sceneMenu;
 }
 

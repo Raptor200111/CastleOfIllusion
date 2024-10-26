@@ -29,6 +29,12 @@ public:
 	void update(int deltaTime);
 	void render();
 
+	//----fet per liliu: check if ok
+	void reStartStatePlayer();
+	//return if player is attacking
+	bool isAttacking() { return newState == BUTT_FALL; }
+	//----
+
 	//Block* ThrownBlock() { return thrownBlock; }
 	Block* getPickedUpBlock() { return pickedUpBlock; }
 
@@ -44,6 +50,11 @@ private:
 
 	CollisionType colType = CollisionType::None;
 	Block* block = nullptr;
+
+	//----fet per liliu: check if ok
+	int elapsedTime = 0;
+	int timeDyingAnim = 2000;
+	//----
 
 	void leftMove();
 	void rightMove();

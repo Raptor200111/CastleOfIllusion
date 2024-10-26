@@ -19,6 +19,8 @@ public:
 	void update(int deltaTime);
 	void render();
 	BlockType getBlockType() { return blockType; }
+	void setOgPosition(const glm::vec2& pos) { ogPosition = pos; }
+	glm::ivec2 getOgPosition() { return ogPosition; }
 	void collisionEnemy(const glm::ivec2& posEnemy);
 	void collisionBlockHorizontal(HColType hBlockCollision, const Block*& b);
 	void collisionBlockVertical(VColType vBlockCollision, const Block*& b);
@@ -36,5 +38,6 @@ private:
 protected:
 	BlockType blockType;
 	BlockStatus blockStatus;
+	glm::ivec2 ogPosition;
 };
 

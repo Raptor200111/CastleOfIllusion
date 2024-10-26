@@ -159,29 +159,28 @@ void BossDragon::update(int deltaTime)
 		}
 		else {
 			cycleTime += deltaTime;
-
-			// If within the idle period (first 160 ms)
+			
+			// If within the idle period 
 			if (cycleTime < idleDuration) {
 				// Accumulate time since the last state change
 				timeSinceLastStateChange += deltaTime;
 
-				// Check if 16ms have passed to change the state
 				if (timeSinceLastStateChange >= stateChangeInterval) {
-					state++;  // Increment state
+					state++; 
 					int index = state % states.size();
 					bossDragonState = states[index];
-					timeSinceLastStateChange -= stateChangeInterval;  // Reset the timer for state change
+					timeSinceLastStateChange -= stateChangeInterval;
 				}
 			}
-			// After 160ms, start the shooting phase
+			// After  idle period, start the shooting phase
 			else if (cycleTime < idleDuration + MaxShoots * shootInterval) {
 				timeSinceLastShoot += deltaTime;
 
-				// Shoot every moveInterval, up to 3 shoots
+				// Shoot every shootInterval, up to 3 shoots
 				if (timeSinceLastShoot >= shootInterval && shootCount < 3) {
-					shoot(deltaTime);  // Move the player to the right
-					shootCount++;   // Increment move counter
-					timeSinceLastShoot -= shootInterval;  // Reset the timer for the next move
+					shoot(deltaTime); 
+					shootCount++; 
+					timeSinceLastShoot -= shootInterval;
 				}
 			}
 			// Reset cycle
@@ -312,4 +311,13 @@ void BossDragon::Damaged()
 	actualLives -= 1;
 	if(actualLives <= 0)
 		entityState = Dying;
+}
+
+void BossDragon::resetDragon() 
+{ 
+	active = false; 
+	entityState = Alive; 
+	actualLives = MAX_LIVES_BOSS;
+	for (auto& shoot : shoots)
+		shoot->setEntityState(Dead);
 }

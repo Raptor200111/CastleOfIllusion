@@ -84,6 +84,12 @@ void ScenePlayLevel::reStartLevelSpecific()
 {
 	int tileSize = map->getTileSize();
 	CollisionManager::instance().init(map);
+	Block* b = player->getPickedUpBlock();
+	if (b) {
+		glm::ivec2 ogPosB = b->getOgPosition();
+		b->setPosition(ogPosB);
+	}
+	player->reStartStatePlayer();
 	player->setPosition(glm::vec2((INIT_PLAYER_X_TILES)*tileSize, (INIT_PLAYER_Y_TILES)*tileSize));
 	player->setTileMap(map);
 	updateCamera();
@@ -186,12 +192,15 @@ bool ScenePlayLevel::checkIfInsideBossRoom() {
 
 void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 	boss.update(deltaTime);
+
 	if (boss.getEntityState() != Dead) {
+
 		if (player->getEntityState() == Alive && CollisionManager::instance().checkCollisionObject(player, &boss)) 
 		{
 			boss.Damaged();
 			Game::instance().onPlayerKilledEnemy();
 		}
+
 		for (auto shoot : boss.getShoots())
 		{
 			shoot->update(deltaTime);
@@ -228,9 +237,24 @@ void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 			Game::instance().onLevelWon();
 		}
 	}
+
 }
 
+void ScenePlayLevel::collisionMovBlockInsideBossRoom(Block* movBlock)
+{
+	if (boss.getEntityState() != Dead) {
+
+		if (movBlock->getEntityState() == Alive && CollisionManager::instance().checkCollisionObject(movBlock, &boss))
+		{
+			boss.Damaged();
+			Game::instance().onPlayerKilledEnemy();
+		}
+	}
+}
+
+
 void ScenePlayLevel::renderBoss() {
+
 	if (boss.getEntityState() != Dead) {
 		boss.render();
 		//cout << "player: " << player->getPosition().x << " " << player->getPosition().y << "\n";
@@ -244,4 +268,5 @@ void ScenePlayLevel::renderBoss() {
 	{
 		blockGem->render();
 	}
+
 }

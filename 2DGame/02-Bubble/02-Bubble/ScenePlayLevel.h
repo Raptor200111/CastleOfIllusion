@@ -16,7 +16,7 @@ protected:
 
 	void updateCollisionsWithBoss(int deltaTime) override;
 	bool checkIfInsideBossRoom() override;
-	void collisionMovBlockInsideBossRoom(Block* movBlock) override {}
+	void collisionMovBlockInsideBossRoom(Block* movBlock) override;
 
 	void renderBoss() override;
 	void initZoneEnemyTree();
