@@ -59,6 +59,8 @@ private:
 
 	int shootCount = 0;                   // Count the number of shoots made during the shooting phase
 
+	int timeDyingAnim = 500; //0,5 s
+	int elapsedTime = 0;
 
 	Texture bodySpritesheet;
 	Sprite* bodySprite;

@@ -1,0 +1,17 @@
+TILEMAP
+95 12 							-- Size of tile map in tiles
+16 16							-- Tile size & block size
+images/tilemap.png 	-- Tilesheet
+4 3 								-- Number of tiles in tilesheet
+e                                                                                            ef
+e                                                                                            ef
+e                                                                                            ee
+e                                                                                            ef
+e                                                        kkh                 3kkkk           ef
+e                                                        eflh               1keffekkk        ee
+e                    3           3kkkh                  kefflh             3eeffeeffe        ef
+e            kkkkkkkkk          3kefelh      3          efefflh           33efeefeefe        ee
+ekkkkkkkkkkkkefeffeeee    kkkkkkkeffeelh    31kkkkkkkkkkkefefelkkkkkkkkkkkkkeeffeefffffekkkkkee
+efefefefeffeeeefefeefejjjjefefeffeefefelkkkkkkeefefefeefefefefefefeeffefefefefeeeeefeefffefefef
+eefefefefeffeeeefefeefeeffeefefeffeefefelkkkkkkeefefefeefefefefefefeeffefefefefeeeeefeefffefeff
+efefefefeffeeeefefeefeeffeefefeffeefefelkkkkkkeefefefeefefefefefefeeffefefefefeeeeefeefffefefef

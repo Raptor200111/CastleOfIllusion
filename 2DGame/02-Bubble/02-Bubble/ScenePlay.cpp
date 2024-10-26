@@ -6,6 +6,11 @@
 #include "Enemy.h"
 #include "EnemyTree.h"
 #include "EnemyBug.h"
+
+#include "BlockChest.h"
+#include "BlockDestroyable.h"
+#include "BlockNonDestroyable.h"
+
 #include "CollisionManager.h"
 
 ScenePlay::ScenePlay()
@@ -52,6 +57,28 @@ ScenePlay::~ScenePlay()
 
 void ScenePlay::init() {
 	initShaders();
+}
+
+void ScenePlay::initBlocks()
+{
+	for (auto block : map->getBlocksPos()) {
+		Block* b;
+		switch (block.type) {
+		case 1:
+			b = new BlockChest();
+			break;
+		case 3:
+			b = new BlockDestroyable();
+			break;
+		case 7:
+			b = new BlockNonDestroyable();
+			break;
+		}
+		b->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+		b->setPosition(glm::ivec2(block.pos.x * map->getTileSize(), block.pos.y * map->getTileSize()));
+		b->setTileMap(map);
+		allBlocks.push_back(b);
+	}
 }
 
 void ScenePlay::reStart()
@@ -108,7 +135,8 @@ void ScenePlay::render() {
 
 	bgTexture.use();
 	bgQuad->render();
-	bgMap->render();
+	if(bgMap != NULL)
+		bgMap->render();
 
 	//level
 	map->render();

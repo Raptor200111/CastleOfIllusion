@@ -6,11 +6,7 @@
 #include "Enemy.h"
 #include "EnemyTree.h"
 #include "EnemyBug.h"
-#include "BlockCake.h"
-#include "BlockCoin.h"
-#include "BlockChest.h"
-#include "BlockDestroyable.h"
-#include "BlockNonDestroyable.h"
+
 #include "CollisionManager.h"
 
 #define INIT_PLAYER_X_TILES 2//+35+36// 4+20
@@ -47,24 +43,7 @@ void ScenePlayLevel::init()
 	initZoneEnemyTree();
 	initZoneEnemyBug();
 
-	for (auto block : map->getBlocksPos()) {
-		Block* b;
-		switch(block.type){
-		case 1:
-			b = new BlockChest();
-			break;
-		case 3:
-			b = new BlockDestroyable();
-			break;
-		case 7:
-			b = new BlockNonDestroyable();
-			break;
-		}
-		b->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-		b->setPosition(glm::ivec2(block.pos.x * tileSize, block.pos.y * tileSize));
-		b->setTileMap(map);
-		allBlocks.push_back(b);
-	}
+	initBlocks();
 	playrunBlocks = allBlocks;
 	playrunEnemies = allEnemies;
 
@@ -93,6 +72,17 @@ void ScenePlayLevel::init()
 
 }
 
+void ScenePlayLevel::reStartLevelSpecific()
+{
+	int tileSize = map->getTileSize();
+	CollisionManager::instance().init(map);
+	player->setPosition(glm::vec2((INIT_PLAYER_X_TILES)*tileSize, (INIT_PLAYER_Y_TILES)*tileSize));
+	player->setTileMap(map);
+	updateCamera();
+	gameUI.resetTime();
+	glm::ivec2 initPos = glm::ivec2(10.0f * tileSize, 38.0f * tileSize - 110);
+	boss.setBossPosition(initPos);
+}
 void ScenePlayLevel::initZoneEnemyTree()
 {
 	vector<ZoneEnemy> zones;
@@ -116,7 +106,7 @@ void ScenePlayLevel::initZoneEnemyTree()
 	ZoneEnemy zone4 = { limit, initPos, true };
 	zones.push_back(zone4);
 
-	for (auto zone : zones) {
+	for (const auto& zone : zones) {
 		EnemyTree* enemy = new EnemyTree();
 		enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone);
 		enemy->setPosition(glm::ivec2(zone.initPos.x * map->getTileSize(), zone.initPos.y * map->getTileSize()));
@@ -154,7 +144,7 @@ void ScenePlayLevel::initZoneEnemyBug()
 	ZoneEnemy zoneBug5 = { limit, initPos, false };
 	zones.push_back(zoneBug5);
 
-	for (auto zone : zones) {
+	for (const auto& zone : zones) {
 		EnemyBug* enemy = new EnemyBug();
 		enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone);
 		enemy->setPosition(glm::ivec2(zone.initPos.x * map->getTileSize(), zone.initPos.y * map->getTileSize()));
