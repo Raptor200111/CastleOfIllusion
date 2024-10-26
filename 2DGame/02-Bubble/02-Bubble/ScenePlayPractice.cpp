@@ -26,10 +26,11 @@ void ScenePlayPractice::init() {
     player->setTileMap(map);
     updateCamera();
     //init enemies
+    allEnemies = vector < vector<Enemy*>>(1);
     initZoneEnemyTree();
     initZoneEnemyBug();
 
-    initBlocks();
+    allBlocks = initBlocks();
     blockGem = new BlockGem();
     blockGem->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
     blockGem->setPosition(glm::vec2(91*tileSize, 6*tileSize));
@@ -81,7 +82,7 @@ void ScenePlayPractice::initZoneEnemyTree()
         enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone);
         enemy->setPosition(glm::ivec2(zone.initPos.x * map->getTileSize(), zone.initPos.y * map->getTileSize()));
         enemy->setTileMap(map);
-        allEnemies.push_back(enemy);
+        allEnemies[0].push_back(enemy);
 
     }
 }
@@ -104,7 +105,7 @@ void ScenePlayPractice::initZoneEnemyBug()
         enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone);
         enemy->setPosition(glm::ivec2(zone.initPos.x * map->getTileSize(), zone.initPos.y * map->getTileSize()));
         enemy->setTileMap(map);
-        allEnemies.push_back(enemy);
+        allEnemies[0].push_back(enemy);
 
     }
 }

@@ -26,13 +26,14 @@ public:
     void reStart();
 protected:
     void initShaders();
-    void initBlocks();
+    vector<vector<Block*>> initBlocks();
 
     void updateCamera();
 
-    void insideScreenObj();
+    int calcFloorIndex(int posY);
+    void insideScreenObj(int floorIndex);
     bool insideScreen(const glm::ivec2& pos);
-    void collisionsEnemies();
+    void collisionsEnemies(int deltaTime);
     void collisionsMovingBlocks(int deltaTime);
 
     virtual void reStartLevelSpecific() = 0;
@@ -43,11 +44,11 @@ protected:
 
     virtual void renderBoss() = 0;
 
-    vector<Enemy*> playrunEnemies;
-    vector<Block*> playrunBlocks;
+    vector<vector<Enemy*>> playrunEnemies;
+    vector<vector<Block*>> playrunBlocks;
 
-    vector<Enemy*> allEnemies;
-    vector<Block*> allBlocks;
+    vector<vector<Enemy*>> allEnemies;
+    vector<vector<Block*>> allBlocks;
 
     std::map<std::string, Enemy*> screenEnemies;
     std::map<std::string, Block*> screenBlocks;
