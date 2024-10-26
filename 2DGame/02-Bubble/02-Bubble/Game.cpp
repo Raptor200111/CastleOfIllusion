@@ -68,7 +68,7 @@ bool Game::getKey(int key) const
 
 void Game::onPlayerFallDownHole() {
 	if (godMode) return;
-	stars = 0;
+	stars = INIT_STARS;
 	tries -= 1;
 	if (tries <= 0) {
 		looseGame();
@@ -112,6 +112,7 @@ void Game::onExceededTimeLimit()
 void Game::onPracticeLevelWon()
 {
 	stars = INIT_STARS;
+	tries = 8;
 	currentScene = &scenePlayLevel;
 	scenePlayLevel.reStart();
 }

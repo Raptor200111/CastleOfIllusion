@@ -3,6 +3,10 @@
 #include "Entity.h"
 #include <cmath>
 
+enum BlockStatus {
+	ITEM_STATUS, CHEST_STATUS, DISAPPEAR
+};
+
 class Block : public Entity
 {
 public:
@@ -18,5 +22,6 @@ public:
 
 protected:
 	BlockType blockType;
+	BlockStatus blockStatus;
 };
 

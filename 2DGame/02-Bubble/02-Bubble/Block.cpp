@@ -3,6 +3,9 @@
 void Block::update(int deltaTime)
 {
 	sprite->update(deltaTime);
+	if (sprite->animation() != blockStatus) {
+		sprite->changeAnimation(blockStatus);
+	}
 }
 
 void Block::render()

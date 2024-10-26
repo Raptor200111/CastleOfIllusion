@@ -7,7 +7,8 @@
 #include "EnemyTree.h"
 #include "EnemyBug.h"
 
-#include "BlockChest.h"
+#include "BlockChestCake.h"
+#include "BlockChestCoin.h"
 #include "BlockDestroyable.h"
 #include "BlockNonDestroyable.h"
 
@@ -65,12 +66,15 @@ void ScenePlay::initBlocks()
 		Block* b;
 		switch (block.type) {
 		case 1:
-			b = new BlockChest();
+			b = new BlockChestCake();
 			break;
 		case 3:
 			b = new BlockDestroyable();
 			break;
-		case 7:
+		case 4:
+			b = new BlockChestCoin();
+		break; 
+		default:
 			b = new BlockNonDestroyable();
 			break;
 		}
