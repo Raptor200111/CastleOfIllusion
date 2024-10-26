@@ -11,8 +11,8 @@
 
 void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
-	bClimbing = false;
-	bTouchBlock = false;
+	jumpAvailable = true;
+	objInteractionAvailable = true;
 	yAxisSpeed = 0.f;
 	oldState = newState = IDLE;
 
@@ -81,7 +81,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	sprite->addKeyframe(CLIMB, glm::vec2(0.066f * 12, 0.098 * 0));
 	sprite->addKeyframe(CLIMB, glm::vec2(0.066f * 13, 0.098 * 0));
 
-	sprite->setAnimationSpeed(B_PICK, 8);
+	sprite->setAnimationSpeed(B_PICK, 6);
 	sprite->addKeyframe(B_PICK, glm::vec2(0.066f * 3, 0.098 * 3));
 	sprite->addKeyframe(B_PICK, glm::vec2(0.066f * 2, 0.098 * 3));
 	sprite->addKeyframe(B_PICK, glm::vec2(0.066f * 4, 0.098 * 3));
@@ -113,8 +113,6 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 void Player::update(int deltaTime)
 {
 	sprite->update(deltaTime);
-	bool oldbClimbing = bClimbing;
-	bool newbTouchBlock = false; //Why?
 
 	yAxisSpeed += GRAVITY;
 	position.y += int(yAxisSpeed) + 1;
@@ -190,7 +188,7 @@ void Player::update(int deltaTime)
 				yAxisSpeed = 0;
 			}
 
-			if (Game::instance().getKey(GLFW_KEY_K)) {
+			if (checkJumpButton()) {
 				newState = JUMP;
 				yAxisSpeed = JUMP_SPEED;
 			}
@@ -210,7 +208,7 @@ void Player::update(int deltaTime)
 		{
 			newState = READY_TO_PICK;
 			movementBehaviour();
-			if (Game::instance().getKey(GLFW_KEY_L)) {
+			if (checkObjInteractionButton()) {
 				pickUpBlock();
 			}
 			break;
@@ -228,7 +226,10 @@ void Player::update(int deltaTime)
 		}
 		case B_PICK:
 		{
-			newState = B_IDLE;
+			position.y -= int(yAxisSpeed) + 1;
+			auto keyframe = sprite->getCurrentKeyframe();
+			if (keyframe.x == keyframe.y-1)
+				newState = B_IDLE;
 			break;
 		}
 		case B_IDLE:
@@ -250,7 +251,7 @@ void Player::update(int deltaTime)
 			if (Game::instance().getKey(GLFW_KEY_D)) {
 				rightMove();
 			}
-			if (Game::instance().getKey(GLFW_KEY_L)) {
+			if (checkObjInteractionButton()) {
 				throwBlock();
 			}
 			if ((stopFallingCollision(block, colType) && yAxisSpeed < 0) || yAxisSpeed > 0)
@@ -268,7 +269,7 @@ void Player::update(int deltaTime)
 			if (Game::instance().getKey(GLFW_KEY_D)) {
 				rightMove();
 			}
-			if (Game::instance().getKey(GLFW_KEY_L)) {
+			if (checkObjInteractionButton()) {
 				//newState = BUTT_FALL;
 				throwBlock();
 			}
@@ -281,18 +282,6 @@ void Player::update(int deltaTime)
 		}
 	}
 
-	if (newbTouchBlock != bTouchBlock) { //From here to...
-		if (newbTouchBlock) {
-			cout << "Tocado\n";
-			//playerState = TOUCH_BLOCK;
-		}
-		else {
-			cout << "Dejo de Tocar\n";
-		}
-	}
-
-	bTouchBlock = newbTouchBlock;
-
 	if (oldState != newState) {
 		oldState = newState;
 		sprite->changeAnimation(newState);
@@ -301,26 +290,29 @@ void Player::update(int deltaTime)
 	setPosition(position);
 	if (Game::instance().getKey(GLFW_KEY_P))
 		cout << position.x << " " << position.y << " - State: " << PlayerStates(oldState) << endl;
-	/* TEBEMOS QUE AÑADIR PARTICULAS CHULAS
-	if (Game::instance().getKey(GLFW_KEY_M))
-	{
-		particleEfect.play(position - glm::ivec2(-32, 0), 0);
-	}
-	*/
+	// TENEMOS QUE AÑADIR PARTICULAS CHULAS
+	
 	particleEfect.update(deltaTime);
 	if (pickedUpBlock != nullptr)
 	{
 		pickedUpBlock->update(deltaTime);//hacemos el update (hay que cambiarle la posicion)
-		pickedUpBlock->setPosition(glm::ivec2(position.x, position.y - 30));
+		if (left)
+		{
+			pickedUpBlock->setPosition(glm::ivec2(position.x, position.y + 10 - pickedUpBlock->getSize().y));
+		}
+		else
+		{
+			pickedUpBlock->setPosition(glm::ivec2(position.x + this->getSize().x - pickedUpBlock->getSize().x, position.y + 10 - pickedUpBlock->getSize().y));
+		}
 	}
 }
 
 void Player::render()
 {
-	sprite->render();
-	particleEfect.render();
 	if (pickedUpBlock != nullptr)
 		pickedUpBlock->render();
+	sprite->render();
+	particleEfect.render();
 }
 
 void Player::pickUpBlock()
@@ -328,6 +320,7 @@ void Player::pickUpBlock()
 	newState = B_PICK;
 	pickedUpBlock = readyToPickBlock;
 	readyToPickBlock = nullptr;
+	pickedUpBlock->grabbed();
 	//collider desconectar block
 	CollisionManager::instance().disAttachBlock(pickedUpBlock);
 	pickedUpBlock->setPosition(glm::ivec2(position.x, position.y - 30));
@@ -336,8 +329,13 @@ void Player::pickUpBlock()
 void Player::throwBlock()
 {
 	//collider atach block
+	glm::vec2 dir = glm::vec2(0, 0);
+	if (left)
+		dir.x *= -1;
+	pickedUpBlock->throwBlock(dir);
 	CollisionManager::instance().attachBlock(pickedUpBlock);
 	pickedUpBlock = nullptr;
+
 	switch (oldState)
 	{
 	case B_IDLE:
@@ -353,6 +351,32 @@ void Player::throwBlock()
 		newState = FALL;
 		break;
 	}
+}
+
+bool Player::checkJumpButton()
+{
+	if ((Game::instance().getKey(GLFW_KEY_K) || Game::instance().getKey(GLFW_KEY_W)) && jumpAvailable)
+	{
+		jumpAvailable = false;
+		return true;
+	}
+	if (!Game::instance().getKey(GLFW_KEY_K) && !Game::instance().getKey(GLFW_KEY_W))
+		jumpAvailable = true;
+	return false;
+}
+
+bool Player::checkObjInteractionButton()
+{
+	if (Game::instance().getKey(GLFW_KEY_L)) {
+		if (objInteractionAvailable)
+		{
+			objInteractionAvailable = false;
+			return true;
+		}
+	}
+	else
+		objInteractionAvailable = true;
+	return false;
 }
 
 void Player::leftMove()
@@ -444,7 +468,7 @@ void Player::movementBehaviour()
 	if (stopFallingCollision(block, colType))
 	{
 		yAxisSpeed = 0;
-		if (Game::instance().getKey(GLFW_KEY_K)) {
+		if (checkJumpButton()) {
 			newState = JUMP;
 			yAxisSpeed = JUMP_SPEED;
 			return;
@@ -498,7 +522,7 @@ void Player::climbBehaviour()
 			position.y += WALK_SPEED;
 			newState = CLIMB;
 		}
-		if (Game::instance().getKey(GLFW_KEY_L) && colType == CollisionType::Stairs) {
+		if (checkObjInteractionButton() && colType == CollisionType::Stairs) {
 			newState = FALL;
 		}
 	}
@@ -532,7 +556,7 @@ void Player::blockMovementBehaviour()
 	if (stopFallingCollision(block, colType))
 	{
 		yAxisSpeed = 0;
-		if (Game::instance().getKey(GLFW_KEY_K)) {
+		if (checkJumpButton()) {
 			newState = B_JUMP;
 			yAxisSpeed = JUMP_SPEED;
 			return;
@@ -551,7 +575,7 @@ void Player::blockMovementBehaviour()
 		newState = B_WALK;
 		rightMove();
 	}
-	if (Game::instance().getKey(GLFW_KEY_L)) {
+	if (checkObjInteractionButton()) {
 		throwBlock();
 	}
 }

@@ -37,11 +37,7 @@ private:
 	Block* pickedUpBlock;
 	Block* readyToPickBlock;
 
-	void pickUpBlock();
-	void throwBlock();
-
-
-	bool bClimbing, bTouchBlock, bJumping;
+	bool jumpAvailable, objInteractionAvailable;
 	float yAxisSpeed;
 	PlayerStates oldState, newState;
 	ParticleEfect particleEfect;
@@ -61,6 +57,11 @@ private:
 	void buttJumpBehaviour();
 	void blockMovementBehaviour();
 
+	void pickUpBlock();
+	void throwBlock();
+
+	bool checkJumpButton();
+	bool checkObjInteractionButton();
 };
 
 #endif
