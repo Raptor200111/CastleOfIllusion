@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Block.h"
+#include "BlockGem.h"
 #include <vector>
 #include "GameUI.h"
 #include <map>
@@ -25,6 +26,8 @@ public:
     void reStart();
 protected:
     void initShaders();
+    void initBlocks();
+
     void updateCamera();
 
     void insideScreenObj();
@@ -65,6 +68,7 @@ protected:
     Texture bgTexture;
     TileMap* bgMap;
 
+    BlockGem* blockGem;
     GameUI gameUI;
     bool insideBossRoom = false;
    

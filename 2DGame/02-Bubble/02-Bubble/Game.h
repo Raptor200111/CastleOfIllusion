@@ -6,7 +6,7 @@
 #include "Scene.h"
 #include "SceneMenu.h"
 #include "ScenePlayLevel.h"
-
+#include "ScenePlayPractice.h"
 
 #define SCREEN_WIDTH 640 
 #define SCREEN_HEIGHT 480
@@ -17,7 +17,8 @@
 enum GameState {
 	MENU,
 	INSTRUCTIONS,
-	PLAY
+	PLAY_LEVEL,
+	PLAY_PRACTICE
 };
 class Game
 {
@@ -73,6 +74,7 @@ private:
 	GameState currentState;
 	SceneMenu sceneMenu;
 	ScenePlayLevel scenePlayLevel;
+	ScenePlayPractice scenePlayPractice;
 
 	int score = 0;
 	int tries = 3;

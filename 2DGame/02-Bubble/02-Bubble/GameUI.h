@@ -15,6 +15,7 @@ public:
 	void update(int deltaTime) override;
 	void render() override;
 	void setMaxTime(int level_maxTime) { maxTime = level_maxTime; time = maxTime / 1000; }
+	void resetTime() { time = 0; }
 
 private:
 	void initShaders();

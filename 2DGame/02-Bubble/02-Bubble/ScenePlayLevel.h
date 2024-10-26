@@ -12,7 +12,7 @@ public:
 
 protected:
 	// Override these methods to handle boss logic and room detection for NormalPlayScene
-	void reStartLevelSpecific() override {}
+	void reStartLevelSpecific() override;
 
 	void updateCollisionsWithBoss(int deltaTime) override;
 	bool checkIfInsideBossRoom() override;

@@ -35,7 +35,8 @@ enum BlockType
 	NonDestroyable,
 	Chest,
 	Coin,
-	Cake
+	Cake,
+	Gem
 };
 enum CollisionType
 {
