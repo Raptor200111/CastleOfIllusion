@@ -132,30 +132,24 @@ void BossDragon::setHeadAnimations(ShaderProgram& shaderProgram)
 void BossDragon::update(int deltaTime)
 {
 	if (entityState == Dead) return;
-	glm::vec2 aux = sprite->updateDiffSize(deltaTime);
-	if (aux != glm::vec2(0.f))
-		sizeObjHead = aux;
-	bodySprite->updateDiffSize(deltaTime);
 
-	if (initParams.initPos.y > posBody.y) {
-		posBody.y += 1;
-		timeSinceLastStateChange += deltaTime;
-		if (timeSinceLastStateChange >= stateChangeInterval) {
-			state++;  // Increment state
-			int index = state % states.size();
-			bossDragonState = states[index];
-			timeSinceLastStateChange -= stateChangeInterval;  // Reset the timer for state change
+	else if (entityState == Dying) {
+		elapsedTime += deltaTime;
+		if (elapsedTime >= timeDyingAnim)
+		{
+			elapsedTime = 0;
+			entityState = Dead;
 		}
 	}
-	else {
-		cycleTime += deltaTime;
+	else if (entityState == Alive) {
+		glm::vec2 aux = sprite->updateDiffSize(deltaTime);
+		if (aux != glm::vec2(0.f))
+			sizeObjHead = aux;
+		bodySprite->updateDiffSize(deltaTime);
 
-		// If within the idle period (first 160 ms)
-		if (cycleTime < idleDuration) {
-			// Accumulate time since the last state change
+		if (initParams.initPos.y > posBody.y) {
+			posBody.y += 1;
 			timeSinceLastStateChange += deltaTime;
-
-			// Check if 16ms have passed to change the state
 			if (timeSinceLastStateChange >= stateChangeInterval) {
 				state++;  // Increment state
 				int index = state % states.size();
@@ -163,36 +157,52 @@ void BossDragon::update(int deltaTime)
 				timeSinceLastStateChange -= stateChangeInterval;  // Reset the timer for state change
 			}
 		}
-		// After 160ms, start the shooting phase
-		else if (cycleTime < idleDuration + MaxShoots * shootInterval) {
-			timeSinceLastShoot += deltaTime;
-
-			// Shoot every moveInterval, up to 3 shoots
-			if (timeSinceLastShoot >= shootInterval && shootCount < 3) {
-				shoot(deltaTime);  // Move the player to the right
-				shootCount++;   // Increment move counter
-				timeSinceLastShoot -= shootInterval;  // Reset the timer for the next move
-			}
-		}
-		// Reset cycle
 		else {
-			cycleTime = 0;               // Reset cycle time
-			state = 0;                   // Reset state
-			shootCount = 0;               // Reset move count
-			timeSinceLastStateChange = 0; // Reset idle state change timer
-			timeSinceLastShoot = 0;       // Reset movement timer
+			cycleTime += deltaTime;
+
+			// If within the idle period (first 160 ms)
+			if (cycleTime < idleDuration) {
+				// Accumulate time since the last state change
+				timeSinceLastStateChange += deltaTime;
+
+				// Check if 16ms have passed to change the state
+				if (timeSinceLastStateChange >= stateChangeInterval) {
+					state++;  // Increment state
+					int index = state % states.size();
+					bossDragonState = states[index];
+					timeSinceLastStateChange -= stateChangeInterval;  // Reset the timer for state change
+				}
+			}
+			// After 160ms, start the shooting phase
+			else if (cycleTime < idleDuration + MaxShoots * shootInterval) {
+				timeSinceLastShoot += deltaTime;
+
+				// Shoot every moveInterval, up to 3 shoots
+				if (timeSinceLastShoot >= shootInterval && shootCount < 3) {
+					shoot(deltaTime);  // Move the player to the right
+					shootCount++;   // Increment move counter
+					timeSinceLastShoot -= shootInterval;  // Reset the timer for the next move
+				}
+			}
+			// Reset cycle
+			else {
+				cycleTime = 0;               // Reset cycle time
+				state = 0;                   // Reset state
+				shootCount = 0;               // Reset move count
+				timeSinceLastStateChange = 0; // Reset idle state change timer
+				timeSinceLastShoot = 0;       // Reset movement timer
+			}
+
 		}
-
+		if (bossDragonState != sprite->animation())
+		{
+			glm::vec2 aux = sprite->changeAnimationDiffSize(bossDragonState);
+			if (aux != glm::vec2(0.f))
+				sizeObjHead = aux;
+		}
+		bodySprite->setPosition(glm::vec2(float(tileMapDispl.x + posBody.x), float(tileMapDispl.y + posBody.y)));
+		setHeadSpritePos();
 	}
-	if (bossDragonState != sprite->animation())
-	{
-		glm::vec2 aux = sprite->changeAnimationDiffSize(bossDragonState);
-		if (aux != glm::vec2(0.f))
-			sizeObjHead = aux;
-	}
-	bodySprite->setPosition(glm::vec2(float(tileMapDispl.x + posBody.x), float(tileMapDispl.y + posBody.y)));
-	setHeadSpritePos();
-
 }
 void BossDragon::render()
 {

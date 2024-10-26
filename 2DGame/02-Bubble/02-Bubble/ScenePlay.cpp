@@ -6,6 +6,12 @@
 #include "Enemy.h"
 #include "EnemyTree.h"
 #include "EnemyBug.h"
+
+#include "BlockChestCake.h"
+#include "BlockChestCoin.h"
+#include "BlockDestroyable.h"
+#include "BlockNonDestroyable.h"
+
 #include "CollisionManager.h"
 
 ScenePlay::ScenePlay()
@@ -54,6 +60,31 @@ void ScenePlay::init() {
 	initShaders();
 }
 
+void ScenePlay::initBlocks()
+{
+	for (auto block : map->getBlocksPos()) {
+		Block* b;
+		switch (block.type) {
+		case 1:
+			b = new BlockChestCake();
+			break;
+		case 3:
+			b = new BlockDestroyable();
+			break;
+		case 4:
+			b = new BlockChestCoin();
+		break; 
+		default:
+			b = new BlockNonDestroyable();
+			break;
+		}
+		b->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+		b->setPosition(glm::ivec2(block.pos.x * map->getTileSize(), block.pos.y * map->getTileSize()));
+		b->setTileMap(map);
+		allBlocks.push_back(b);
+	}
+}
+
 void ScenePlay::reStart()
 {
 	playrunEnemies = allEnemies;
@@ -89,7 +120,7 @@ void ScenePlay::update(int deltaTime) {
 		collisionsEnemies();
 	}
 
-	collisionsMovingBlocks();
+	collisionsMovingBlocks(deltaTime);
 
 	gameUI.update(deltaTime);
 }
@@ -108,7 +139,8 @@ void ScenePlay::render() {
 
 	bgTexture.use();
 	bgQuad->render();
-	bgMap->render();
+	if(bgMap != NULL)
+		bgMap->render();
 
 	//level
 	map->render();
@@ -315,11 +347,12 @@ void ScenePlay::collisionsEnemies()
 	}
 }
 
-void ScenePlay::collisionsMovingBlocks()
+void ScenePlay::collisionsMovingBlocks(int deltaTime)
 {
 	//remember movingBlocks will always be inside screen: player cannot throw them far enough
 	for (auto& itMovBlock = playrunMovBlocks.begin(); itMovBlock != playrunMovBlocks.end(); ++itMovBlock)
 	{
+		itMovBlock->second->update(deltaTime);
 		BlockType blockType = itMovBlock->second->getBlockType();
 		//block alive === moving
 

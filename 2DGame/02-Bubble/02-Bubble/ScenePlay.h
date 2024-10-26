@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Block.h"
+#include "BlockGem.h"
 #include <vector>
 #include "GameUI.h"
 #include <map>
@@ -25,12 +26,14 @@ public:
     void reStart();
 protected:
     void initShaders();
+    void initBlocks();
+
     void updateCamera();
 
     void insideScreenObj();
     bool insideScreen(const glm::ivec2& pos);
     void collisionsEnemies();
-    void collisionsMovingBlocks();;
+    void collisionsMovingBlocks(int deltaTime);
 
     virtual void reStartLevelSpecific() = 0;
 
@@ -65,6 +68,7 @@ protected:
     Texture bgTexture;
     TileMap* bgMap;
 
+    BlockGem* blockGem;
     GameUI gameUI;
     bool insideBossRoom = false;
    

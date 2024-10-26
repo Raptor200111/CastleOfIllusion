@@ -12,10 +12,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimKeyframes.h" />
-    <ClInclude Include="BlockCake.h" />
-    <ClInclude Include="BlockChest.h" />
-    <ClInclude Include="BlockCoin.h" />
+    <ClInclude Include="BlockChestCake.h" />
+    <ClInclude Include="BlockChestCoin.h" />
     <ClInclude Include="BlockDestroyable.h" />
+    <ClInclude Include="BlockGem.h" />
     <ClInclude Include="BlockNonDestroyable.h" />
     <ClInclude Include="BossDragon.h" />
     <ClInclude Include="BossShoot.h" />
@@ -47,10 +47,10 @@
     <ClInclude Include="TileMap.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BlockCake.cpp" />
-    <ClCompile Include="BlockChest.cpp" />
-    <ClCompile Include="BlockCoin.cpp" />
+    <ClCompile Include="BlockChestCake.cpp" />
+    <ClCompile Include="BlockChestCoin.cpp" />
     <ClCompile Include="BlockDestroyable.cpp" />
+    <ClCompile Include="BlockGem.cpp" />
     <ClCompile Include="BlockNonDestroyable.cpp" />
     <ClCompile Include="BossDragon.cpp" />
     <ClCompile Include="BossShoot.cpp" />
@@ -68,7 +68,7 @@
     <ClCompile Include="ParticleEfect.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="ScenePlay.cpp" />
-    <ClCompile Include="PracticePlayScene.cpp" />
+    <ClCompile Include="ScenePlayPractice.cpp" />
     <ClCompile Include="Quad.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />

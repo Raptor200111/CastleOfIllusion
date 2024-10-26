@@ -11,6 +11,7 @@ void Game::init()
 	SoundManager::instance().init();
 	sceneMenu.init();
 	scenePlayLevel.init();
+	scenePlayPractice.init();
 	currentScene = &sceneMenu;
 }
 
@@ -33,7 +34,12 @@ void Game::keyPressed(int key)
 		bPlay = false;
 	}
 	else if (currentScene == &sceneMenu && key == GLFW_KEY_Z) {
+		currentScene = &scenePlayPractice;
+		scenePlayPractice.reStart();
+	}
+	else if (currentScene == &scenePlayPractice && key == GLFW_KEY_0) {
 		currentScene = &scenePlayLevel;
+		scenePlayLevel.reStart();
 	}
 	keys[key] = true;
 }
@@ -62,13 +68,16 @@ bool Game::getKey(int key) const
 
 void Game::onPlayerFallDownHole() {
 	if (godMode) return;
-	stars = 0;
+	stars = INIT_STARS;
 	tries -= 1;
 	if (tries <= 0) {
 		looseGame();
 	}
 	else {
-		//restart level
+		ScenePlay* playScene = dynamic_cast<ScenePlay*>(currentScene);
+		if (playScene) {
+			playScene->reStart();
+		}
 	}
 }
 
@@ -84,6 +93,10 @@ void Game::onPlayerKilled()
 		stars = INIT_STARS;
 		tries -= 1;
 		//restart level
+		ScenePlay* playScene = dynamic_cast<ScenePlay*>(currentScene);
+		if (playScene) {
+			playScene->reStart();
+		}
 	}
 	if (tries <= 0)
 	{
@@ -99,14 +112,18 @@ void Game::onExceededTimeLimit()
 void Game::onPracticeLevelWon()
 {
 	stars = INIT_STARS;
+	tries = 8;
 	currentScene = &scenePlayLevel;
+	scenePlayLevel.reStart();
 }
 
 void Game::onLevelWon()
 {
 	//winGame();
+	currentScene = &sceneMenu;
 }
 
 void Game::looseGame()
 {
+	currentScene = &sceneMenu;
 }

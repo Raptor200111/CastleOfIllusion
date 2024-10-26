@@ -3,10 +3,13 @@
 #include "Entity.h"
 #include <cmath>
 
-
 enum BlockState
 {
 	STILL, GRABBED, FALLING
+};
+
+enum BlockStatus {
+	ITEM_STATUS, CHEST_STATUS, DISAPPEAR
 };
 
 class Block : public Entity
@@ -32,5 +35,6 @@ private:
 	
 protected:
 	BlockType blockType;
+	BlockStatus blockStatus;
 };
 

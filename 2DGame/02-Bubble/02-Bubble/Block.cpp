@@ -20,6 +20,9 @@ void Block::update(int deltaTime)
 	
 	setPosition(position);
 	sprite->update(deltaTime);
+	if (sprite->animation() != blockStatus) {
+		sprite->changeAnimation(blockStatus);
+	}
 }
 
 void Block::render()
