@@ -40,10 +40,11 @@ void ScenePlayLevel::init()
 	player->setPosition(glm::vec2((INIT_PLAYER_X_TILES)*tileSize, (INIT_PLAYER_Y_TILES)*tileSize));
 	player->setTileMap(map);
 	updateCamera();
+	allEnemies = vector<vector<Enemy*>>(4);
 	initZoneEnemyTree();
 	initZoneEnemyBug();
 
-	initBlocks();
+	allBlocks = initBlocks();
 	playrunBlocks = allBlocks;
 	playrunEnemies = allEnemies;
 
@@ -71,7 +72,11 @@ void ScenePlayLevel::init()
 	//bossRoom = { float((mapSize.x-19) * tileSize), float(mapSize.x * tileSize), float(mapSize.y * tileSize), float(40 * tileSize) };
 	bossRoom = { float(79.0f * tileSize), float(mapSize.x * tileSize), float(mapSize.y * tileSize), float(45 * tileSize) };
 
-	//211ms
+
+	blockGem = new BlockGem();
+	blockGem->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	blockGem->setPosition(glm::vec2(92 * tileSize, 50 * tileSize));
+	blockGem->setTileMap(map);
 
 }
 
@@ -84,6 +89,7 @@ void ScenePlayLevel::reStartLevelSpecific()
 	updateCamera();
 	gameUI.resetTime();
 	boss.setBossPosition(initPosBoss);
+	boss.resetDragon();
 }
 void ScenePlayLevel::initZoneEnemyTree()
 {
@@ -113,34 +119,35 @@ void ScenePlayLevel::initZoneEnemyTree()
 		enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone);
 		enemy->setPosition(glm::ivec2(zone.initPos.x * map->getTileSize(), zone.initPos.y * map->getTileSize()));
 		enemy->setTileMap(map);
-		allEnemies.push_back(enemy);
+		allEnemies[0].push_back(enemy);
 
 	}
 }
 void ScenePlayLevel::initZoneEnemyBug()
 {
 	vector<ZoneEnemy> zones;
-	Zone limit = { 34.0f * map->getTileSize(), 46.0f * map->getTileSize(), 19, 22 };
+	int tileSize = map->getTileSize();
+	Zone limit = { 34.0f * tileSize, 46.0f * tileSize, 19.f * tileSize, 22.f * tileSize };
 	glm::ivec2 initPos = glm::ivec2(35.0f, 19.0f);
 	ZoneEnemy zoneBug1 = { limit, initPos, false };
 	zones.push_back(zoneBug1);
 
-	limit = { 76.0f * map->getTileSize(), 89.0f * map->getTileSize(), 22, 22 };
+	limit = { 76.0f * tileSize, 89.0f * tileSize, 22.f * tileSize, 22.f * tileSize };
 	initPos = glm::ivec2(88.0f, 22.0f);
 	ZoneEnemy zoneBug2 = { limit, initPos, false };
 	zones.push_back(zoneBug2);
 
-	limit = { 69.0f * map->getTileSize(), 81.0f * map->getTileSize(), 35, 35 };
+	limit = { 69.0f * tileSize, 81.0f * tileSize, 35.f * tileSize, 35.f * tileSize };
 	initPos = glm::ivec2(80.0f, 35.0f);
 	ZoneEnemy zoneBug3 = { limit, initPos, false };
 	zones.push_back(zoneBug3);
 
-	limit = { 26.0f * map->getTileSize(), 37.0f * map->getTileSize(), 36, 36 };
+	limit = { 26.0f * tileSize, 37.0f * tileSize, 36.f * tileSize, 36.f * tileSize };
 	initPos = glm::ivec2(26.0f, 36.0f);
 	ZoneEnemy zoneBug4 = { limit, initPos, false };
 	zones.push_back(zoneBug4);
 
-	limit = { 14.0f * map->getTileSize(), 24.0f * map->getTileSize(), 30, 32 };
+	limit = { 14.0f * tileSize, 24.0f * tileSize, 30.f * tileSize, 32.f * tileSize };
 	initPos = glm::ivec2(14.0f, 30.0f);
 	ZoneEnemy zoneBug5 = { limit, initPos, false };
 	zones.push_back(zoneBug5);
@@ -148,10 +155,10 @@ void ScenePlayLevel::initZoneEnemyBug()
 	for (const auto& zone : zones) {
 		EnemyBug* enemy = new EnemyBug();
 		enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone);
-		enemy->setPosition(glm::ivec2(zone.initPos.x * map->getTileSize(), zone.initPos.y * map->getTileSize()));
+		enemy->setPosition(glm::ivec2(zone.initPos.x * tileSize, zone.initPos.y * tileSize));
 		enemy->setTileMap(map);
-		allEnemies.push_back(enemy);
-
+		int floorIndex = calcFloorIndex(zone.limit.max_y/tileSize);
+		allEnemies[floorIndex].push_back(enemy);
 	}
 }
 
@@ -160,7 +167,10 @@ bool ScenePlayLevel::checkIfInsideBossRoom() {
 	glm::ivec2 posP = player->getPosition();
 	if (bossRoom.left <= posP.x && posP.x < bossRoom.right && bossRoom.top < posP.y && posP.y < bossRoom.bottom) {
 		inside = true;
-		boss.setEntityState(Alive);
+		if (!boss.getActive())
+		{
+			boss.appear();
+		}
 		shoots.clear();
 		for (const auto& shoot : boss.getShoots())
 		{
@@ -176,42 +186,62 @@ bool ScenePlayLevel::checkIfInsideBossRoom() {
 
 void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 	boss.update(deltaTime);
-	for (auto shoot : boss.getShoots())
-	{
-		shoot->update(deltaTime);
-		//add if !godMode
-		if (shoot->getEntityState() == Alive) {
-			if (CollisionManager::instance().checkCollisionObject(player, shoot)) {
-				shoot->setEntityState(Dying);
-			}
+	if (boss.getEntityState() != Dead) {
+		if (player->getEntityState() == Alive && CollisionManager::instance().checkCollisionObject(player, &boss)) 
+		{
+			boss.Damaged();
+			Game::instance().onPlayerKilledEnemy();
 		}
-
-		if (shoot->getEntityState() == Alive) {
-			glm::ivec2 posShoot = shoot->getPosition();
-			if (CollisionManager::instance().checkCollisionVertical(shoot) != None || CollisionManager::instance().checkCollisionHorizontal(shoot) != None)
-				shoot->setEntityState(Dying);
-		}
-
-		if (shoot->getEntityState() == Alive) {
-			for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
-			{
-				VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(shoot, itBlock->second);
-				if (CollisionManager::instance().checkCollisionBlockVertical(shoot, itBlock->second) != NoVcol || CollisionManager::instance().checkCollisionBlockHorizontal(shoot, itBlock->second) != NoHcol)
-				{
+		for (auto shoot : boss.getShoots())
+		{
+			shoot->update(deltaTime);
+			if (shoot->getEntityState() == Alive && !Game::instance().isOnGodMode()) {
+				if (CollisionManager::instance().checkCollisionObject(player, shoot)) {
+					Game::instance().onPlayerKilled();
 					shoot->setEntityState(Dying);
-					break;
 				}
 			}
+
+			if (shoot->getEntityState() == Alive) {
+				glm::ivec2 posShoot = shoot->getPosition();
+				if (CollisionManager::instance().checkCollisionVertical(shoot) != None || CollisionManager::instance().checkCollisionHorizontal(shoot) != None)
+					shoot->setEntityState(Dying);
+			}
+
+			if (shoot->getEntityState() == Alive) {
+				for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
+				{
+					VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(shoot, itBlock->second);
+					if (CollisionManager::instance().checkCollisionBlockVertical(shoot, itBlock->second) != NoVcol || CollisionManager::instance().checkCollisionBlockHorizontal(shoot, itBlock->second) != NoHcol)
+					{
+						shoot->setEntityState(Dying);
+						break;
+					}
+				}
+			}
+		}
+	}
+	else {
+		blockGem->update(deltaTime);
+		if (player->getEntityState() == Alive && CollisionManager::instance().checkCollisionObject(player, blockGem))
+		{
+			Game::instance().onLevelWon();
 		}
 	}
 }
 
 void ScenePlayLevel::renderBoss() {
-	boss.render();
-	//cout << "player: " << player->getPosition().x << " " << player->getPosition().y << "\n";
-	for (auto shoot : shoots)
+	if (boss.getEntityState() != Dead) {
+		boss.render();
+		//cout << "player: " << player->getPosition().x << " " << player->getPosition().y << "\n";
+		for (auto shoot : shoots)
+		{
+			if (shoot->getEntityState() != Dead)
+				shoot->render();
+		}
+	}
+	else
 	{
-		if (shoot->getEntityState() != Dead)
-			shoot->render();
+		blockGem->render();
 	}
 }

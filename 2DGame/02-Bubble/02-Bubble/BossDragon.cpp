@@ -131,7 +131,7 @@ void BossDragon::setHeadAnimations(ShaderProgram& shaderProgram)
 
 void BossDragon::update(int deltaTime)
 {
-	if (entityState == Dead) return;
+	if (!active || entityState == Dead) return;
 
 	else if (entityState == Dying) {
 		elapsedTime += deltaTime;
@@ -141,7 +141,7 @@ void BossDragon::update(int deltaTime)
 			entityState = Dead;
 		}
 	}
-	else if (entityState == Alive) {
+	else if (active && entityState == Alive) {
 		glm::vec2 aux = sprite->updateDiffSize(deltaTime);
 		if (aux != glm::vec2(0.f))
 			sizeObjHead = aux;
@@ -206,7 +206,7 @@ void BossDragon::update(int deltaTime)
 }
 void BossDragon::render()
 {
-	if (entityState == Dead) return;
+	if (!active || entityState == Dead) return;
 	bodySprite->render();
 	sprite->render();
 }
@@ -249,8 +249,6 @@ void BossDragon::setHeadSpritePos()
 	posHead = posBody + diffPos;
 	position = posHead;
 	positionStartShoot = posHead + positionStartShoot;
-	if (BOSS_RIGHT_DOWN)
-		position.x = 17;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posHead.x), float(tileMapDispl.y + posHead.y)));
 }
 

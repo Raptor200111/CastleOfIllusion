@@ -33,9 +33,11 @@ public:
 	void collideVertical() override {}
 	void collisionBlockHorizontal(Block* b) override {}
 
-	vector<BossShoot*> getShoots() { return shoots; }
+	void resetDragon() { active = false; entityState = Alive; actualLives = MAX_LIVES_BOSS; shoots = vector<BossShoot*>();}
+	bool getActive() { return active; }
+	void appear() { active = true; entityState = Alive; }
 
-	void setActive() { active = true; }
+	vector<BossShoot*> getShoots() { return shoots; }
 
 private:
 	void setHeadSpritePos();
@@ -73,7 +75,7 @@ private:
 	vector<vector<float>> angleShoots;
 	int indexAngleShoot, indexQuadrantShoot = 0;
 	int MaxShoots = 3;
-	int actualLives = 5;
+	int actualLives = MAX_LIVES_BOSS;
 
 	BossDragonStates bossDragonState = BossDragonStates::BOSS_LEFT;
 	BossBodyStates bossBodyState = BossBodyStates::BOSS_BODY_IDLE;

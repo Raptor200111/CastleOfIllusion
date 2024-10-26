@@ -24,8 +24,8 @@ ScenePlay::ScenePlay()
     screenEnemies = std::map<string, Enemy*>();
     screenBlocks = std::map<string, Block*>();
     playrunMovBlocks = std::map<string, Block*>();
-	playrunEnemies = std::vector<Enemy*>();
-	playrunBlocks = std::vector<Block*>();
+	playrunEnemies = std::vector<vector<Enemy*>>();
+	playrunBlocks = std::vector<vector<Block*>>();
 	allEnemies = playrunEnemies;
 	allBlocks = playrunBlocks;
 }
@@ -44,24 +44,35 @@ ScenePlay::~ScenePlay()
 		delete bgQuad;
 
 	//quitar
-	for (auto block : allBlocks) {
-		delete block;
+	for (auto& row : allBlocks) {
+		for (Block* block : row) {
+			delete block; // Delete each Block* pointer
+		}
 	}
-	playrunBlocks.clear();
+
+	// Clear the containers to remove all references
 	screenBlocks.clear();
 	playrunMovBlocks.clear();
-	for (auto e : allEnemies)
-		delete e;
-	playrunEnemies.clear();
+	playrunBlocks.clear();
+	allBlocks.clear();
+	for (auto& row : allEnemies) {
+		for (Enemy* enemy : row) {
+			delete enemy; // Delete each Block* pointer
+		}
+	}
 	screenEnemies.clear();
+	playrunEnemies.clear();
+	allEnemies.clear();
 }
 
 void ScenePlay::init() {
 	initShaders();
 }
 
-void ScenePlay::initBlocks()
+vector<vector<Block*>> ScenePlay::initBlocks()
 {
+	
+	vector<vector<Block*>> blocks(4);
 	for (auto block : map->getBlocksPos()) {
 		Block* b;
 		switch (block.type) {
@@ -81,8 +92,11 @@ void ScenePlay::initBlocks()
 		b->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 		b->setPosition(glm::ivec2(block.pos.x * map->getTileSize(), block.pos.y * map->getTileSize()));
 		b->setTileMap(map);
-		allBlocks.push_back(b);
+		int floorIndex = calcFloorIndex(block.pos.y);
+		blocks[floorIndex].push_back(b);
 	}
+	cout << blocks[0].size() << "\n";
+	return blocks;
 }
 
 void ScenePlay::reStart()
@@ -97,27 +111,23 @@ void ScenePlay::reStart()
 
 void ScenePlay::update(int deltaTime) {
 	//update screenBlocks and screenEnemies
-	insideScreenObj();
+	int floorIndex = calcFloorIndex(player->getPosition().y/map->getTileSize());
+	insideScreenObj(floorIndex);
 
 
-	CollisionManager::instance().update(screenBlocks, playrunMovBlocks, playrunBlocks);
+	CollisionManager::instance().update(screenBlocks, playrunMovBlocks, playrunBlocks[floorIndex]);
 	player->update(deltaTime);
 	updateCamera();
 	screenBlocks = CollisionManager::instance().getScreenBlocks();
 	playrunMovBlocks = CollisionManager::instance().getMovBlocks();
-	playrunBlocks = CollisionManager::instance().getPlayrunBlocks();
+	playrunBlocks[floorIndex] = CollisionManager::instance().getPlayrunBlocks();
 
 
 	if (insideBossRoom) {
 		updateCollisionsWithBoss(deltaTime);
 	}
 	else {
-		//update enemies
-		for (auto screenEnemy : screenEnemies) {
-			//enemy is alive, dying or deadTree waiting to regenerate
-			screenEnemy.second->update(deltaTime);
-		}
-		collisionsEnemies();
+		collisionsEnemies(deltaTime);
 	}
 
 	collisionsMovingBlocks();
@@ -202,14 +212,14 @@ void ScenePlay::updateCamera()
 
 }
 
-void ScenePlay::insideScreenObj()
+void ScenePlay::insideScreenObj(int floorIndex)
 {
 	int tileSize = map->getTileSize();
 	glm::ivec2 posP = player->getPosition();
 	int tilesize = map->getTileSize();
 	insideBossRoom = checkIfInsideBossRoom();
 	if(!insideBossRoom) {
-		for (auto& playrunEnemy : playrunEnemies)
+		for (auto& playrunEnemy : playrunEnemies[floorIndex])
 		{
 			glm::ivec2 posEnemyId = playrunEnemy->getInitPos();
 			glm::ivec2 posEnemy = playrunEnemy->getPosition();
@@ -271,7 +281,8 @@ void ScenePlay::insideScreenObj()
 			}
 		}
 	}
-	for (auto& playrunBlock : playrunBlocks)
+	
+	for (auto& playrunBlock : playrunBlocks[floorIndex])
 	{
 		glm::ivec2 posBlock = playrunBlock->getPosition();
 		string idBlock = std::to_string(posBlock.x) + " " + std::to_string(posBlock.y);
@@ -294,6 +305,18 @@ void ScenePlay::insideScreenObj()
 
 }
 
+int ScenePlay::calcFloorIndex(int posY)
+{
+	if (posY <= MAX_HEIGHT_F0)
+		return 0;
+	else if (posY <= MAX_HEIGHT_F1)
+		return 1;
+	else if (posY <= MAX_HEIGHT_F2)
+		return 2;
+	else
+		return 3;
+}
+
 bool ScenePlay::insideScreen(const glm::ivec2& pos)
 {
 
@@ -304,13 +327,16 @@ bool ScenePlay::insideScreen(const glm::ivec2& pos)
 }
 
 
-void ScenePlay::collisionsEnemies()
+void ScenePlay::collisionsEnemies(int deltaTime)
 {
 	for (auto& itEnemy = screenEnemies.begin(); itEnemy != screenEnemies.end(); ++itEnemy)
 	{
-		if (itEnemy->second->getEntityState() == Alive && player->getEntityState() == Alive && CollisionManager::instance().checkCollisionObject(player, itEnemy->second)) {
+		itEnemy->second->update(deltaTime);
+		if (itEnemy->second->getEntityState() == Alive && player->getEntityState() == Alive 
+			&& !Game::instance().isOnGodMode() && CollisionManager::instance().checkCollisionObject(player, itEnemy->second)) {
 			//if (Player::instance().killEnemy()) {
 			itEnemy->second->setEntityState(Dying);
+			Game::instance().onPlayerKilledEnemy();
 			//} else
 			//game onPlayerKilled
 			//player to dying
@@ -427,7 +453,8 @@ void ScenePlay::collisionsMovingBlocks()
 				}
 			}
 			else if (blockType == NonDestroyable) {
-				playrunBlocks.push_back(itMovBlock->second);
+				int movBlockFloorIndex = calcFloorIndex(itMovBlock->second->getPosition().y/map->getTileSize());
+				playrunBlocks[movBlockFloorIndex].push_back(itMovBlock->second);
 			}
 		}
 	}

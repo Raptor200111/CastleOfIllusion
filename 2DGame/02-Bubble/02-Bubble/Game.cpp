@@ -10,13 +10,20 @@ void Game::init()
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	SoundManager::instance().init();
 	sceneMenu.init();
-	scenePlayLevel.init();
 	scenePlayPractice.init();
+	scenePlayLevel.init();
 	currentScene = &sceneMenu;
 }
 
 bool Game::update(int deltaTime)
 {
+	if (keys[GLFW_KEY_G])
+	{
+		godMode = !godMode;
+	}
+	if (keys[GLFW_KEY_H]) {
+		onHeal();
+	}
 	currentScene->update(deltaTime);
 	return bPlay;
 }
