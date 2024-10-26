@@ -3,7 +3,6 @@
 
 void Block::update(int deltaTime)
 {
-	
 	switch (state)
 	{
 	case STILL:
@@ -54,8 +53,8 @@ void Block::collisionHorizontal(CollisionType horizontalCollision)
 
 void Block::throwBlock(glm::vec2 speed)
 {
-	state = FALLING;
 	this->speed = speed;
+	state = FALLING;
 }
 
 void Block::grabbed()

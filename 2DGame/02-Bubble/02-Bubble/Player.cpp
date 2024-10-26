@@ -230,6 +230,10 @@ void Player::update(int deltaTime)
 			auto keyframe = sprite->getCurrentKeyframe();
 			if (keyframe.x == keyframe.y-1)
 				newState = B_IDLE;
+			if (keyframe.x > 0)
+			{
+				pickedUpBlock->setPosition(pickedUpBlock->getPosition() + glm::ivec2(0, 12));
+			}
 			break;
 		}
 		case B_IDLE:
@@ -296,13 +300,16 @@ void Player::update(int deltaTime)
 	if (pickedUpBlock != nullptr)
 	{
 		pickedUpBlock->update(deltaTime);//hacemos el update (hay que cambiarle la posicion)
-		if (left)
+		if (oldState != B_PICK)
 		{
-			pickedUpBlock->setPosition(glm::ivec2(position.x, position.y + 10 - pickedUpBlock->getSize().y));
-		}
-		else
-		{
-			pickedUpBlock->setPosition(glm::ivec2(position.x + this->getSize().x - pickedUpBlock->getSize().x, position.y + 10 - pickedUpBlock->getSize().y));
+			if (left)
+			{
+				pickedUpBlock->setPosition(glm::ivec2(position.x, position.y + 10 - pickedUpBlock->getSize().y));
+			}
+			else
+			{
+				pickedUpBlock->setPosition(glm::ivec2(position.x + this->getSize().x - pickedUpBlock->getSize().x, position.y + 10 - pickedUpBlock->getSize().y));
+			}
 		}
 	}
 }
@@ -317,19 +324,17 @@ void Player::render()
 
 void Player::pickUpBlock()
 {
-	newState = B_PICK;
+	CollisionManager::instance().disAttachBlock(readyToPickBlock);
 	pickedUpBlock = readyToPickBlock;
 	readyToPickBlock = nullptr;
 	pickedUpBlock->grabbed();
-	//collider desconectar block
-	CollisionManager::instance().disAttachBlock(pickedUpBlock);
-	pickedUpBlock->setPosition(glm::ivec2(position.x, position.y - 30));
+	newState = B_PICK;
 }
 
 void Player::throwBlock()
 {
 	//collider atach block
-	glm::vec2 dir = glm::vec2(0, 0);
+	glm::vec2 dir = glm::vec2(4, -4);
 	if (left)
 		dir.x *= -1;
 	pickedUpBlock->throwBlock(dir);

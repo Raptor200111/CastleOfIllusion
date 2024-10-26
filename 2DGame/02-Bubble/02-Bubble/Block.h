@@ -30,8 +30,8 @@ public:
 	void explode();
 
 private:
-	BlockState state;// = BlockState::STILL;
-	glm::vec2 speed;// = glm::vec2(0, 0);
+	BlockState state = BlockState::STILL;
+	glm::vec2 speed = glm::vec2(0, 0);
 	
 protected:
 	BlockType blockType;
