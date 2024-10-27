@@ -13,6 +13,7 @@ void EnemyBug::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgra
 	this->initParams = initParams;
 	enemyType = Bug;
 	attackSpeed = WALK_SPEED;
+	timeDyingAnim = 800;
 	spritesheet.loadFromFile("images/bug1.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sizeObject = glm::ivec2(24.f, 32.f);
 	sprite = Sprite::createSprite(sizeObject, glm::vec2(0.25f, 0.5f), &spritesheet, &shaderProgram);
@@ -134,4 +135,13 @@ void EnemyBug::collideHorizontal()
 void EnemyBug::Damaged()
 {
 	entityState = Dying;
+}
+
+void EnemyBug::reLive()
+{
+	entityState = Alive;
+	left = initParams.left;
+	position = initParams.initPos * map->getTileSize();
+	sprite->setLeft(left);
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }
