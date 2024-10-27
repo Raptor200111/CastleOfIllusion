@@ -1,33 +1,32 @@
 #pragma once
-
 #include "Enemy.h"
 
-enum EnemyBugStates
+enum EnemyBeeStates
 {
-	BUG_WALK_RIGHT, BUG_ROLL_RIGHT, BUG_DIE
-};
+	BEE_FLY_RIGHT, BEE_DIE
+}; 
 
-class EnemyBug : public Enemy
+class EnemyBee : public Enemy
 {
 public:
-	EnemyBug() { }
-	~EnemyBug() override {}
-	//void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) override {}
+	EnemyBee() { }
+	~EnemyBee() override {}
 	void update(int deltaTime) override;
 	void initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, const ZoneEnemy& initParams) override;
 	void render() override;
 	void Damaged() override;
 	void collideVertical() override;
-	void collideHorizontal() override;
+	void collideHorizontal() override {}
 	void collisionBlockHorizontal(Block* b) override;
 
 private:
 
-	int attackDistance = 3*16;//5*mapTileSize
+	int attackDistance = 2 * 16;//5*mapTileSize
 	int attackSpeed;
 	int elapsedTime = 0;
 	int timeDyingAnim = 500; //0,5 s
-
-	EnemyBugStates enemyBugState = EnemyBugStates::BUG_WALK_RIGHT;
+	int moveY = 1;
+	int countY = 2;
+	EnemyBeeStates enemyBeeState = EnemyBeeStates::BEE_FLY_RIGHT;
 };
 

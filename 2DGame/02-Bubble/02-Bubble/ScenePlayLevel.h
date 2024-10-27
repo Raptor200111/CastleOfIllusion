@@ -21,6 +21,7 @@ protected:
 	void renderBoss() override;
 	void initZoneEnemyTree();
 	void initZoneEnemyBug();
+	void initZoneEnemyBee();
 	BossDragon boss;
 	glm::ivec2 initPosBoss;
 	Cam bossRoom;

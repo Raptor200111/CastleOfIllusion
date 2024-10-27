@@ -20,7 +20,7 @@ ScenePlay::ScenePlay()
 {
     map = NULL;
     player = NULL;
-    zoomLevel = 1.5f;
+    zoomLevel = 2.f;
     bgMap = NULL;
     bgQuad = NULL;
     screenEnemies = std::map<string, Enemy*>();
@@ -105,6 +105,13 @@ void ScenePlay::reStart()
 {
 	playrunEnemies = allEnemies;
 	playrunBlocks = allBlocks;
+	for (auto& row : allBlocks)
+	{
+		for (auto& b : row) {
+			glm::ivec2 ogPosB = b->getOgPosition();
+			b->setPosition(ogPosB);
+		}
+	}
 	screenEnemies.clear();
 	screenBlocks.clear();
 	playrunMovBlocks.clear();
@@ -170,12 +177,14 @@ void ScenePlay::render() {
 	else
 	{
 		for (const auto& screenEnemy : screenEnemies) {
-			screenEnemy.second->render();
+			if(insideScreen(screenEnemy.second->getPosition()))
+				screenEnemy.second->render();
 		}
 	}
 	for (const auto& screenBlock : screenBlocks)
 	{
-		screenBlock.second->render();
+		if (insideScreen(screenBlock.second->getPosition()))
+			screenBlock.second->render();
 	}
 
 	for (const auto& movBlock : playrunMovBlocks)
@@ -205,7 +214,7 @@ void ScenePlay::updateCamera()
 
 	// Constrain the camera within the map boundaries
 	float maxCameraX = map->getMapSize().x * map->getTileSize() - zoomScreenWidth;
-	float maxCameraY = map->getMapSize().y * map->getTileSize() - zoomScreenHeight + 50;
+	float maxCameraY = map->getMapSize().y * map->getTileSize() - zoomScreenHeight + 77;
 
 	if (cameraPosition.x < 0) cameraPosition.x = 0;
 	if (cameraPosition.y < 0) cameraPosition.y = 0;
@@ -226,93 +235,39 @@ void ScenePlay::insideScreenObj(int floorIndex)
 {
 	int tileSize = map->getTileSize();
 	glm::ivec2 posP = player->getPosition();
-	int tilesize = map->getTileSize();
 	insideBossRoom = checkIfInsideBossRoom();
 	if(!insideBossRoom) {
-		for (auto& playrunEnemy : playrunEnemies[floorIndex])
-		{
-			glm::ivec2 posEnemyId = playrunEnemy->getInitPos();
-			glm::ivec2 posEnemy = playrunEnemy->getPosition();
-			glm::ivec2 posEnemyToCompare = glm::ivec2(posEnemyId.x * tileSize, posEnemyId.y * tileSize);
-			string idEnemy = std::to_string(posEnemyId.x) + " " + std::to_string(posEnemyId.y);
-			EntityState enemyState = playrunEnemy->getEntityState();
-			if (enemyState == Dying) {
-				if (insideScreen(posEnemyToCompare)) {
-					if (screenEnemies.find(idEnemy) == screenEnemies.end())
-					{
-						screenEnemies.insert(std::pair<string, Enemy*>(idEnemy, playrunEnemy));
-					}
-				}
-				else {
-					playrunEnemy->setEntityState(Alive);
-					auto it = screenEnemies.find(idEnemy);
-					if (it != screenEnemies.end()) {
-						it->second = NULL;
-						screenEnemies.erase(it);
-					}
-				}
-			}
-			//only trees can be dead aka waiting to regenerate
-			else if (enemyState == Dead)
+		if (!screenEnemies.empty()) {
+			int enemyPosY = screenEnemies.begin()->second->getPosition().y;
+			if (calcFloorIndex(enemyPosY) != floorIndex)
 			{
-				EnemyTree* enemyTree = dynamic_cast<EnemyTree*>(playrunEnemy);
-				if (enemyTree && insideScreen(posEnemyToCompare)) {
-					if (screenEnemies.find(idEnemy) == screenEnemies.end())
-					{
-						screenEnemies.insert(std::pair<string, Enemy*>(idEnemy, playrunEnemy));
-					}
-				}
-				else if (!insideScreen(posEnemyToCompare)) {
-					playrunEnemy->setEntityState(Alive);
-					auto it = screenEnemies.find(idEnemy);
-					if (it != screenEnemies.end()) {
-						it->second = NULL;
-						screenEnemies.erase(it);
-					}
-				}
-
+				screenEnemies.clear();
 			}
-			else {
-				if (insideScreen(posEnemyToCompare))
-				{
-					if (screenEnemies.find(idEnemy) == screenEnemies.end())
-					{
-						screenEnemies.insert(std::pair<string, Enemy*>(idEnemy, playrunEnemy));
-					}
-				}
-				else
-				{
-					auto it = screenEnemies.find(idEnemy);
-					if (it != screenEnemies.end()) {
-						it->second = NULL;
-						screenEnemies.erase(it);
-					}
-				}
-			}
+		}
+		if(screenEnemies.empty()){
+			for (auto& playrunEnemy : playrunEnemies[floorIndex])
+			{
+				glm::ivec2 posEnemyId = playrunEnemy->getInitPos();
+				string idEnemy = std::to_string(posEnemyId.x) + " " + std::to_string(posEnemyId.y);
+				screenEnemies.insert(std::pair<string, Enemy*>(idEnemy, playrunEnemy));
+			}			
 		}
 	}
-	
-	for (auto& playrunBlock : playrunBlocks[floorIndex])
-	{
-		glm::ivec2 posBlock = playrunBlock->getPosition();
-		string idBlock = std::to_string(posBlock.x) + " " + std::to_string(posBlock.y);
-		if (insideScreen(posBlock))
+	if (!screenBlocks.empty()) {
+		int blocksPosY = screenBlocks.begin()->second->getPosition().y;
+		if (calcFloorIndex(blocksPosY) != floorIndex)
 		{
-			if (screenBlocks.find(idBlock) == screenBlocks.end())
-			{
-				screenBlocks.insert(std::pair<string, Block*>(idBlock, playrunBlock));
-			}
-		}
-		else
-		{
-			auto it = screenBlocks.find(idBlock);
-			if (it != screenBlocks.end()) {
-				it->second = NULL;
-				screenBlocks.erase(it);
-			}
+			screenBlocks.clear();
 		}
 	}
-
+	if (screenBlocks.empty()) {
+		for (auto& playrunBlock : playrunBlocks[floorIndex])
+		{
+			glm::ivec2 posBlock = playrunBlock->getPosition();
+			string idBlock = std::to_string(posBlock.x) + " " + std::to_string(posBlock.y);
+			screenBlocks.insert(std::pair<string, Block*>(idBlock, playrunBlock));
+		}
+	}
 }
 
 int ScenePlay::calcFloorIndex(int posY)
@@ -343,6 +298,7 @@ void ScenePlay::collisionsEnemies(int deltaTime)
 	{
 		bool reStarted = false;
 		itEnemy->second->update(deltaTime);
+		EnemyType enemyType = itEnemy->second->getEnemyType();
 		if (itEnemy->second->getEntityState() == Alive && player->getEntityState() == Alive 
 			&& !Game::instance().isOnGodMode() && CollisionManager::instance().checkCollisionObject(player, itEnemy->second)) {
 			if (player->isAttacking()) {
@@ -360,36 +316,42 @@ void ScenePlay::collisionsEnemies(int deltaTime)
 			}
 		}
 		if (!reStarted) {
-			if (itEnemy->second->getEntityState() == Alive) {
-				int countBlockCollisions = 0;
-				for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
+			if (enemyType != Bee) {
+				if (itEnemy->second->getEntityState() == Alive && CollisionManager::instance().checkCollisionVertical(itEnemy->second) == Tile)
 				{
-					bool collided = false;
-					VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(itEnemy->second, itBlock->second);
-					if (vBlockCollision != NoVcol)
+					itEnemy->second->collideVertical();
+				}
+
+				if (itEnemy->second->getEntityState() == Alive) {
+					int countBlockCollisions = 0;
+					for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
 					{
-						itEnemy->second->collideVertical();
-						collided = true;
-						countBlockCollisions += 1;
-					}
-					else if (!collided)
-					{
+						bool collided = false;
 						HColType hBlockCollision = CollisionManager::instance().checkCollisionBlockHorizontal(itEnemy->second, itBlock->second);
 						if (hBlockCollision != NoHcol) {
 							itEnemy->second->collisionBlockHorizontal(itBlock->second);
+							collided = true;
 							countBlockCollisions += 1;
 						}
-					}
-					if (countBlockCollisions >= 2) {
-						break;
+						else if (!collided)
+						{
+							VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(itEnemy->second, itBlock->second);
+							if (vBlockCollision != NoVcol)
+							{
+								itEnemy->second->collideVertical();
+								countBlockCollisions += 1;
+							}
+						}
+						if (countBlockCollisions >= 2) {
+							break;
+						}
 					}
 				}
+				
+				if (itEnemy->second->getEntityState() == Alive && CollisionManager::instance().checkCollisionHorizontal(itEnemy->second) == Tile)
+				{					itEnemy->second->collideHorizontal();
+				}
 			}
-			if (itEnemy->second->getEntityState() == Alive && CollisionManager::instance().checkCollisionVertical(itEnemy->second) == Tile)
-			{
-				itEnemy->second->collideVertical();
-			}
-
 			++itEnemy;
 		}
 	}
@@ -493,14 +455,14 @@ void ScenePlay::initShaders()
 	vShader.initFromFile(VERTEX_SHADER, "shaders/texture.vert");
 	if (!vShader.isCompiled())
 	{
-		cout << "Vertex Shader Error" << endl;
-		cout << "" << vShader.log() << endl << endl;
+		std::cout << "Vertex Shader Error" << endl;
+		std::cout << "" << vShader.log() << endl << endl;
 	}
 	fShader.initFromFile(FRAGMENT_SHADER, "shaders/texture.frag");
 	if (!fShader.isCompiled())
 	{
-		cout << "Fragment Shader Error" << endl;
-		cout << "" << fShader.log() << endl << endl;
+		std::cout << "Fragment Shader Error" << endl;
+		std::cout << "" << fShader.log() << endl << endl;
 	}
 	texProgram.init();
 	texProgram.addShader(vShader);
@@ -508,8 +470,8 @@ void ScenePlay::initShaders()
 	texProgram.link();
 	if (!texProgram.isLinked())
 	{
-		cout << "Shader Linking Error" << endl;
-		cout << "" << texProgram.log() << endl << endl;
+		std::cout << "Shader Linking Error" << endl;
+		std::cout << "" << texProgram.log() << endl << endl;
 	}
 	texProgram.bindFragmentOutput("outColor");
 	vShader.free();

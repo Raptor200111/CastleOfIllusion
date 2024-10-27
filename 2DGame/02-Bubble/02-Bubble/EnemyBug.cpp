@@ -11,6 +11,7 @@ void EnemyBug::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgra
 	tileMapDispl = tileMapPos;
 	this->left = initParams.left;
 	this->initParams = initParams;
+	enemyType = Bug;
 	attackSpeed = WALK_SPEED;
 	spritesheet.loadFromFile("images/bug1.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sizeObject = glm::ivec2(24.f, 32.f);
@@ -113,6 +114,15 @@ void EnemyBug::collideVertical()
 }
 
 void EnemyBug::collisionBlockHorizontal(Block* b)
+{
+	left = !left;
+	moveHorizontal(left, WALK_SPEED);
+	sprite->setLeft(left);
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
+
+}
+
+void EnemyBug::collideHorizontal()
 {
 	left = !left;
 	moveHorizontal(left, WALK_SPEED);

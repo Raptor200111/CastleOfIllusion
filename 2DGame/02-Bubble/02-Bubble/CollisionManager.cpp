@@ -45,8 +45,8 @@ bool CollisionManager::checkCollisionObject(Entity* objectA, Entity* objectB)
 	glm::ivec2 pos2 = objectB->getPosition();
 	glm::ivec2 size2 = pos2 + objectB->getSize();
 
-	if (size1.x < pos2.x || size2.x < pos1.x) return false;
-	if (size1.y < pos2.y || size2.y < pos1.y) return false;
+	if (size1.x <= pos2.x || size2.x <= pos1.x) return false;
+	if (size1.y <= pos2.y || size2.y <= pos1.y) return false;
 	return true;
 }
 

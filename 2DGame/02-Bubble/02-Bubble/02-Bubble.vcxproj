@@ -22,6 +22,7 @@
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="Defs.h" />
     <ClInclude Include="Enemy.h" />
+    <ClInclude Include="EnemyBee.h" />
     <ClInclude Include="EnemyBug.h" />
     <ClInclude Include="EnemyTree.h" />
     <ClInclude Include="Entity.h" />
@@ -56,6 +57,7 @@
     <ClCompile Include="BossShoot.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="EnemyBee.cpp" />
     <ClCompile Include="EnemyBug.cpp" />
     <ClCompile Include="EnemyTree.cpp" />
     <ClCompile Include="Entity.cpp" />

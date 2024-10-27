@@ -30,6 +30,7 @@ public:
 
 	void Damaged() override;
 	void collideVertical() override {}
+	void collideHorizontal() override {}
 	void collisionBlockHorizontal(Block* b) override {}
 
 	void resetDragon();

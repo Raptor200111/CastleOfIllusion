@@ -17,12 +17,15 @@ public:
     virtual void render() = 0;
     virtual void Damaged() = 0;
     virtual void collideVertical() = 0;
+    virtual void collideHorizontal() = 0;
     virtual void collisionBlockHorizontal(Block* b) = 0;
     void moveHorizontal(bool left, int walk_speed);
 
     glm::ivec2 getInitPos() { return initParams.initPos; }
+    EnemyType getEnemyType() { return enemyType; }
 
 protected:
     float velocity;
     ZoneEnemy initParams;
+    EnemyType enemyType;
 };
