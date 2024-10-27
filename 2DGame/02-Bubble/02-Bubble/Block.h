@@ -39,5 +39,7 @@ protected:
 	BlockType blockType;
 	BlockStatus blockStatus;
 	glm::ivec2 ogPosition;
+	int elapsedTime = 0;
+	int timeDyingAnim = 0;
 };
 

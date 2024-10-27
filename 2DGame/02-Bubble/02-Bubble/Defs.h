@@ -50,7 +50,8 @@ enum CollisionType
 	None,
 	Tile,
 	Stairs,
-	TileStairs
+	TileStairs,
+	Hole
 };
 
 enum VColType

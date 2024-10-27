@@ -3,20 +3,29 @@
 
 void Block::update(int deltaTime)
 {
-	switch (state)
-	{
-	case STILL:
-		break;
-	case GRABBED:
-		break;
-	case FALLING:
-		speed.y += 0.5;
-		position += speed;
-		break;
-	default:
-		break;
+	if (entityState == Dying) {
+		elapsedTime += deltaTime;
+		if (elapsedTime >= timeDyingAnim)
+		{
+			elapsedTime = 0;
+			entityState = Dead;
+		}
 	}
-	
+	else if (entityState == Alive) {
+		switch (state)
+		{
+		case STILL:
+			break;
+		case GRABBED:
+			break;
+		case FALLING:
+			speed.y += 0.5;
+			position += speed;
+			break;
+		default:
+			break;
+		}
+	}
 	setPosition(position);
 	sprite->update(deltaTime);
 	if (sprite->animation() != blockStatus) {

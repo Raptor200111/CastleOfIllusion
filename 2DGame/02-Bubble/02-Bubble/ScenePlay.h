@@ -8,6 +8,7 @@
 #include "BlockGem.h"
 #include <vector>
 #include "GameUI.h"
+#include "Quad.h"
 #include <map>
 
 #define SCREEN_X 32
@@ -38,11 +39,11 @@ protected:
     void collisionsMovingBlocks(int deltaTime);
 
     virtual void reStartLevelSpecific() = 0;
-
     virtual void updateCollisionsWithBoss(int deltaTime) = 0;
     virtual bool checkIfInsideBossRoom() = 0;
     virtual void collisionMovBlockInsideBossRoom(Block* movBlock) = 0;
 
+    virtual void renderQuadBg() = 0;
     virtual void renderBoss() = 0;
 
     vector<vector<Enemy*>> playrunEnemies;
@@ -60,7 +61,7 @@ protected:
 
     float currentTime;
     glm::mat4 projection;
-    ShaderProgram texProgram;
+    ShaderProgram texProgram, simpleProgram;
     float zoomLevel;
     glm::vec2 cameraPosition;
     Cam cam;
@@ -68,6 +69,8 @@ protected:
     // Background
     Sprite* bgQuad;
     Texture bgTexture;
+    Quad* quad;
+    bool winAnimScenePlay = false;
     TileMap* bgMap;
 
     BlockGem* blockGem;

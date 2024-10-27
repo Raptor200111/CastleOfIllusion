@@ -4,6 +4,7 @@ void BlockGem::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
 	blockType = Gem;
 	sizeObject = glm::ivec2(16, 16);
+	timeDyingAnim = 2000;
 	spritesheet.loadFromFile("images/specialItems.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(sizeObject, glm::vec2(1 / 4.f, 0.5), &spritesheet, &shaderProgram);
 

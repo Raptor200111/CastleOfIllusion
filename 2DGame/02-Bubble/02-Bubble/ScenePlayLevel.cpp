@@ -50,9 +50,10 @@ void ScenePlayLevel::init()
 	//background
 	bgMap = TileMap::createTileMap("levels/bgTileMap.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 
-	bgTexture.loadFromFile("images/portada.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	glm::vec2 bgSize = map->getMapSize() * tileSize;
+	bgTexture.loadFromFile("images/sky.jpg", TEXTURE_PIXEL_FORMAT_RGBA);
+	glm::vec2 bgSize = glm::vec2((mapSize.x + 4)* tileSize, (mapSize.y + 4) * tileSize);
 	bgQuad = Sprite::createSprite(bgSize, glm::vec2(1.f, 1.f), &bgTexture, &texProgram);
+	quad = Quad::createQuad(0.f, 0.f, bgSize.x, bgSize.y, simpleProgram);
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH), float(SCREEN_HEIGHT), 0.f);
 	currentTime = 0.0f;
@@ -268,10 +269,11 @@ void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 		}
 	}
 	else {
-		blockGem->update(deltaTime);
+		if (blockGem->getEntityState() != Dead)
+			blockGem->update(deltaTime);
 		if (player->getEntityState() == Alive && CollisionManager::instance().checkCollisionObject(player, blockGem))
 		{
-			Game::instance().onLevelWon();
+			blockGem->setEntityState(Dying);
 		}
 	}
 
@@ -303,7 +305,19 @@ void ScenePlayLevel::renderBoss() {
 	}
 	else
 	{
-		blockGem->render();
+		EntityState gemState = blockGem->getEntityState();
+		if (gemState == Alive)
+			blockGem->render();
+		else if (gemState == Dying)
+			winAnimScenePlay = true;
+		else {
+			Game::instance().onLevelWon();
+		}
 	}
 
+}
+
+void ScenePlayLevel::renderQuadBg()
+{
+	float timeFactor = sin(currentTime / 1000.f) * 0.5f + 0.5f;  // Value oscillates between 0.0 and 1.0
 }
