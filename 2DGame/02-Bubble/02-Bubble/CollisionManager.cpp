@@ -171,6 +171,8 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 				if (tileType == 9)
 					stairs = true;
 
+				if (tileType == 10)
+					return Hole;
 				if (j == yDown && tileType != 9)
 				{
 					if (pos.y + size.y > tileSize * j)
