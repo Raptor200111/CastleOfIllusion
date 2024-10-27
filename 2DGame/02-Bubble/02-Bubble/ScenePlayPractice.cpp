@@ -38,8 +38,8 @@ void ScenePlayPractice::init() {
     playrunEnemies = allEnemies;
 
     bgMap = NULL;
-    bgTexture.loadFromFile("images/portada.png", TEXTURE_PIXEL_FORMAT_RGBA);
-    glm::vec2 bgSize = map->getMapSize() * tileSize;
+    bgTexture.loadFromFile("images/sky.jpg", TEXTURE_PIXEL_FORMAT_RGBA);
+    glm::vec2 bgSize = glm::vec2((mapSize.x + 4) * tileSize, (mapSize.y + 4) * tileSize);
     bgQuad = Sprite::createSprite(bgSize, glm::vec2(1.f, 1.f), &bgTexture, &texProgram);
 
     projection = glm::ortho(0.f, float(SCREEN_WIDTH), float(SCREEN_HEIGHT), 0.f);

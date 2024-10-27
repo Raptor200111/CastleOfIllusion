@@ -212,7 +212,7 @@ void ScenePlay::updateCamera()
 
 	// Constrain the camera within the map boundaries
 	float maxCameraX = map->getMapSize().x * map->getTileSize() - zoomScreenWidth;
-	float maxCameraY = map->getMapSize().y * map->getTileSize() - zoomScreenHeight + 77;
+	float maxCameraY = map->getMapSize().y * map->getTileSize() - zoomScreenHeight + 52;
 
 	if (cameraPosition.x < 0) cameraPosition.x = 0;
 	if (cameraPosition.y < 0) cameraPosition.y = 0;
