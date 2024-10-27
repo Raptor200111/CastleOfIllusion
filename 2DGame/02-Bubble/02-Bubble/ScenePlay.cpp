@@ -383,6 +383,7 @@ void ScenePlay::collisionsEnemies(int deltaTime)
 			else {
 				string idEnemy = itEnemy->first;
 				Game::instance().onPlayerKilled();
+				//player->takingDamage();
 				player->setEntityState(Dying);
 				if (screenEnemies.find(idEnemy) == screenEnemies.end()) {
 					reStarted = true;
