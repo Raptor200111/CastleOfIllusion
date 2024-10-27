@@ -20,7 +20,7 @@ ScenePlay::ScenePlay()
 {
     map = NULL;
     player = NULL;
-    zoomLevel = 1.5f;
+    zoomLevel = 2.f;
     bgMap = NULL;
     bgQuad = NULL;
     screenEnemies = std::map<string, Enemy*>();
@@ -105,6 +105,13 @@ void ScenePlay::reStart()
 {
 	playrunEnemies = allEnemies;
 	playrunBlocks = allBlocks;
+	for (auto& row : allBlocks)
+	{
+		for (auto& b : row) {
+			glm::ivec2 ogPosB = b->getOgPosition();
+			b->setPosition(ogPosB);
+		}
+	}
 	screenEnemies.clear();
 	screenBlocks.clear();
 	playrunMovBlocks.clear();
@@ -205,7 +212,7 @@ void ScenePlay::updateCamera()
 
 	// Constrain the camera within the map boundaries
 	float maxCameraX = map->getMapSize().x * map->getTileSize() - zoomScreenWidth;
-	float maxCameraY = map->getMapSize().y * map->getTileSize() - zoomScreenHeight + 50;
+	float maxCameraY = map->getMapSize().y * map->getTileSize() - zoomScreenHeight + 77;
 
 	if (cameraPosition.x < 0) cameraPosition.x = 0;
 	if (cameraPosition.y < 0) cameraPosition.y = 0;
@@ -343,6 +350,7 @@ void ScenePlay::collisionsEnemies(int deltaTime)
 	{
 		bool reStarted = false;
 		itEnemy->second->update(deltaTime);
+		EnemyType enemyType = itEnemy->second->getEnemyType();
 		if (itEnemy->second->getEntityState() == Alive && player->getEntityState() == Alive 
 			&& !Game::instance().isOnGodMode() && CollisionManager::instance().checkCollisionObject(player, itEnemy->second)) {
 			if (player->isAttacking()) {
@@ -360,36 +368,37 @@ void ScenePlay::collisionsEnemies(int deltaTime)
 			}
 		}
 		if (!reStarted) {
-			if (itEnemy->second->getEntityState() == Alive) {
-				int countBlockCollisions = 0;
-				for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
-				{
-					bool collided = false;
-					VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(itEnemy->second, itBlock->second);
-					if (vBlockCollision != NoVcol)
+			if (enemyType != Bee) {
+				if (itEnemy->second->getEntityState() == Alive) {
+					int countBlockCollisions = 0;
+					for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
 					{
-						itEnemy->second->collideVertical();
-						collided = true;
-						countBlockCollisions += 1;
-					}
-					else if (!collided)
-					{
-						HColType hBlockCollision = CollisionManager::instance().checkCollisionBlockHorizontal(itEnemy->second, itBlock->second);
-						if (hBlockCollision != NoHcol) {
-							itEnemy->second->collisionBlockHorizontal(itBlock->second);
+						bool collided = false;
+						VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(itEnemy->second, itBlock->second);
+						if (vBlockCollision != NoVcol)
+						{
+							itEnemy->second->collideVertical();
+							collided = true;
 							countBlockCollisions += 1;
 						}
-					}
-					if (countBlockCollisions >= 2) {
-						break;
+						else if (!collided)
+						{
+							HColType hBlockCollision = CollisionManager::instance().checkCollisionBlockHorizontal(itEnemy->second, itBlock->second);
+							if (hBlockCollision != NoHcol) {
+								itEnemy->second->collisionBlockHorizontal(itBlock->second);
+								countBlockCollisions += 1;
+							}
+						}
+						if (countBlockCollisions >= 2) {
+							break;
+						}
 					}
 				}
+				if (itEnemy->second->getEntityState() == Alive && CollisionManager::instance().checkCollisionVertical(itEnemy->second) == Tile)
+				{
+					itEnemy->second->collideVertical();
+				}
 			}
-			if (itEnemy->second->getEntityState() == Alive && CollisionManager::instance().checkCollisionVertical(itEnemy->second) == Tile)
-			{
-				itEnemy->second->collideVertical();
-			}
-
 			++itEnemy;
 		}
 	}

@@ -12,6 +12,7 @@ void EnemyTree::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgr
 	this->left = initParams.left;
 	this->initParams = initParams;
 	enemyTreeState = WALK_RIGHT;
+	enemyType = Tree;
 	glm::vec2 sizeSpriteSheet = glm::vec2(1.f);
 	glm::vec2 totalSizeSpriteSheet = glm::vec2(98.f, 32.f);
 
@@ -34,7 +35,7 @@ void EnemyTree::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgr
 	sprite->addKeyframeDiffSize(WALK_RIGHT, glm::vec2(48.f/ totalSizeSpriteSheet.x, 0.f), sizeObject, sizeSpriteSheet);
 
 	sprite->setAnimationSpeed(DIE_RIGHT, 8);
-	sprite->addKeyframeDiffSize(DIE_RIGHT, glm::vec2(totalSizeSpriteSheet.x-sizeObject.x, 0.f), sizeObject, sizeSpriteSheet);
+	sprite->addKeyframeDiffSize(DIE_RIGHT, glm::vec2(74.f/totalSizeSpriteSheet.x, 0.f), sizeObject, sizeSpriteSheet);
 
 	
 	glm::vec2 aux = sprite->changeAnimationDiffSize(enemyTreeState);
@@ -62,6 +63,9 @@ void EnemyTree::update(int deltaTime)
 		{
 			entityState = Dead;
 			elapsedTime = 0;
+			velocity += GRAVITY;
+			position.y += int(velocity);
+			moveHorizontal(!left, WALK_SPEED);
 		}
 	}
 	else if (entityState == Dead) {
