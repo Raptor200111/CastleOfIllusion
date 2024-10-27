@@ -13,7 +13,6 @@
 void ScenePlayPractice::init() {
     // Call the base class init() to initialize common elements
     ScenePlay::init();
-    SoundManager::instance().setMusicVolume(64);
 
     // Initialize the map and other specific elements for NormalPlayScene
     map = TileMap::createTileMap("levels/practiceMatrix.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -53,11 +52,6 @@ void ScenePlayPractice::reStartLevelSpecific()
 {
     int tileSize = map->getTileSize();
     CollisionManager::instance().init(map);
-    Block* b = player->getPickedUpBlock();
-    if (b) {
-        glm::ivec2 ogPosB = b->getOgPosition();
-        b->setPosition(ogPosB);
-    }
     player->reStartStatePlayer();
     player->setPosition(glm::vec2((PRACTICE_INIT_PLAYER_X_TILES)*tileSize, (PRACTICE_INIT_PLAYER_Y_TILES)*tileSize));
     player->setTileMap(map);

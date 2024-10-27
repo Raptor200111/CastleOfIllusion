@@ -215,7 +215,7 @@ void BossDragon::setHeadSpritePos()
 	glm::ivec2 diffPos = glm::ivec2(0);
 
 	//body from 0 to neck at 18x 
-	int y = 43 - 32;
+	int y = 43 - 32+1;
 	switch (bossDragonState) {
 
 	case BOSS_LEFT:

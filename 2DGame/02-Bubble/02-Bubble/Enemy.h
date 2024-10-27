@@ -21,8 +21,10 @@ public:
     void moveHorizontal(bool left, int walk_speed);
 
     glm::ivec2 getInitPos() { return initParams.initPos; }
+    EnemyType getEnemyType() { return enemyType; }
 
 protected:
     float velocity;
     ZoneEnemy initParams;
+    EnemyType enemyType;
 };

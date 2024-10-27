@@ -26,6 +26,7 @@ enum EnemyType
 {
 	Tree,
 	Bug,
+	Bee,
 };
 
 enum EntityState
