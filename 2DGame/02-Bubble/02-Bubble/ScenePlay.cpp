@@ -23,6 +23,7 @@ ScenePlay::ScenePlay()
     zoomLevel = 2.f;
     bgMap = NULL;
     bgQuad = NULL;
+	quad = NULL;
     screenEnemies = std::map<string, Enemy*>();
     screenBlocks = std::map<string, Block*>();
     playrunMovBlocks = std::map<string, Block*>();
@@ -44,7 +45,8 @@ ScenePlay::~ScenePlay()
 		delete bgMap;
 	if (bgQuad != NULL)
 		delete bgQuad;
-
+	if (quad != NULL)
+		delete quad;
 	//quitar
 	for (auto& row : allBlocks) {
 		for (Block* block : row) {
@@ -115,6 +117,7 @@ void ScenePlay::reStart()
 	screenEnemies.clear();
 	screenBlocks.clear();
 	playrunMovBlocks.clear();
+	winAnimScenePlay = false;
 	reStartLevelSpecific();
 }
 
@@ -149,7 +152,19 @@ void ScenePlay::update(int deltaTime) {
 }
 
 void ScenePlay::render() {
-	glm::mat4 modelview;
+	glm::mat4 modelview = glm::mat4(1.0f);
+	simpleProgram.use();
+	simpleProgram.setUniformMatrix4f("projection", projection);
+	simpleProgram.setUniformMatrix4f("modelview", modelview);
+	if (!winAnimScenePlay) {
+		simpleProgram.setUniform4f("color", 48 / 255.f, 188 / 255.f, 1.f, 0.9f);
+	}
+	else {
+		int rand = std::rand();
+		//int rand1 = std::rand();
+		simpleProgram.setUniform4f("color", rand / 255.f, 0/ 255.f, (255-rand) / 255.f, 0.9f);
+	}
+	quad->render();
 
 	texProgram.use();
 	texProgram.setUniformMatrix4f("projection", projection); // Projection is now affected by camera
@@ -159,20 +174,16 @@ void ScenePlay::render() {
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 
 	//background
-
-	bgTexture.use();
-	bgQuad->render();
+	
+	//bgTexture.use();
+	//bgQuad->render();
 	if(bgMap != NULL)
 		bgMap->render();
 
 	//level
 	map->render();
 	if (insideBossRoom) {
-		//auto start = std::chrono::high_resolution_clock::now();
 		renderBoss();
-		//auto end = std::chrono::high_resolution_clock::now();
-		//std::chrono::duration<float, std::milli> duration = end - start;
-		//std::cout << "renderBoss execution time: " << duration.count() << "ms" << std::endl;
 	}
 	else
 	{
@@ -479,6 +490,7 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 		//block Dead == has stopped moving
 		if (itMovBlock->second->getEntityState() == Dead) {
 			if (blockType == NonDestroyable) {
+				itMovBlock->second->setEntityState(Alive);
 				int movBlockFloorIndex = calcFloorIndex(itMovBlock->second->getPosition().y / map->getTileSize());
 				playrunBlocks[movBlockFloorIndex].push_back(itMovBlock->second);
 			}
@@ -499,6 +511,31 @@ void ScenePlay::initShaders()
 {
 	Shader vShader, fShader;
 
+	vShader.initFromFile(VERTEX_SHADER, "shaders/simple.vert");
+	if (!vShader.isCompiled())
+	{
+		cout << "Vertex Shader Error" << endl;
+		cout << "" << vShader.log() << endl << endl;
+	}
+	fShader.initFromFile(FRAGMENT_SHADER, "shaders/simple.frag");
+	if (!fShader.isCompiled())
+	{
+		cout << "Fragment Shader Error" << endl;
+		cout << "" << fShader.log() << endl << endl;
+	}
+	simpleProgram.init();
+	simpleProgram.addShader(vShader);
+	simpleProgram.addShader(fShader);
+	simpleProgram.link();
+	if (!simpleProgram.isLinked())
+	{
+		cout << "Shader Linking Error" << endl;
+		cout << "" << simpleProgram.log() << endl << endl;
+	}
+	simpleProgram.bindFragmentOutput("outColor");
+
+	vShader.free();
+	fShader.free();
 	vShader.initFromFile(VERTEX_SHADER, "shaders/texture.vert");
 	if (!vShader.isCompiled())
 	{
@@ -521,6 +558,4 @@ void ScenePlay::initShaders()
 		cout << "" << texProgram.log() << endl << endl;
 	}
 	texProgram.bindFragmentOutput("outColor");
-	vShader.free();
-	fShader.free();
 }

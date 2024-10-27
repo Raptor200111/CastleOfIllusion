@@ -18,6 +18,7 @@ protected:
     bool checkIfInsideBossRoom() override;
     void collisionMovBlockInsideBossRoom(Block* movBlock) override;
 
+    void renderQuadBg() override;
     void renderBoss() override;
 
     void initZoneEnemyTree();
