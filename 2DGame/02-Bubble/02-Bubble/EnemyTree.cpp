@@ -113,6 +113,12 @@ void EnemyTree::collideVertical() {
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }
 
+void EnemyTree::collideHorizontal() {
+	position = initParams.initPos * map->getTileSize();
+	left = initParams.left;
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
+}
+
 void EnemyTree::collisionBlockHorizontal(Block* b)
 {
 	//trees can jump over blocks;

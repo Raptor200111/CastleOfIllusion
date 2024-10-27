@@ -89,7 +89,8 @@ void EnemyBee::update(int deltaTime)
 		//if after mov enemy outside limits, turn around
 		if (position.x < initParams.limit.min_x || initParams.limit.max_x < position.x) {
 			enemyBeeState = BEE_FLY_RIGHT;
-			position = initParams.initPos * map->getTileSize();
+			int tilesize = map->getTileSize();
+			position = glm::ivec2(initParams.limit.max_x * tilesize, initParams.initPos.y * tilesize);
 			left = initParams.left;
 		}
 

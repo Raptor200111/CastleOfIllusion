@@ -16,6 +16,7 @@ public:
 	void render() override;
 	void Damaged() override;
 	void collideVertical() override;
+	void collideHorizontal() override {}
 	void collisionBlockHorizontal(Block* b) override;
 
 private:
