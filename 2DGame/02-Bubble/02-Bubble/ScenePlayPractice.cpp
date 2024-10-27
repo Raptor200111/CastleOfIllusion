@@ -30,8 +30,7 @@ void ScenePlayPractice::init() {
     initZoneEnemyBug();
 
     allBlocks = initBlocks();
-    blockGem = new BlockGem();
-    blockGem->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+    blockGem = new BlockGem(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
     blockGem->setPosition(glm::vec2(91*tileSize, 6*tileSize));
     blockGem->setTileMap(map);
     playrunBlocks = allBlocks;
@@ -112,12 +111,12 @@ void ScenePlayPractice::initZoneEnemyBug()
 }
 
 void ScenePlayPractice::updateCollisionsWithBoss(int deltaTime) {
-    if (blockGem->getEntityState() != Dead)
+    if (blockGem->getEntityState() != DEAD)
         blockGem->update(deltaTime);
 
-    if (player->getEntityState() == Alive) {
+    if (player->getEntityState() == ALIVE) {
         if (CollisionManager::instance().checkCollisionObject(player, blockGem)) {
-            blockGem->setEntityState(Dying);
+            blockGem->setEntityState(DYING);
         }
     }
 }
@@ -135,9 +134,9 @@ void ScenePlayPractice::collisionMovBlockInsideBossRoom(Block* movBlock)
 
 void ScenePlayPractice::renderBoss() {
     EntityState gemState = blockGem->getEntityState();
-    if (gemState == Alive)
+    if (gemState == ALIVE)
         blockGem->render();
-    else if (gemState == Dying)
+    else if (gemState == DYING)
         winAnimScenePlay = true;
     else {
         Game::instance().onPracticeLevelWon();

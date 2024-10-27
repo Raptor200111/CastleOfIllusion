@@ -1,6 +1,6 @@
 #include "BlockGem.h"
 
-void BlockGem::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
+BlockGem::BlockGem(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) : Block(tileMapDispl, shaderProgram)
 {
 	blockType = Gem;
 	sizeObject = glm::ivec2(16, 16);
@@ -16,5 +16,4 @@ void BlockGem::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	sprite->changeAnimation(0);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
-
 }

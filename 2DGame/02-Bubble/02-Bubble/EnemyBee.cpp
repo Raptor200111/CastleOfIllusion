@@ -41,14 +41,14 @@ void EnemyBee::update(int deltaTime)
 	sprite->update(deltaTime);
 
 	elapsedTime += deltaTime;
-	if (entityState == Dead)
+	if (entityState == DEAD)
 	{
 	}
-	else if (entityState == Dying) {
+	else if (entityState == DYING) {
 		enemyBeeState = BEE_DIE;
 		if (elapsedTime >= timeDyingAnim)
 		{
-			entityState = Dead;
+			entityState = DEAD;
 			elapsedTime = 0;
 			velocity += GRAVITY;
 			position.y += int(velocity);
@@ -56,7 +56,7 @@ void EnemyBee::update(int deltaTime)
 		}
 	}
 	//!dying=animDying ended && !dead=alive
-	else if (entityState == Alive) {
+	else if (entityState == ALIVE) {
 		elapsedTime = 0;
 		int min_x_attack = position.x - attackDistance;
 		int max_x_attack = position.x + attackDistance;
@@ -102,7 +102,7 @@ void EnemyBee::update(int deltaTime)
 }
 void EnemyBee::render()
 {
-	if (entityState != Dead) {
+	if (entityState != DEAD) {
 		sprite->render();
 	}
 }
@@ -118,5 +118,5 @@ void EnemyBee::collisionBlockHorizontal(Block* b)
 
 void EnemyBee::Damaged()
 {
-	entityState = Dying;
+	entityState = DYING;
 }

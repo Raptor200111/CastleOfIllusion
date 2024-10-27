@@ -10,7 +10,6 @@ public:
 
 	virtual ~Entity() { if (sprite) delete sprite; }
 
-	
 	glm::ivec2 getPosition() { return position; }
 	glm::ivec2 getSize() { return sizeObject; }
 	bool getLeft() { return left; }
@@ -27,8 +26,8 @@ public:
 	void setEntityState(EntityState s) { entityState = s; }
 
 protected:
-	EntityState entityState = Alive;
-	bool left;
+	EntityState entityState = ALIVE;
+	bool left = false;
 	Texture spritesheet;
 	Sprite* sprite;
 	TileMap* map;

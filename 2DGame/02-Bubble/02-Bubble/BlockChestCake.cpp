@@ -1,6 +1,6 @@
 #include "BlockChestCake.h"
 
-void BlockChestCake::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
+BlockChestCake::BlockChestCake(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) : Block(tileMapPos, shaderProgram)
 {
 	blockType = Chest;
 	blockStatus = CHEST_STATUS;
@@ -19,7 +19,4 @@ void BlockChestCake::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderPro
 	sprite->changeAnimation(blockStatus);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
-
 }
-
-

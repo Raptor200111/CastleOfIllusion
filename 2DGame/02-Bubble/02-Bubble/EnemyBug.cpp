@@ -52,16 +52,16 @@ void EnemyBug::update(int deltaTime)
 		sizeObject = aux;
 
 	elapsedTime += deltaTime;
-	if (entityState == Dying) {
+	if (entityState == DYING) {
 		enemyBugState = BUG_DIE;
 		if (elapsedTime >= timeDyingAnim)
 		{
-			entityState = Dead;
+			entityState = DEAD;
 			elapsedTime = 0;
 		}
 	}
 	//!dying=animDying ended && !dead=alive
-	else if (entityState == Alive) {
+	else if (entityState == ALIVE) {
 		elapsedTime = 0;
 		int min_x_attack = position.x - attackDistance;
 		int max_x_attack = position.x + attackDistance;
@@ -102,7 +102,7 @@ void EnemyBug::update(int deltaTime)
 }
 void EnemyBug::render()
 {
-	if (entityState!=Dead) {
+	if (entityState!=DEAD) {
 		sprite->render();
 	}
 }
@@ -124,5 +124,5 @@ void EnemyBug::collisionBlockHorizontal(Block* b)
 
 void EnemyBug::Damaged()
 {
-	entityState = Dying;
+	entityState = DYING;
 }

@@ -57,21 +57,21 @@ void EnemyTree::update(int deltaTime)
 	if (aux != glm::vec2(0.f))
 		sizeObject = aux;
 	elapsedTime += deltaTime;
-	if (entityState == Dying) {
+	if (entityState == DYING) {
 		enemyTreeState = DIE_RIGHT;
 		if (elapsedTime >= timeDyingAnim)
 		{
-			entityState = Dead;
+			entityState = DEAD;
 			elapsedTime = 0;
 			velocity += GRAVITY;
 			position.y += int(velocity);
 			moveHorizontal(!left, WALK_SPEED);
 		}
 	}
-	else if (entityState == Dead) {
+	else if (entityState == DEAD) {
 		if (elapsedTime >= timeToRegenerate)
 		{
-			entityState = Alive;
+			entityState = ALIVE;
 			elapsedTime = 0;
 			position = initParams.initPos * map->getTileSize();
 			left = initParams.left;
@@ -103,7 +103,7 @@ void EnemyTree::update(int deltaTime)
 
 void EnemyTree::render()
 {
-	if (entityState != Dead) {
+	if (entityState != DEAD) {
 		sprite->render();
 	}
 }
@@ -123,5 +123,5 @@ void EnemyTree::collisionBlockHorizontal(Block* b)
 
 void EnemyTree::Damaged()
 {
-	entityState = Dying;
+	entityState = DYING;
 }

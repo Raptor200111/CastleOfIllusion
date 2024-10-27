@@ -7,25 +7,25 @@
 void BossShoot::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
 	endDirection = glm::vec2(1.0f);
-	entityState = Dead;
+	entityState = DEAD;
 	setShootAnimations(shaderProgram);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 
 }
 void BossShoot::update(int deltaTime) {
-	if (entityState == Dead) return;
+	if (entityState == DEAD) return;
 	sprite->updateDiffSize(deltaTime);
 
 	elapsedTime += deltaTime;
-	if (entityState == Dying) {
+	if (entityState == DYING) {
 		shootState = BOSS_SHOOT_END;
 		if (elapsedTime >= timeDyingAnim) {
 			elapsedTime = 0;
-			entityState = Dead;
+			entityState = DEAD;
 		}
 	}
-	else if (entityState == Alive) {
+	else if (entityState == ALIVE) {
 		shootState = BOSS_SHOOT_START;
 		float deltaSeconds = deltaTime / 1000.0f;
 		glm::vec2 direction = glm::vec2(endDirection - glm::vec2(position));
@@ -47,7 +47,7 @@ void BossShoot::update(int deltaTime) {
 }
 
 void BossShoot::render() {
-	if(entityState != Dead)
+	if(entityState != DEAD)
 		sprite->render();
 }
 

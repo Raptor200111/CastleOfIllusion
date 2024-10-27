@@ -1,28 +1,50 @@
 #include "Block.h"
 #include "CollisionManager.h"
 
-void Block::update(int deltaTime)
+Block::~Block()
 {
-	if (entityState == Dying) {
-		elapsedTime += deltaTime;
-		if (elapsedTime >= timeDyingAnim)
+	if (explosionEfect != NULL)
+		delete explosionEfect;
+}
+
+Block::Block(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) : Entity()
+{
+	explosionEfect = new ParticleEfect(tileMapPos, position, glm::ivec2(32, 36), shaderProgram, "images/explosion.png", glm::vec2(0.333, 0.5), 1);
+
+	glm::vec2* vec2Array = new glm::vec2[6];
+	vec2Array[0] = glm::vec2(0.f, 0.f);
+	vec2Array[1] = glm::vec2(0.333f * 3, 0.f);
+	vec2Array[2] = glm::vec2(0.666f * 4, 0.f);
+	vec2Array[3] = glm::vec2(0.f * 5, 0.5f);
+	vec2Array[4] = glm::vec2(0.333f * 6, 0.5f);
+	vec2Array[5] = glm::vec2(0.666f * 7, 0.5f);
+
+	explosionEfect->addAnimation(8, vec2Array, 6);
+	delete vec2Array;
+}
+
+void Block::update(int deltaTime)
+{	
+	switch (entityState)
+	{
+		case ALIVE:
 		{
-			elapsedTime = 0;
-			entityState = Dead;
-		}
-	}
-	else if (entityState == Alive) {
-		switch (state)
-		{
-		case STILL:
-			break;
-		case GRABBED:
-			break;
-		case FALLING:
 			speed.y += 0.5;
 			position += speed;
 			break;
-		default:
+		}
+		case DEAD:
+		{
+			break;
+		}
+		case DYING:
+		{
+			elapsedTime += deltaTime;
+			if (elapsedTime >= timeDyingAnim)
+			{
+				elapsedTime = 0;
+				entityState = DEAD;
+			}
 			break;
 		}
 	}
@@ -31,53 +53,62 @@ void Block::update(int deltaTime)
 	if (sprite->animation() != blockStatus) {
 		sprite->changeAnimation(blockStatus);
 	}
+	explosionEfect->update(deltaTime);
 }
 
 void Block::render()
 {
 	sprite->render();
+	explosionEfect->render();
 }
 
 void Block::collisionEnemy(const glm::ivec2& posEnemy)
 {
-	explode();
-	//destroy enemy
+	if (entityState == ALIVE)
+	{
+		explode();
+	}
 }
 void Block::collisionBlockHorizontal(HColType hBlockCollision, const Block*& b)
 {
-	explode();
+	if (entityState == ALIVE)
+	{
+		explode();
+	}
 }
 void Block::collisionBlockVertical(VColType vBlockCollision, const Block*& b)
 {
-	explode();
+	if (entityState == ALIVE)
+	{
+		explode();
+	}
 }
 void Block::collisionVertical(CollisionType verticalCollision)
 {
-	explode();
+	if (entityState == ALIVE)
+	{
+		explode();
+	}
 }
 void Block::collisionHorizontal(CollisionType horizontalCollision)
 {
-	explode();
+	if (entityState == ALIVE)
+	{
+		explode();
+	}
 }
 
 void Block::throwBlock(glm::vec2 speed)
 {
 	this->speed = speed;
-	state = FALLING;
-}
-
-void Block::grabbed()
-{
-	state = GRABBED;
+	entityState = ALIVE;
 }
 
 void Block::explode()
 {
-	if (state == FALLING)
-	{
-		entityState = Dead;
-		state = STILL;
-		speed = glm::vec2(0, 0);
-		//explode
-	}
+	entityState = DYING;
+	speed = glm::vec2(0, 0);
+
+	explosionEfect->play(position + (getSize()/2) - glm::ivec2(16, 18), 0);
+	//explode
 }

@@ -1,6 +1,6 @@
 #include "BlockChestCoin.h"
 
-void BlockChestCoin::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
+BlockChestCoin::BlockChestCoin(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) : Block(tileMapPos, shaderProgram)
 {
 	blockType = Chest;
 	blockStatus = CHEST_STATUS;
@@ -14,10 +14,9 @@ void BlockChestCoin::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderPro
 	sprite->addKeyframe(CHEST_STATUS, glm::vec2(3.f / 4.f, 0.5f));
 
 	sprite->setAnimationSpeed(ITEM_STATUS, 8);
-	sprite->addKeyframe(ITEM_STATUS, glm::vec2(3.f/4.f, 0.0f));
+	sprite->addKeyframe(ITEM_STATUS, glm::vec2(3.f / 4.f, 0.0f));
 
 	sprite->changeAnimation(blockStatus);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
-
 }
