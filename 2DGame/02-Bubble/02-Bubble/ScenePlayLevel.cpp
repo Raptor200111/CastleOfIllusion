@@ -233,7 +233,8 @@ void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 
 	if (boss.getEntityState() != Dead) {
 
-		if (player->getEntityState() == Alive && CollisionManager::instance().checkCollisionObject(player, &boss)) 
+		if (boss.getEntityState() == Alive && player->getEntityState() == Alive && 
+			CollisionManager::instance().checkCollisionObject(player, &boss))
 		{
 			boss.Damaged();
 			Game::instance().onPlayerKilledEnemy();

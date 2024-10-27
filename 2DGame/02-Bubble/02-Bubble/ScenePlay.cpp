@@ -15,6 +15,7 @@
 #include "CollisionManager.h"
 //debug
 #include <chrono>
+#include <glm/gtc/random.hpp>
 
 ScenePlay::ScenePlay()
 {
@@ -156,6 +157,11 @@ void ScenePlay::render() {
 	simpleProgram.use();
 	simpleProgram.setUniformMatrix4f("projection", projection);
 	simpleProgram.setUniformMatrix4f("modelview", modelview);
+
+	float shakeIntensity = 10.0f;
+	float offsetX = glm::linearRand(-shakeIntensity, shakeIntensity);
+	float offsetY = glm::linearRand(-shakeIntensity, shakeIntensity);
+	glm::mat4 projectionWithShake = glm::translate(projection, glm::vec3(offsetX, offsetY, 0.0f));
 	if (!winAnimScenePlay) {
 		simpleProgram.setUniform4f("color", 48 / 255.f, 188 / 255.f, 1.f, 0.9f);
 	}
@@ -163,11 +169,17 @@ void ScenePlay::render() {
 		int rand = std::rand();
 		//int rand1 = std::rand();
 		simpleProgram.setUniform4f("color", rand / 255.f, 0/ 255.f, (255-rand) / 255.f, 0.9f);
+		simpleProgram.setUniformMatrix4f("projection", projectionWithShake);
+
 	}
 	quad->render();
 
 	texProgram.use();
-	texProgram.setUniformMatrix4f("projection", projection); // Projection is now affected by camera
+	if (!winAnimScenePlay)
+		texProgram.setUniformMatrix4f("projection", projection); // Projection is now affected by camera
+	else
+		texProgram.setUniformMatrix4f("projection", projectionWithShake); // Projection is now affected by camera
+
 	texProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
 	modelview = glm::mat4(1.0f);
 	texProgram.setUniformMatrix4f("modelview", modelview);
@@ -319,6 +331,7 @@ void ScenePlay::collisionsEnemies(int deltaTime)
 			else {
 				string idEnemy = itEnemy->first;
 				Game::instance().onPlayerKilled();
+				//player->takingDamage();
 				player->setEntityState(Dying);
 				if (screenEnemies.find(idEnemy) == screenEnemies.end()) {
 					reStarted = true;
