@@ -38,5 +38,5 @@ protected:
 	BlockStatus blockStatus;
 	glm::ivec2 ogPosition;
 	int elapsedTime = 0;
-	int timeDyingAnim = 0;
+	int timeDyingAnim = 6 * 1000/15;
 };

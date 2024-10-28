@@ -19,7 +19,7 @@ Block::Block(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) : Entit
 	vec2Array[4] = glm::vec2(0.333f * 6, 0.5f);
 	vec2Array[5] = glm::vec2(0.666f * 7, 0.5f);
 
-	explosionEfect->addAnimation(8, vec2Array, 6);
+	explosionEfect->addAnimation(15, vec2Array, 6);
 	delete vec2Array;
 }
 
@@ -50,9 +50,9 @@ void Block::update(int deltaTime)
 	}
 	setPosition(position);
 	sprite->update(deltaTime);
-	if (sprite->animation() != blockStatus) {
+	/*if (sprite->animation() != blockStatus) {
 		sprite->changeAnimation(blockStatus);
-	}
+	}*/
 	explosionEfect->update(deltaTime);
 }
 
@@ -108,7 +108,5 @@ void Block::explode()
 {
 	entityState = DYING;
 	speed = glm::vec2(0, 0);
-
 	explosionEfect->play(position + (getSize()/2) - glm::ivec2(16, 18), 0);
-	//explode
 }
