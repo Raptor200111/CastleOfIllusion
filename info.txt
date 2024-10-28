@@ -1,0 +1,57 @@
+Integrats del grup:
+    Liliu Martinez
+    Alvar Dalda
+
+Funcionalitats implementades:
+    Hi ha 5 pantalles: menu, jugar, instruccions, credits i pantalla final de guanyar/perdre
+    En tot moment:
+        Apretant la tecla M tornes al menu
+        Apretant la tecla I te'n vas a instruccions
+        Apretant la tecla C te'n vas a credits
+        Apretant la tecla P reinicies el joc des del nivell practice
+    Hi han 2 pantalles de jugar: Practice i Level. Has de passar el nivell Practice per arribar al Level.
+    El jugador ha de passar cada pantalla de jugar en un cert temps: Practice en 200s i Level en 400s.
+    El jugador disposa de inicialment 3 vides(stars).
+    En el Practice el jugador te 3 intents.
+    En el Level el jugador te 8 intents.
+    Quan el jugador perd totes les vides, es reinicia la pantalla de jugar on esta tornant a la posicio inicial i perdent un intent.
+    Si perd tots els intents apareix la pantalla final. Per tornar a reiniciar el joc s'ha de premer tecla M. 
+    Si el jugador guanya el joc passant la pantalla de jugar Level, apareix la pantalla final. Per tornar a reiniciar el joc s'ha de premer tecla M. 
+    El jugador te punts. Al matar enemics i el boss se li sumen 50 i 10000 punts respectivament. 
+    
+    Per passar les pantalles de jugar el jugador ha d'obtenir una gema. 
+    El jugador pot matar els enemics a atacant-los amb butAttack. Per a fer butAttack el jugador ha de saltar i a continuacio apretar tecla S
+    El jugador quan esta al terra es mou a l'esquerra amb la tecla A, a la dreta amb la tecla D, salta amb la tecla W i s'ajup amb la tecla S.
+    El jugador pot escalar escales. Quan es troba una escala unicament pot anar cap amunt amb la tecla W i cap avall amb la tecla S.
+    El jugador pot agafar objectes amb la tecla L i un cop agafats els pot llencar tornant a polsar la tecla L.
+    Si el jugador cau en un forat, aquest mort instantaniament perdent un intent i reiniciant la pantalla de jugar actual.
+
+    Hi ha 3 tipus d'enemics: Tree, Bug, Bee.
+    Tree: es mou horitzontalment pel terra en una unica direccio. Si es troba  un block pel cami salta per sobre. Es regenera constantment. 
+    Bug: es mou horitzontalment pel terra en les dos direccions. Si es troba un block pel cami canvia de direccio. Es regenera un cop surt de la pantalla.
+    Bee: es mou horitzontalment per l'aire en una unica direccio. No collisiona contra els blocks que no es mouen ni el terra. Es regenera un cop mort. 
+    El jugador pot matar els enemics tirant-lis blocks o atacant-los amb butAttack.
+    Sino, si el jugador colisiona amb un enemic, el jugador perd una vida(estrella). 
+
+    Hi ha 3 tipus d'objectes: Blocs destructibles, blocks no destructibles i cofres. 
+    Els blocs destructibles es destrueixen un cop colisionen amb alguna cosa despres de ser llancats o son atacats amb butAttack.
+    Els blocs no destructibles no es destrueixen un cop colisionen amb alguna cosa despres de ser llencats ni quan son atacats amb butAttack.
+    Els cofres es destrueixen com els blocs destructibles. Un cop destruits, donen lloc a una moneda o un tros de pastis. 
+    La moneda dona punts extra al jugador.
+    El tros de pastis dona una vida extra al jugador fins un maxim de 5 vides.
+
+    Hi ha un boss al final de la pantalla de jugar tipus Level. 
+    El boss es un drac que escup boles de foc cada x temps amb direccio al jugador.
+    Si el jugador colisiona amb alguna de les boles, aquest perd una vida.
+    Per a matar el drac el jugador ha de tirar 5 cops un bloc al cap del drac. 
+    Un cop mort el drac, apareix la gema necessaria per a passar el Level i guanyar.
+
+    Hi ha banda sonora.
+    Prement la tecla G actives GodMode que et perment ser invulnerable als enemics i als forats. Es desactiva tornant a premer tecla G.
+    Prement la tecla H el jugador recupera totes les seves vides. 
+
+Instruccions del joc:
+
+
+
+
