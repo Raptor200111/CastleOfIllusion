@@ -23,6 +23,7 @@ public:
 
     glm::ivec2 getInitPos() { return initParams.initPos; }
     EnemyType getEnemyType() { return enemyType; }
+    virtual void reLive() = 0;
 
 protected:
     float velocity;

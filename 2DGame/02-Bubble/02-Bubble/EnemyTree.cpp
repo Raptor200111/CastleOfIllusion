@@ -13,6 +13,7 @@ void EnemyTree::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgr
 	this->initParams = initParams;
 	enemyTreeState = WALK_RIGHT;
 	enemyType = Tree;
+	timeDyingAnim = 800;
 	glm::vec2 sizeSpriteSheet = glm::vec2(1.f);
 	glm::vec2 totalSizeSpriteSheet = glm::vec2(98.f, 32.f);
 
@@ -130,4 +131,14 @@ void EnemyTree::collisionBlockHorizontal(Block* b)
 void EnemyTree::Damaged()
 {
 	entityState = Dying;
+}
+
+
+void EnemyTree::reLive()
+{
+	entityState = Alive;
+	left = initParams.left;
+	position = initParams.initPos * map->getTileSize();
+	sprite->setLeft(left);
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }
