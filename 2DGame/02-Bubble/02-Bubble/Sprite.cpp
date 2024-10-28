@@ -36,6 +36,7 @@ Sprite::Sprite(const glm::vec2 &quadSize, const glm::vec2 &sizeInSpritesheet, Te
 	left = false;
 	playingOnce = false;
 	playingNow = false;
+	durationAnimation = 0.f;
 }
 
 void Sprite::update(int deltaTime)
@@ -43,16 +44,22 @@ void Sprite::update(int deltaTime)
 	if(playingNow)
 	{
 		timeAnimation += deltaTime;
+		
 		while(timeAnimation > animations[currentAnimation].millisecsPerKeyframe)
 		{
 			timeAnimation -= animations[currentAnimation].millisecsPerKeyframe;
 			currentKeyframe = (currentKeyframe + 1) % animations[currentAnimation].keyframeDispl.size();
 		}
 		texCoordDispl = animations[currentAnimation].keyframeDispl[currentKeyframe];
-		if (playingOnce && (currentKeyframe == (animations[currentAnimation].keyframeDispl.size() - 1)))
+		if (playingOnce)
 		{
-			playingOnce = false;
-			playingNow = false;
+			durationAnimation += deltaTime;
+			if (durationAnimation >= (animations[currentAnimation].keyframeDispl.size() * animations[currentAnimation].millisecsPerKeyframe))
+			{
+				playingOnce = false;
+				playingNow = false;
+				durationAnimation = 0.f;
+			}
 		}
 	}
 }

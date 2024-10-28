@@ -11,8 +11,7 @@
 class ParticleEfect : public Entity
 {
 public:
-	//~ParticleEfect();
-	void init(const glm::ivec2& tileMapPos, glm::ivec2& pos, glm::ivec2& siz, ShaderProgram& shaderProgram, string file, glm::vec2 weirdSize, int numAnims);
+	ParticleEfect(const glm::ivec2& tileMapPos, glm::ivec2& pos, glm::ivec2& siz, ShaderProgram& shaderProgram, string file, glm::vec2 weirdSize, int numAnims);
 	void update(int deltaTime);
 	void render();
 

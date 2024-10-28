@@ -12,6 +12,7 @@ void Game::init()
 	sceneMenu.init();
 	sceneInstructions.init();
 	sceneCredits.init();
+	sceneFinalScreen.init();
 	scenePlayPractice.init();
 	scenePlayLevel.init();
 	currentScene = &sceneMenu;
@@ -37,25 +38,26 @@ void Game::keyPressed(int key)
 	{
 		bPlay = false;
 	}
-	else if (currentScene == &sceneMenu && key == GLFW_KEY_Z) {
+	else if (key == GLFW_KEY_Z) {
 		currentScene = &scenePlayPractice;
 		tries = 3;
 		scenePlayPractice.reStart();
 		SoundManager::instance().setMusicVolume(40);
 		//SoundManager::instance().playMusic("level", -1);
 	}
-	else if (currentScene == &scenePlayPractice && key == GLFW_KEY_0) {
+	else if (godMode && currentScene == &scenePlayPractice && key == GLFW_KEY_0) {
 		currentScene = &scenePlayLevel;
 		tries = 8;
 		scenePlayLevel.reStart();
 	}
-	else if (key == GLFW_KEY_I) {
+	else if (currentScene != &sceneFinalScreen && key == GLFW_KEY_I) {
 		currentScene = &sceneInstructions;
 	}
 	else if (key == GLFW_KEY_M) {
+		sceneFinalScreen.setWon(false);
 		currentScene = &sceneMenu;
 	}
-	else if (key == GLFW_KEY_C) {
+	else if (currentScene != &sceneFinalScreen && key == GLFW_KEY_C) {
 		currentScene = &sceneCredits;
 	}
 	keys[key] = true;
@@ -143,14 +145,16 @@ void Game::onPracticeLevelWon()
 
 void Game::onLevelWon()
 {
-	currentScene = &sceneMenu;
+	sceneFinalScreen.setWon(true);
+	currentScene = &sceneFinalScreen;
 	SoundManager::instance().setMusicVolume(40);
 	//SoundManager::instance().playMusic("menu", -1);
 }
 
 void Game::looseGame()
 {
-	currentScene = &sceneMenu;
+	sceneFinalScreen.setWon(false);
+	currentScene = &sceneFinalScreen;
 	SoundManager::instance().setMusicVolume(40);
 	//SoundManager::instance().playMusic("menu", -1);
 }

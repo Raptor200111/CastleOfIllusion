@@ -2,11 +2,7 @@
 
 #include "Entity.h"
 #include <cmath>
-
-enum BlockState
-{
-	STILL, GRABBED, FALLING
-};
+#include "ParticleEfect.h"
 
 enum BlockStatus {
 	ITEM_STATUS, CHEST_STATUS, DISAPPEAR
@@ -15,7 +11,9 @@ enum BlockStatus {
 class Block : public Entity
 {
 public:
-	virtual void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) = 0;
+	~Block();
+	Block(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
+	//virtual void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) = 0;
 	void update(int deltaTime);
 	void render();
 	BlockType getBlockType() { return blockType; }
@@ -28,18 +26,17 @@ public:
 	void collisionHorizontal(CollisionType horizontalCollision);
 
 	void throwBlock(glm::vec2 speed);
-	void grabbed();
 	void explode();
 
 private:
-	BlockState state = BlockState::STILL;
 	glm::vec2 speed = glm::vec2(0, 0);
+	ParticleEfect* explosionEfect;
+
 	
 protected:
 	BlockType blockType;
 	BlockStatus blockStatus;
 	glm::ivec2 ogPosition;
 	int elapsedTime = 0;
-	int timeDyingAnim = 0;
+	int timeDyingAnim = 6 * 1000/15;
 };
-

@@ -1,6 +1,6 @@
 #include "BlockNonDestroyable.h"
 
-void BlockNonDestroyable::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
+BlockNonDestroyable::BlockNonDestroyable(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) : Block(tileMapPos, shaderProgram)
 {
 	blockType = NonDestroyable;
 	blockStatus = ITEM_STATUS;
@@ -17,6 +17,6 @@ void BlockNonDestroyable::init(const glm::ivec2& tileMapPos, ShaderProgram& shad
 	sprite->changeAnimation(blockStatus);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
-
 }
+
 

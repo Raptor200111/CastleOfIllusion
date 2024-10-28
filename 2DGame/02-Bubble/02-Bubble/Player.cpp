@@ -7,7 +7,14 @@
 #define JUMP_SPEED -9.f
 #define BUTT_JUMP_SPEED -12.f
 #define STANDART_SIZE glm::ivec2(24, 32)
-#define DODGE_SIZE glm::ivec2(24, 32)
+#define DODGE_SIZE glm::ivec2(24, 21)
+#define OFFSET glm::ivec2(4, 8)
+
+Player::~Player()
+{
+	if (particleEfect != NULL)
+		delete particleEfect;
+}
 
 void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
@@ -30,14 +37,14 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	vec2Array[4] = glm::vec2(0.066f * 6, 0.f);
 	vec2Array[5] = glm::vec2(0.066f * 7, 0.f);
 
-	particleEfect.init(tileMapPos, position, sizeSprite, shaderProgram, "images/Mickey_Mouse.png", glm::vec2(0.066, 0.098), 1);
-	particleEfect.addAnimation(8, vec2Array, 6);
+	particleEfect = new ParticleEfect(tileMapPos, position, sizeSprite, shaderProgram, "images/Mickey_Mouse.png", glm::vec2(0.066, 0.098), 1);
+	particleEfect->addAnimation(8, vec2Array, 6);
 
 	delete vec2Array;
 	//HASTA AQUI
 
-	setSize(glm::ivec2(24, 32));
-	setOffset(glm::ivec2(4, 8));
+	sizeObject = STANDART_SIZE;
+	offset = OFFSET;
 
 	spritesheet.loadFromFile("images/Mickey_Mouse.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(sizeSprite, glm::vec2(0.066, 0.098), &spritesheet, &shaderProgram);
@@ -138,14 +145,14 @@ void Player::update(int deltaTime)
 	colType = CollisionType::None;
 	block = nullptr;
 
-	if (entityState == Dying) {
+	if (entityState == DYING) {
 		elapsedTime += deltaTime;
 		if (elapsedTime >= timeDyingAnim) {
 			elapsedTime = 0;
 			if (Game::instance().getStars() > 0)
-				entityState = Alive;
+				entityState = ALIVE;
 			else
-				entityState = Dead;
+				entityState = DEAD;
 		}
 	}
 
@@ -209,7 +216,9 @@ void Player::update(int deltaTime)
 		case DODGE:
 		{
 			if (!Game::instance().getKey(GLFW_KEY_S)) {
-				setSize(STANDART_SIZE);
+				sizeObject = STANDART_SIZE;
+				offset = OFFSET;
+				position.y -= 11;
 				newState = IDLE;
 			}
 			if (stopFallingCollision(block, colType))
@@ -323,12 +332,11 @@ void Player::update(int deltaTime)
 	setPosition(position);
 	if (Game::instance().getKey(GLFW_KEY_P))
 		cout << position.x << " " << position.y << " - State: " << PlayerStates(oldState) << endl;
-	// TENEMOS QUE AÑADIR PARTICULAS CHULAS
 	
-	particleEfect.update(deltaTime);
+	particleEfect->update(deltaTime);
 	if (pickedUpBlock != nullptr)
 	{
-		pickedUpBlock->update(deltaTime);//hacemos el update (hay que cambiarle la posicion)
+		pickedUpBlock->update(deltaTime);
 		if (oldState != B_PICK)
 		{
 			if (left)
@@ -348,7 +356,7 @@ void Player::render()
 	if (pickedUpBlock != nullptr)
 		pickedUpBlock->render();
 	sprite->render();
-	particleEfect.render();
+	particleEfect->render();
 }
 
 void Player::pickUpBlock()
@@ -356,7 +364,6 @@ void Player::pickUpBlock()
 	CollisionManager::instance().disAttachBlock(readyToPickBlock);
 	pickedUpBlock = readyToPickBlock;
 	readyToPickBlock = nullptr;
-	pickedUpBlock->grabbed();
 	newState = B_PICK;
 }
 
@@ -411,6 +418,16 @@ bool Player::checkObjInteractionButton()
 	else
 		objInteractionAvailable = true;
 	return false;
+}
+
+void Player::playerButtJump()
+{
+	if (oldState == BUTT_FALL || oldState == BUTT_JUMP)
+	{
+		oldState = BUTT_JUMP;
+		yAxisSpeed = BUTT_JUMP_SPEED;
+		newState = BUTT_JUMP;
+	}
 }
 
 void Player::leftMove()
@@ -469,6 +486,13 @@ void Player::changeToClimb()
 	//calcular posicion de la escalera
 }
 
+void Player::changeToDodge() {
+	newState = DODGE;
+	sizeObject = DODGE_SIZE;
+	offset = OFFSET + glm::ivec2(0, 11);
+	position.y += 11;
+}
+
 bool Player::stopFallingCollision(Block*& block, CollisionType& colType)
 {
 	auto originalPos = position;
@@ -514,7 +538,7 @@ void Player::movementBehaviour()
 				return;
 			}
 			else {
-				newState = DODGE;
+				changeToDodge();
 				return;
 			}
 				
@@ -582,6 +606,10 @@ void Player::buttJumpBehaviour()
 		newState = BUTT_JUMP;
 		// destruccion del objeto que devuelve
 		// delete b;
+		CollisionManager::instance().disAttachBlock(block);
+		CollisionManager::instance().attachBlock(block);
+		CollisionManager::instance().disAttachBlock(block);
+		block->explode();
 	}
 }
 

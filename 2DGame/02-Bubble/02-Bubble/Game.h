@@ -9,6 +9,7 @@
 #include "ScenePlayPractice.h"
 #include "SceneInstructions.h"
 #include "SceneCredits.h"
+#include "SceneFinalScreen.h"
 
 #define SCREEN_WIDTH 640 
 #define SCREEN_HEIGHT 480
@@ -79,6 +80,7 @@ private:
 	ScenePlayPractice scenePlayPractice;
 	SceneInstructions sceneInstructions;
 	SceneCredits sceneCredits;
+	SceneFinalScreen sceneFinalScreen;
 
 	int score = 0;
 	int tries = 3;
