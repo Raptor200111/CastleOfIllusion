@@ -69,6 +69,12 @@ void EnemyBee::update(int deltaTime)
 			attackSpeed = WALK_SPEED;
 			enemyBeeState = BEE_FLY_RIGHT;
 			moveHorizontal(left, WALK_SPEED);
+			moveY += 1;
+			moveY %= countY;
+			if (moveY < countY/2)
+				position.y -= 1;
+			else
+				position.y += 1;
 			/*countY--;
 			if (countY < 0) {
 				moveY = moveY * -1;
@@ -80,9 +86,10 @@ void EnemyBee::update(int deltaTime)
 		else
 		{
 			enemyBeeState = BEE_FLY_RIGHT;
-			glm::vec2 direction = glm::vec2(glm::vec2(posPlayer.x - position.x, 0.f));
+			//glm::vec2 direction = glm::vec2(glm::vec2(posPlayer.x - position.x, 0.f));
+			glm::vec2 direction = glm::vec2(posPlayer - position);
 			glm::vec2 normalizedDirection = glm::normalize(direction);
-			glm::vec2 movement = normalizedDirection * 2.f;
+			glm::vec2 movement = glm::vec2(normalizedDirection.x * 2.f, normalizedDirection.y*1.f);
 			glm::ivec2 newPosition = position + glm::ivec2(glm::round(movement));
 			position += glm::ivec2(glm::round(movement));
 		}

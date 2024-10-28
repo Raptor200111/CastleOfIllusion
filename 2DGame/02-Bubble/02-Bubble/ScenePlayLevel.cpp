@@ -10,8 +10,8 @@
 
 #include "CollisionManager.h"
 
-#define INIT_PLAYER_X_TILES 5//74// 4+20
-#define INIT_PLAYER_Y_TILES 51//44//+8+2 //20
+#define INIT_PLAYER_X_TILES 74//5//74// 4+20
+#define INIT_PLAYER_Y_TILES 8//51//44//+8+2 //20
 
 ScenePlayLevel::ScenePlayLevel()
 {
@@ -122,6 +122,16 @@ void ScenePlayLevel::initZoneEnemyTree()
 		allEnemies[0].push_back(enemy);
 
 	}
+
+	limit = { 1.0f * map->getTileSize(), 13.0f * map->getTileSize(), 27, 39 };
+	initPos = glm::ivec2(1.0f, 33.0f);
+	ZoneEnemy zone5 = { limit, initPos, false };
+	EnemyTree* enemy = new EnemyTree();
+	enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone5);
+	enemy->setPosition(glm::ivec2(zone5.initPos.x * map->getTileSize(), zone5.initPos.y * map->getTileSize()));
+	enemy->setTileMap(map);
+	allEnemies[2].push_back(enemy);
+
 }
 void ScenePlayLevel::initZoneEnemyBug()
 {
@@ -148,7 +158,7 @@ void ScenePlayLevel::initZoneEnemyBug()
 	zones.push_back(zoneBug4);
 
 	limit = { 14.0f * tileSize, 24.0f * tileSize, 30.f * tileSize, 32.f * tileSize };
-	initPos = glm::ivec2(14.0f, 30.0f);
+	initPos = glm::ivec2(14.0f, 34.0f);
 	ZoneEnemy zoneBug5 = { limit, initPos, false };
 	zones.push_back(zoneBug5);
 
@@ -196,12 +206,38 @@ void ScenePlayLevel::initZoneEnemyBee()
 	ZoneEnemy zoneBee5 = { limit, initPos, true };
 	zones.push_back(zoneBee5);
 
+	limit = { 59.0f * tileSize, 77.0f * tileSize, 0, 12.f * tileSize };
+	initPos = glm::ivec2(76.0f, 5.0f);
+	ZoneEnemy zoneBee00 = { limit, initPos, true };
+	zones.push_back(zoneBee00);
+
+	limit = { 19.0f * tileSize, 37.0f * tileSize, 16.f * tileSize, 26.f * tileSize };
+	initPos = glm::ivec2(19.0f, 18.0f);
+	ZoneEnemy zoneBee10 = { limit, initPos, false };
+	zones.push_back(zoneBee10); 
+	
+	limit = { 38.0f * tileSize, 60.0f * tileSize, 16.f * tileSize, 26.f * tileSize };
+	initPos = glm::ivec2(45.0f, 19.0f);
+	ZoneEnemy zoneBee11 = { limit, initPos, false };
+	zones.push_back(zoneBee11);
+
+	limit = { 64.0f * tileSize, 92.0f * tileSize, 16.f * tileSize, 26.f * tileSize };
+	initPos = glm::ivec2(64.0f, 18.0f);
+	ZoneEnemy zoneBee12 = { limit, initPos, true };
+	zones.push_back(zoneBee12);
+
+	limit = { 44.0f * tileSize, 81.0f * tileSize, 26.f * tileSize, 39.f * tileSize };
+	initPos = glm::ivec2(48.0f, 32.0f);
+	ZoneEnemy zoneBee20 = { limit, initPos, false };
+	zones.push_back(zoneBee20);
+
 	for (const auto& zone : zones) {
 		EnemyBee* enemy = new EnemyBee();
 		enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone);
 		enemy->setPosition(glm::ivec2(zone.initPos.x * tileSize, zone.initPos.y * tileSize));
 		enemy->setTileMap(map);
-		allEnemies[3].push_back(enemy);
+		int floorIndex = calcFloorIndex(zone.initPos.y);
+		allEnemies[floorIndex].push_back(enemy);
 	}
 }
 
