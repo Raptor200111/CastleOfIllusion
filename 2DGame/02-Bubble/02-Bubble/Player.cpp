@@ -504,9 +504,12 @@ bool Player::stopFallingCollision(Block*& block, CollisionType& colType)
 	if (originalPos != tileCorrectedPos && tileCorrectedPos != position)
 		position = tileCorrectedPos;
 
+	if (colType == CollisionType::Hole && Game::instance().isOnGodMode())
+		Game::instance().onPlayerFallDownHole();
+
 	if (colType == CollisionType::Tile || colType == CollisionType::TileStairs)
 		return true;
-	if (block != nullptr) 
+	if (block != nullptr)
 		return true;
 	return false;
 }
