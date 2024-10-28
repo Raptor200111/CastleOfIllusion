@@ -323,11 +323,12 @@ void ScenePlay::collisionsEnemies(int deltaTime)
 		bool reStarted = false;
 		itEnemy->second->update(deltaTime);
 		EnemyType enemyType = itEnemy->second->getEnemyType();
-		if (itEnemy->second->getEntityState() == Alive && player->getEntityState() == Alive 
-			&& CollisionManager::instance().checkCollisionBlockVertical(player, itEnemy->second) == Down) {
+		if (itEnemy->second->getEntityState() == ALIVE && player->getEntityState() == ALIVE 
+			&& CollisionManager::instance().checkCollisionObject(player, itEnemy->second)) {
 			if (player->isAttacking()) {
 				Game::instance().onPlayerKilledEnemy();
 				itEnemy->second->Damaged();
+				player->playerButtJump();
 			}
 			else if (!Game::instance().isOnGodMode()){
 				string idEnemy = itEnemy->first;
