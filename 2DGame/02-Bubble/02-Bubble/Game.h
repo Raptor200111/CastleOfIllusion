@@ -54,17 +54,17 @@ public:
 	int getStars() { return stars; }
 	int getScore() { return score; }
 	int getTries() { return tries; }
-	void addStar() { stars += 1; }
-	void substractStar() { stars -= 1; }
-	void onPlayerKilledEnemy() { score += ENEMY_POINTS; }
+	//void addStar() { stars += 1; }
+	//void substractStar() { stars -= 1; }
+	void onPlayerKilledEnemy();
 	void onPlayerFallDownHole();
 	void onPlayerKilled();
 	void onPracticeLevelWon();
 	void onLevelWon();
-	void onGetCake() { if (stars < MAX_STARS) stars += 1; }
-	void onGetCoin() { score += COIN_POINTS; }
+	void onGetCake();
+	void onGetCoin();
 	void onExceededTimeLimit();
-	void onHeal() { stars = INIT_STARS; }
+	void onHeal();
 	bool isOnGodMode() { return godMode; }
 
 private:

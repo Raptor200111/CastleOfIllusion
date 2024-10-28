@@ -29,8 +29,10 @@ void Block::update(int deltaTime)
 	{
 		case ALIVE:
 		{
-			speed.y += 0.5;
-			position += speed;
+			if (blockType != Gem) {
+				speed.y += 0.5;
+				position += speed;
+			}
 			break;
 		}
 		case DEAD:
@@ -108,5 +110,7 @@ void Block::explode()
 {
 	entityState = DYING;
 	speed = glm::vec2(0, 0);
+	SoundManager::instance().setMusicVolume(40);
+	SoundManager::instance().playSoundEffect("break", 0);
 	explosionEfect->play(position + (getSize()/2) - glm::ivec2(16, 18), 0);
 }
