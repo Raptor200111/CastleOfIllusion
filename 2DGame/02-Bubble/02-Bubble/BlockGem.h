@@ -4,6 +4,6 @@
 class BlockGem: public Block
 {
 public:
-	void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) override;
+	BlockGem(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
 };
 

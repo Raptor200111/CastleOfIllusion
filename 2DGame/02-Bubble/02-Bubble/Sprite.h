@@ -55,7 +55,7 @@ private:
 	glm::vec2 position;
 	glm::vec2 size;
 	int currentAnimation, currentKeyframe;
-	float timeAnimation;
+	float timeAnimation, durationAnimation;
 	glm::vec2 texCoordDispl;
 	vector<AnimKeyframes> animations;
 	bool left, playingOnce, playingNow;

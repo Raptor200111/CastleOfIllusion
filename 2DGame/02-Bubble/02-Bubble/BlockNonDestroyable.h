@@ -4,6 +4,6 @@
 class BlockNonDestroyable: public Block
 {
 public:
-	void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) override;
+	BlockNonDestroyable(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
 };
 

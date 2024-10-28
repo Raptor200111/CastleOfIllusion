@@ -1,7 +1,7 @@
 #include "ParticleEfect.h"
 #include "Game.h"
 
-void ParticleEfect::init(const glm::ivec2& tileMapPos, glm::ivec2& pos, glm::ivec2& siz, ShaderProgram& shaderProgram, string file, glm::vec2 weirdSize, int numAnims)
+ParticleEfect::ParticleEfect(const glm::ivec2& tileMapPos, glm::ivec2& pos, glm::ivec2& siz, ShaderProgram& shaderProgram, string file, glm::vec2 weirdSize, int numAnims)
 {
 	tileMapDispl = tileMapPos;
 	position = pos;
@@ -42,6 +42,6 @@ void ParticleEfect::play(const glm::vec2& pos, int anim)
 {
 	setPosition(pos);
 	sprite->changeAnimation(anim);
-	sprite->stop();
+	//sprite->stop();
 	sprite->playOnce();
 }

@@ -1,6 +1,6 @@
 #include "BlockDestroyable.h"
 
-void BlockDestroyable::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
+BlockDestroyable::BlockDestroyable(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) : Block(tileMapPos, shaderProgram)
 {
 	blockType = Destroyable;
 	blockStatus = ITEM_STATUS;
@@ -11,10 +11,9 @@ void BlockDestroyable::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderP
 	sprite->setNumberAnimations(1);
 
 	sprite->setAnimationSpeed(ITEM_STATUS, 8);
-	sprite->addKeyframe(ITEM_STATUS, glm::vec2(2.f/ 6.f, 0.0f));
+	sprite->addKeyframe(ITEM_STATUS, glm::vec2(2.f / 6.f, 0.0f));
 
 	sprite->changeAnimation(blockStatus);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
-
 }

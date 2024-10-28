@@ -3,6 +3,6 @@
 class BlockDestroyable: public Block
 {
 public:
-	void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) override;
+	BlockDestroyable(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
 };
 

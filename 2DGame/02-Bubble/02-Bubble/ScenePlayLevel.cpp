@@ -73,8 +73,7 @@ void ScenePlayLevel::init()
 	bossRoom = { float(79.0f * tileSize), float(mapSize.x * tileSize), float(mapSize.y * tileSize), float(45 * tileSize) };
 
 
-	blockGem = new BlockGem();
-	blockGem->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	blockGem = new BlockGem(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	blockGem->setPosition(glm::vec2(92 * tileSize, 50 * tileSize));
 	blockGem->setTileMap(map);
 
@@ -218,7 +217,7 @@ bool ScenePlayLevel::checkIfInsideBossRoom() {
 		shoots.clear();
 		for (const auto& shoot : boss.getShoots())
 		{
-			if (shoot->getEntityState() != Dead)
+			if (shoot->getEntityState() != DEAD)
 				shoots.push_back(shoot);
 		}
 	}
@@ -231,9 +230,9 @@ bool ScenePlayLevel::checkIfInsideBossRoom() {
 void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 	boss.update(deltaTime);
 
-	if (boss.getEntityState() != Dead) {
+	if (boss.getEntityState() != DEAD) {
 
-		if (boss.getEntityState() == Alive && player->getEntityState() == Alive && 
+		if (boss.getEntityState() == ALIVE && player->getEntityState() == ALIVE && 
 			CollisionManager::instance().checkCollisionObject(player, &boss))
 		{
 			boss.Damaged();
@@ -243,26 +242,26 @@ void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 		for (auto shoot : boss.getShoots())
 		{
 			shoot->update(deltaTime);
-			if (shoot->getEntityState() == Alive && !Game::instance().isOnGodMode()) {
+			if (shoot->getEntityState() == ALIVE && !Game::instance().isOnGodMode()) {
 				if (CollisionManager::instance().checkCollisionObject(player, shoot)) {
 					Game::instance().onPlayerKilled();
-					shoot->setEntityState(Dying);
+					shoot->setEntityState(DYING);
 				}
 			}
 
-			if (shoot->getEntityState() == Alive) {
+			if (shoot->getEntityState() == ALIVE) {
 				glm::ivec2 posShoot = shoot->getPosition();
 				if (CollisionManager::instance().checkCollisionVertical(shoot) != None || CollisionManager::instance().checkCollisionHorizontal(shoot) != None)
-					shoot->setEntityState(Dying);
+					shoot->setEntityState(DYING);
 			}
 
-			if (shoot->getEntityState() == Alive) {
+			if (shoot->getEntityState() == ALIVE) {
 				for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
 				{
 					VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(shoot, itBlock->second);
 					if (CollisionManager::instance().checkCollisionBlockVertical(shoot, itBlock->second) != NoVcol || CollisionManager::instance().checkCollisionBlockHorizontal(shoot, itBlock->second) != NoHcol)
 					{
-						shoot->setEntityState(Dying);
+						shoot->setEntityState(DYING);
 						break;
 					}
 				}
@@ -270,11 +269,11 @@ void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 		}
 	}
 	else {
-		if (blockGem->getEntityState() != Dead)
+		if (blockGem->getEntityState() != DEAD)
 			blockGem->update(deltaTime);
-		if (player->getEntityState() == Alive && CollisionManager::instance().checkCollisionObject(player, blockGem))
+		if (player->getEntityState() == ALIVE && CollisionManager::instance().checkCollisionObject(player, blockGem))
 		{
-			blockGem->setEntityState(Dying);
+			blockGem->setEntityState(DYING);
 		}
 	}
 
@@ -282,9 +281,9 @@ void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 
 void ScenePlayLevel::collisionMovBlockInsideBossRoom(Block* movBlock)
 {
-	if (boss.getEntityState() != Dead) {
+	if (boss.getEntityState() != DEAD) {
 
-		if (movBlock->getEntityState() == Alive && CollisionManager::instance().checkCollisionObject(movBlock, &boss))
+		if (movBlock->getEntityState() == ALIVE && CollisionManager::instance().checkCollisionObject(movBlock, &boss))
 		{
 			boss.Damaged();
 			Game::instance().onPlayerKilledEnemy();
@@ -295,21 +294,21 @@ void ScenePlayLevel::collisionMovBlockInsideBossRoom(Block* movBlock)
 
 void ScenePlayLevel::renderBoss() {
 
-	if (boss.getEntityState() != Dead) {
+	if (boss.getEntityState() != DEAD) {
 		boss.render();
 		//cout << "player: " << player->getPosition().x << " " << player->getPosition().y << "\n";
 		for (auto shoot : shoots)
 		{
-			if (shoot->getEntityState() != Dead)
+			if (shoot->getEntityState() != DEAD)
 				shoot->render();
 		}
 	}
 	else
 	{
 		EntityState gemState = blockGem->getEntityState();
-		if (gemState == Alive)
+		if (gemState == ALIVE)
 			blockGem->render();
-		else if (gemState == Dying)
+		else if (gemState == DYING)
 			winAnimScenePlay = true;
 		else {
 			Game::instance().onLevelWon();

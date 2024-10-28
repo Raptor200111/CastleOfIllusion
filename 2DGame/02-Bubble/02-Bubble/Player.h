@@ -24,7 +24,7 @@ public:
 		static Player P;
 		return P;
 	}
-
+	~Player();
 	void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram);
 	void update(int deltaTime);
 	void render();
@@ -46,7 +46,7 @@ private:
 	bool jumpAvailable, objInteractionAvailable;
 	float yAxisSpeed;
 	PlayerStates oldState, newState;
-	ParticleEfect particleEfect;
+	ParticleEfect* particleEfect;
 
 	CollisionType colType = CollisionType::None;
 	Block* block = nullptr;
@@ -59,6 +59,7 @@ private:
 	void leftMove();
 	void rightMove();
 	void changeToClimb();
+	void changeToDodge();
 	bool stopFallingCollision(Block*& block, CollisionType& colType);
 	bool stairCollision();
 
@@ -73,6 +74,8 @@ private:
 
 	bool checkJumpButton();
 	bool checkObjInteractionButton();
+
+	void playerButtJump();
 };
 
 #endif
