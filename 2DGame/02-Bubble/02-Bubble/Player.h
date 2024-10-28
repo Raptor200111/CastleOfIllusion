@@ -59,6 +59,7 @@ private:
 	void leftMove();
 	void rightMove();
 	void changeToClimb();
+	void changeToDodge();
 	bool stopFallingCollision(Block*& block, CollisionType& colType);
 	bool stairCollision();
 

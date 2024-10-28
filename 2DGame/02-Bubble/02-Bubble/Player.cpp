@@ -7,7 +7,8 @@
 #define JUMP_SPEED -9.f
 #define BUTT_JUMP_SPEED -12.f
 #define STANDART_SIZE glm::ivec2(24, 32)
-#define DODGE_SIZE glm::ivec2(24, 32)
+#define DODGE_SIZE glm::ivec2(24, 21)
+#define OFFSET glm::ivec2(4, 8)
 
 Player::~Player()
 {
@@ -42,8 +43,8 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	delete vec2Array;
 	//HASTA AQUI
 
-	setSize(glm::ivec2(24, 32));
-	setOffset(glm::ivec2(4, 8));
+	sizeObject = STANDART_SIZE;
+	offset = OFFSET;
 
 	spritesheet.loadFromFile("images/Mickey_Mouse.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(sizeSprite, glm::vec2(0.066, 0.098), &spritesheet, &shaderProgram);
@@ -215,7 +216,9 @@ void Player::update(int deltaTime)
 		case DODGE:
 		{
 			if (!Game::instance().getKey(GLFW_KEY_S)) {
-				setSize(STANDART_SIZE);
+				sizeObject = STANDART_SIZE;
+				offset = OFFSET;
+				position.y -= 11;
 				newState = IDLE;
 			}
 			if (stopFallingCollision(block, colType))
@@ -329,12 +332,11 @@ void Player::update(int deltaTime)
 	setPosition(position);
 	if (Game::instance().getKey(GLFW_KEY_P))
 		cout << position.x << " " << position.y << " - State: " << PlayerStates(oldState) << endl;
-	// TENEMOS QUE AÑADIR PARTICULAS CHULAS
 	
 	particleEfect->update(deltaTime);
 	if (pickedUpBlock != nullptr)
 	{
-		pickedUpBlock->update(deltaTime);//hacemos el update (hay que cambiarle la posicion)
+		pickedUpBlock->update(deltaTime);
 		if (oldState != B_PICK)
 		{
 			if (left)
@@ -484,6 +486,13 @@ void Player::changeToClimb()
 	//calcular posicion de la escalera
 }
 
+void Player::changeToDodge() {
+	newState = DODGE;
+	sizeObject = DODGE_SIZE;
+	offset = OFFSET + glm::ivec2(0, 11);
+	position.y += 11;
+}
+
 bool Player::stopFallingCollision(Block*& block, CollisionType& colType)
 {
 	auto originalPos = position;
@@ -529,7 +538,7 @@ void Player::movementBehaviour()
 				return;
 			}
 			else {
-				newState = DODGE;
+				changeToDodge();
 				return;
 			}
 				
