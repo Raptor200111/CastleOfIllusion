@@ -201,7 +201,7 @@ void ScenePlay::render() {
 		for (const auto& screenEnemy : screenEnemies) {
 			if (insideScreen(screenEnemy.second->getPosition()))
 				screenEnemy.second->render();
-			else if(screenEnemy.second->getEnemyType() == Dead)
+			else if(screenEnemy.second->getEnemyType() == EntityState::DEAD)
 				screenEnemy.second->reLive();
 		}
 	}
@@ -323,7 +323,7 @@ void ScenePlay::collisionsEnemies(int deltaTime)
 		bool reStarted = false;
 		itEnemy->second->update(deltaTime);
 		EnemyType enemyType = itEnemy->second->getEnemyType();
-		if (itEnemy->second->getEntityState() == Alive && player->getEntityState() == Alive 
+		if (itEnemy->second->getEntityState() == EntityState::ALIVE && player->getEntityState() == EntityState::ALIVE
 			&& !Game::instance().isOnGodMode() && CollisionManager::instance().checkCollisionBlockVertical(player, itEnemy->second) == Down) {
 			if (player->isAttacking()) {
 				Game::instance().onPlayerKilledEnemy();

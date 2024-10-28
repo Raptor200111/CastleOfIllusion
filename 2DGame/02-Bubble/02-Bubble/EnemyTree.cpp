@@ -136,7 +136,7 @@ void EnemyTree::Damaged()
 
 void EnemyTree::reLive()
 {
-	entityState = Alive;
+	entityState = EntityState::ALIVE;
 	left = initParams.left;
 	position = initParams.initPos * map->getTileSize();
 	sprite->setLeft(left);

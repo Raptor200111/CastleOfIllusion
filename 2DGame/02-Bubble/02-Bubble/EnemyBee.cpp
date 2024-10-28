@@ -127,7 +127,7 @@ void EnemyBee::Damaged()
 void EnemyBee::reLive()
 {
 	enemyBeeState = BEE_FLY_RIGHT;
-	entityState = Alive;
+	entityState = EntityState::ALIVE;
 	left = initParams.left;
 	position = glm::ivec2(initParams.limit.max_x, initParams.initPos.y * map->getTileSize());
 	sprite->setLeft(left);
