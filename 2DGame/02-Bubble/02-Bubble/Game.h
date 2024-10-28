@@ -7,6 +7,8 @@
 #include "SceneMenu.h"
 #include "ScenePlayLevel.h"
 #include "ScenePlayPractice.h"
+#include "SceneInstructions.h"
+#include "SceneCredits.h"
 
 #define SCREEN_WIDTH 640 
 #define SCREEN_HEIGHT 480
@@ -75,6 +77,8 @@ private:
 	SceneMenu sceneMenu;
 	ScenePlayLevel scenePlayLevel;
 	ScenePlayPractice scenePlayPractice;
+	SceneInstructions sceneInstructions;
+	SceneCredits sceneCredits;
 
 	int score = 0;
 	int tries = 3;

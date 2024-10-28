@@ -10,6 +10,8 @@ void Game::init()
 	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	SoundManager::instance().init();
 	sceneMenu.init();
+	sceneInstructions.init();
+	sceneCredits.init();
 	scenePlayPractice.init();
 	scenePlayLevel.init();
 	currentScene = &sceneMenu;
@@ -46,6 +48,15 @@ void Game::keyPressed(int key)
 		currentScene = &scenePlayLevel;
 		tries = 8;
 		scenePlayLevel.reStart();
+	}
+	else if (key == GLFW_KEY_I) {
+		currentScene = &sceneInstructions;
+	}
+	else if (key == GLFW_KEY_M) {
+		currentScene = &sceneMenu;
+	}
+	else if (key == GLFW_KEY_C) {
+		currentScene = &sceneCredits;
 	}
 	keys[key] = true;
 }
