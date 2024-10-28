@@ -30,9 +30,11 @@ void SceneFinalScreen::init()
 	bgTexture.loadFromFile("images/bgInstructions.jpg", TEXTURE_PIXEL_FORMAT_RGBA);
 	bgQuad = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1.f, 1.f), &bgTexture, &texProgram);
 
+	winTexture.loadFromFile("images/gameWin.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	winTexture.loadFromFile("images/win.jpg", TEXTURE_PIXEL_FORMAT_RGBA);
 	win = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1.f, 1.f), &winTexture, &texProgram);
 
+	loseTexture.loadFromFile("images/gameOver.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	loseTexture.loadFromFile("images/lose.jpg", TEXTURE_PIXEL_FORMAT_RGBA);
 	lose = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1.f, 1.f), &loseTexture, &texProgram);
 
