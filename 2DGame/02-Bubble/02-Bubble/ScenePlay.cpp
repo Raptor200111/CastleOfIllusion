@@ -21,7 +21,7 @@ ScenePlay::ScenePlay()
 {
     map = NULL;
     player = NULL;
-    zoomLevel = 0.7f;
+    zoomLevel = 1.5f;
     bgMap = NULL;
     bgQuad = NULL;
 	quad = NULL;
@@ -118,6 +118,8 @@ void ScenePlay::reStart()
 	screenBlocks.clear();
 	playrunMovBlocks.clear();
 	winAnimScenePlay = false;
+	insideBossRoom = false;
+	changeBg = false;
 	reStartLevelSpecific();
 }
 
@@ -203,9 +205,13 @@ void ScenePlay::render() {
 	{
 		for (const auto& screenEnemy : screenEnemies) {
 			if (insideScreen(screenEnemy.second->getPosition()))
+			{
 				screenEnemy.second->render();
-			else if(screenEnemy.second->getEnemyType() == EntityState::DEAD)
+			}
+			else if (screenEnemy.second->getEntityState() != EntityState::ALIVE)
+			{
 				screenEnemy.second->reLive();
+			}
 		}
 	}
 	for (const auto& screenBlock : screenBlocks)
@@ -265,9 +271,14 @@ void ScenePlay::insideScreenObj(int floorIndex)
 	insideBossRoom = checkIfInsideBossRoom();
 	if(!insideBossRoom) {
 		if (!screenEnemies.empty()) {
-			int enemyPosY = screenEnemies.begin()->second->getPosition().y;
+			int enemyPosY = screenEnemies.begin()->second->getPosition().y / map->getTileSize();
 			if (calcFloorIndex(enemyPosY) != floorIndex)
 			{
+				for (auto& itEnemy : screenEnemies)
+				{
+					if(itEnemy.second->getEntityState() != ALIVE)
+						itEnemy.second->reLive();
+				}
 				screenEnemies.clear();
 			}
 		}
@@ -281,7 +292,7 @@ void ScenePlay::insideScreenObj(int floorIndex)
 		}
 	}
 	if (!screenBlocks.empty()) {
-		int blocksPosY = screenBlocks.begin()->second->getPosition().y;
+		int blocksPosY = screenBlocks.begin()->second->getPosition().y / map->getTileSize();
 		if (calcFloorIndex(blocksPosY) != floorIndex)
 		{
 			screenBlocks.clear();
@@ -379,7 +390,7 @@ void ScenePlay::collisionsEnemies(int deltaTime)
 				
 				if (itEnemy->second->getEntityState() == ALIVE && CollisionManager::instance().checkCollisionHorizontal(itEnemy->second) == Tile)
 				{					
-          itEnemy->second->collideHorizontal();
+					itEnemy->second->collideHorizontal();
 				}
 			}
 			++itEnemy;
@@ -444,7 +455,7 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 				}
 			}
 		}
-
+		
 		//check collision tilemap vertical
 		if (itMovBlock->second->getEntityState() == ALIVE) {
 			CollisionType verticalCollision = CollisionManager::instance().checkCollisionVertical(itMovBlock->second);

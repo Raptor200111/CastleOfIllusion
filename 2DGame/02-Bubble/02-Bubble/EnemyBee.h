@@ -22,7 +22,7 @@ public:
 
 private:
 
-	int attackDistance = 2 * 16;//5*mapTileSize
+	int attackDistance = 3 * 16;//5*mapTileSize
 	int attackSpeed;
 	int elapsedTime = 0;
 	int timeDyingAnim = 500; //0,5 s

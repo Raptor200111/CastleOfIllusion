@@ -207,7 +207,7 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 	}
 	if (correctRamp(entity))
 		tile = true;
-	if (hole)
+	if (hole && !Game::instance().isOnGodMode())
 		return Hole;
 	if (tile && stairs)
 		return TileStairs;

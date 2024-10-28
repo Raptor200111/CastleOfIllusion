@@ -64,7 +64,8 @@ void EnemyBee::update(int deltaTime)
 		int min_y_attack = position.y - attackDistance;
 		int max_y_attack = position.y + attackDistance;
 		glm::ivec2 posPlayer = Player::instance().getPosition();
-		if (posPlayer.x < min_x_attack || position.x < posPlayer.x
+		bool playerInFront = left && posPlayer.x < position.x || !left && position.x < posPlayer.x;
+		if (posPlayer.x < min_x_attack || max_x_attack < posPlayer.x || !playerInFront
 			|| posPlayer.y < min_y_attack || max_y_attack < posPlayer.y) {
 			attackSpeed = WALK_SPEED;
 			enemyBeeState = BEE_FLY_RIGHT;
@@ -83,7 +84,7 @@ void EnemyBee::update(int deltaTime)
 			position.y += moveY;*/
 		}
 		//player inside attack range rols x2_Speed
-		else
+		else 
 		{
 			enemyBeeState = BEE_FLY_RIGHT;
 			//glm::vec2 direction = glm::vec2(glm::vec2(posPlayer.x - position.x, 0.f));
@@ -95,10 +96,13 @@ void EnemyBee::update(int deltaTime)
 		}
 
 		//if after mov enemy outside limits, turn around
-		if (position.x < initParams.limit.min_x || initParams.limit.max_x < position.x) {
+		if (position.x <= initParams.limit.min_x || initParams.limit.max_x <= position.x) {
 			enemyBeeState = BEE_FLY_RIGHT;
 			int tilesize = map->getTileSize();
-			position = glm::ivec2(initParams.limit.max_x, initParams.initPos.y * tilesize);
+			if(left)
+				position = glm::ivec2(initParams.limit.max_x, initParams.initPos.y * tilesize);
+			else
+				position = glm::ivec2(initParams.limit.min_x, initParams.initPos.y * tilesize);
 			left = initParams.left;
 		}
 
@@ -136,7 +140,10 @@ void EnemyBee::reLive()
 	enemyBeeState = BEE_FLY_RIGHT;
 	entityState = EntityState::ALIVE;
 	left = initParams.left;
-	position = glm::ivec2(initParams.limit.max_x, initParams.initPos.y * map->getTileSize());
+	if (left)
+		position = glm::ivec2(initParams.limit.max_x, initParams.initPos.y * map->getTileSize());
+	else
+		position = glm::ivec2(initParams.limit.min_x, initParams.initPos.y * map->getTileSize());
 	sprite->setLeft(left);
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }

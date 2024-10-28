@@ -1,5 +1,5 @@
 TILEMAP
-95 55 							-- Size of tile map in tiles
+95 56 							-- Size of tile map in tiles
 16 16							-- Tile size & block size
 images/tilemap.png 	-- Tilesheet
 4 3 								-- Number of tiles in tilesheet
@@ -48,13 +48,14 @@ efd          bcd                                                                
 ef                                                                                            e
 ef                                                                                            e
 ef                                                                  kkkk                      e
-ef                                                                            e               e
-e                                                            kkkkk        kk  e               e
-e                                                kkk                          e               e
-e                            kkk                       kkk                    e               e
-e                                          kkkk                               e               e
-e   44                  kk                                                    e               e
-e                                   kkkk                                      e   aa          e
-e                                                                             e               e
-e                  33                                                         e   7           e
-fkkkkkkkkkkkkkkkkkkkkjjjjjjjjjjjjkkkkkkkkkkkjjjjjjjjjjjjkkkkkkkkkjjjjjjjjjjjjkkkkkkkkkkkkkkkkkk
+ef                                                                             e              e
+e                                                            kkkkk        kk   e              e
+e                                                kkk                           e              e
+e                                                      kkk                     e              e
+e                           kkkk           kkkk                                e              e
+e   44                                                                         e              e
+e                      kkk         kkkkk                                       e   aa         e
+e                                                                              e              e
+e                  33                                                          e           7  e
+ekkkkkkkkkkkkkkkkkkkk            kkkkkkkkkkk            kkkkkkkkk            kkkkkkkkkkkkkkkkke
+fkkkkkkkkkkkkkkkkkkkkjjjjjjjjjjjjeeeeeeeeeeejjjjjjjjjjjjeeeeeeeeejjjjjjjjjjjjeeeeeeeeeeeeeeeeek

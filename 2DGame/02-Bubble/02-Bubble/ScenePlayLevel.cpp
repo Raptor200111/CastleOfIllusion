@@ -61,7 +61,7 @@ void ScenePlayLevel::init()
 	gameUI.setMaxTime(400 * 1000);
 
 	Zone limit = { 79.0f * tileSize, mapSize.x * tileSize, 0, 0 };
-	glm::ivec2 finalPosBoss = glm::ivec2(87.0f * tileSize, 45.0f * tileSize);
+	glm::ivec2 finalPosBoss = glm::ivec2(88.0f * tileSize, 45.0f * tileSize);
 	//Zone limit = { (mapSize.x - 19) * tileSize, mapSize.x * tileSize, 0, 0 };
 	//glm::ivec2 finalPosBoss = glm::ivec2((mapSize.x - 9) * tileSize, (mapSize.y-9) * tileSize);
 	ZoneEnemy zone1 = { limit, finalPosBoss, false };
@@ -122,16 +122,6 @@ void ScenePlayLevel::initZoneEnemyTree()
 		allEnemies[0].push_back(enemy);
 
 	}
-
-	limit = { 1.0f * map->getTileSize(), 13.0f * map->getTileSize(), 27, 39 };
-	initPos = glm::ivec2(1.0f, 33.0f);
-	ZoneEnemy zone5 = { limit, initPos, false };
-	EnemyTree* enemy = new EnemyTree();
-	enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone5);
-	enemy->setPosition(glm::ivec2(zone5.initPos.x * map->getTileSize(), zone5.initPos.y * map->getTileSize()));
-	enemy->setTileMap(map);
-	allEnemies[2].push_back(enemy);
-
 }
 void ScenePlayLevel::initZoneEnemyBug()
 {
@@ -194,14 +184,14 @@ void ScenePlayLevel::initZoneEnemyBee()
 	ZoneEnemy zoneBee3 = { limit, initPos, true };
 	zones.push_back(zoneBee3);
 
-	//limit = { 15.0f * tileSize, 65.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
-	limit = { 15.0f * tileSize, 78.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
+	limit = { 15.0f * tileSize, 65.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
+	//limit = { 15.0f * tileSize, 78.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
 	initPos = glm::ivec2(65.0f, 45.0f);
 	ZoneEnemy zoneBee4 = { limit, initPos, true };
 	zones.push_back(zoneBee4);
 
-	//limit = { 15.0f * tileSize, 78.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
 	limit = { 15.0f * tileSize, 78.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
+	//limit = { 15.0f * tileSize, 78.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
 	initPos = glm::ivec2(78.0f, 43.0f);
 	ZoneEnemy zoneBee5 = { limit, initPos, true };
 	zones.push_back(zoneBee5);
@@ -230,6 +220,11 @@ void ScenePlayLevel::initZoneEnemyBee()
 	initPos = glm::ivec2(48.0f, 32.0f);
 	ZoneEnemy zoneBee20 = { limit, initPos, false };
 	zones.push_back(zoneBee20);
+
+	limit = { 1.0f * map->getTileSize(), 21.0f * map->getTileSize(), 27, 39 };
+	initPos = glm::ivec2(1.0f, 30.0f);
+	ZoneEnemy zoneBee21 = { limit, initPos, false };
+	zones.push_back(zoneBee21);
 
 	for (const auto& zone : zones) {
 		EnemyBee* enemy = new EnemyBee();
