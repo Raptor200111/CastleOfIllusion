@@ -14,6 +14,7 @@ void EnemyBee::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgra
 	this->initParams = initParams;
 	attackSpeed = WALK_SPEED;
 	enemyType = Bee;
+	timeDyingAnim = 800;
 	spritesheet.loadFromFile("images/bee.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sizeObject = glm::ivec2(16.f, 17.f);
 	sprite = Sprite::createSprite(sizeObject, glm::vec2( 1/6.f, 1.f), &spritesheet, &shaderProgram);
@@ -89,7 +90,8 @@ void EnemyBee::update(int deltaTime)
 		//if after mov enemy outside limits, turn around
 		if (position.x < initParams.limit.min_x || initParams.limit.max_x < position.x) {
 			enemyBeeState = BEE_FLY_RIGHT;
-			position = initParams.initPos * map->getTileSize();
+			int tilesize = map->getTileSize();
+			position = glm::ivec2(initParams.limit.max_x, initParams.initPos.y * tilesize);
 			left = initParams.left;
 		}
 
@@ -119,4 +121,15 @@ void EnemyBee::collisionBlockHorizontal(Block* b)
 void EnemyBee::Damaged()
 {
 	entityState = DYING;
+}
+
+
+void EnemyBee::reLive()
+{
+	enemyBeeState = BEE_FLY_RIGHT;
+	entityState = Alive;
+	left = initParams.left;
+	position = glm::ivec2(initParams.limit.max_x, initParams.initPos.y * map->getTileSize());
+	sprite->setLeft(left);
+	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }

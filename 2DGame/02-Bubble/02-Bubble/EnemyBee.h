@@ -15,7 +15,9 @@ public:
 	void initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, const ZoneEnemy& initParams) override;
 	void render() override;
 	void Damaged() override;
+	void reLive() override;
 	void collideVertical() override;
+	void collideHorizontal() override {}
 	void collisionBlockHorizontal(Block* b) override;
 
 private:

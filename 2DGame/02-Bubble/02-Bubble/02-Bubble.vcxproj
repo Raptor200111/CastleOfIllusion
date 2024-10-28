@@ -29,6 +29,8 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Block.h" />
     <ClInclude Include="GameUI.h" />
+    <ClInclude Include="SceneCredits.h" />
+    <ClInclude Include="SceneInstructions.h" />
     <ClInclude Include="ScenePlayLevel.h" />
     <ClInclude Include="SceneMenu.h" />
     <ClInclude Include="ParticleEfect.h" />
@@ -64,6 +66,8 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="GameUI.cpp" />
+    <ClCompile Include="SceneCredits.cpp" />
+    <ClCompile Include="SceneInstructions.cpp" />
     <ClCompile Include="ScenePlayLevel.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SceneMenu.cpp" />

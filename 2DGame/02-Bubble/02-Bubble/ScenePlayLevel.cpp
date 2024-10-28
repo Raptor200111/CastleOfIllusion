@@ -10,7 +10,7 @@
 
 #include "CollisionManager.h"
 
-#define INIT_PLAYER_X_TILES 5//79//+35+36// 4+20
+#define INIT_PLAYER_X_TILES 5//74// 4+20
 #define INIT_PLAYER_Y_TILES 51//44//+8+2 //20
 
 ScenePlayLevel::ScenePlayLevel()
@@ -166,27 +166,32 @@ void ScenePlayLevel::initZoneEnemyBee()
 {
 	vector<ZoneEnemy> zones;
 	int tileSize = map->getTileSize();
-	Zone limit = { 15.0f * tileSize, 27.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
+	//Zone limit = { 15.0f * tileSize, 27.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
+	Zone limit = { 15.0f * tileSize, 78.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
 	glm::ivec2 initPos = glm::ivec2(27.0f, 47.0f);
 	ZoneEnemy zoneBee1 = { limit, initPos, true };
 	zones.push_back(zoneBee1);
 
-	limit = { 27.0f * tileSize, 39.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
+	//limit = { 15.0f * tileSize, 39.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
+	limit = { 15.0f * tileSize, 78.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
 	initPos = glm::ivec2(39.0f, 44.0f);
 	ZoneEnemy zoneBee2 = { limit, initPos, true };
 	zones.push_back(zoneBee2);
 
-	limit = { 39.0f * tileSize, 53.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
+//	limit = { 15.0f * tileSize, 53.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
+	limit = { 15.0f * tileSize, 78.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
 	initPos = glm::ivec2(53.0f, 46.0f);
 	ZoneEnemy zoneBee3 = { limit, initPos, true };
 	zones.push_back(zoneBee3);
 
-	limit = { 53.0f * tileSize, 65.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
+	//limit = { 15.0f * tileSize, 65.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
+	limit = { 15.0f * tileSize, 78.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
 	initPos = glm::ivec2(65.0f, 45.0f);
 	ZoneEnemy zoneBee4 = { limit, initPos, true };
 	zones.push_back(zoneBee4);
 
-	limit = { 65.0f * tileSize, 78.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
+	//limit = { 15.0f * tileSize, 78.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
+	limit = { 15.0f * tileSize, 78.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
 	initPos = glm::ivec2(78.0f, 43.0f);
 	ZoneEnemy zoneBee5 = { limit, initPos, true };
 	zones.push_back(zoneBee5);
@@ -227,7 +232,8 @@ void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 
 	if (boss.getEntityState() != DEAD) {
 
-		if (player->getEntityState() == ALIVE && CollisionManager::instance().checkCollisionObject(player, &boss)) 
+		if (boss.getEntityState() == ALIVE && player->getEntityState() == ALIVE && 
+			CollisionManager::instance().checkCollisionObject(player, &boss))
 		{
 			boss.Damaged();
 			Game::instance().onPlayerKilledEnemy();

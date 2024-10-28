@@ -17,7 +17,9 @@ public:
 	void update(int deltaTime) override;
 	void render() override;
 	void Damaged() override;
+	void reLive() override;
 	void collideVertical() override;
+	void collideHorizontal() override;
 	void collisionBlockHorizontal(Block* b) override;
 private:
 	int elapsedTime = 0;

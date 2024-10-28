@@ -30,6 +30,7 @@ void BossDragon::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProg
 	this->left = initParams.left;
 	this->initParams = initParams;
 	entityState = DEAD;
+	timeDyingAnim = 1800;
 	states = { BOSS_LEFT, BOSS_LEFT_DOWN, BOSS_DOWN, BOSS_RIGHT_DOWN, BOSS_DOWN, BOSS_LEFT_DOWN };
 	angleShoots = vector<vector<float>>{
 		{185.f, 160.f, 140.f},
@@ -135,6 +136,7 @@ void BossDragon::update(int deltaTime)
 
 	else if (entityState == DYING) {
 		elapsedTime += deltaTime;
+		posBody.y += 1;
 		if (elapsedTime >= timeDyingAnim)
 		{
 			elapsedTime = 0;
@@ -199,9 +201,9 @@ void BossDragon::update(int deltaTime)
 			if (aux != glm::vec2(0.f))
 				sizeObjHead = aux;
 		}
-		bodySprite->setPosition(glm::vec2(float(tileMapDispl.x + posBody.x), float(tileMapDispl.y + posBody.y)));
-		setHeadSpritePos();
 	}
+	bodySprite->setPosition(glm::vec2(float(tileMapDispl.x + posBody.x), float(tileMapDispl.y + posBody.y)));
+	setHeadSpritePos();
 }
 void BossDragon::render()
 {
