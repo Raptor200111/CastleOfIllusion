@@ -76,5 +76,5 @@ protected:
     BlockGem* blockGem;
     GameUI gameUI;
     bool insideBossRoom = false;
-   
+    bool changeBg = false;
 };

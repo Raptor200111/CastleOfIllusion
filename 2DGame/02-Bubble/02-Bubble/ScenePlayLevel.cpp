@@ -210,6 +210,12 @@ bool ScenePlayLevel::checkIfInsideBossRoom() {
 	glm::ivec2 posP = player->getPosition();
 	if (bossRoom.left <= posP.x && posP.x < bossRoom.right && bossRoom.top < posP.y && posP.y < bossRoom.bottom) {
 		inside = true;
+		changeBg = true;
+		if (insideBossRoom != inside)
+		{
+			SoundManager::instance().setMusicVolume(30);
+			SoundManager::instance().playMusic("finalBoss", -1);
+		}
 		if (!boss.getActive())
 		{
 			boss.appear();
@@ -274,6 +280,8 @@ void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 		if (player->getEntityState() == ALIVE && CollisionManager::instance().checkCollisionObject(player, blockGem))
 		{
 			blockGem->setEntityState(DYING);
+			SoundManager::instance().setMusicVolume(40);
+			SoundManager::instance().playSoundEffect("gameWin", 0);
 		}
 	}
 

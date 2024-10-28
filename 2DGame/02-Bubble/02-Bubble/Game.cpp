@@ -35,6 +35,7 @@ void Game::render()
 
 void Game::keyPressed(int key)
 {
+	SoundManager::instance().setMusicVolume(30);
 	if (key == GLFW_KEY_ESCAPE) // Escape code
 	{
 		bPlay = false;
@@ -43,7 +44,6 @@ void Game::keyPressed(int key)
 		currentScene = &scenePlayPractice;
 		tries = 3;
 		scenePlayPractice.reStart();
-		SoundManager::instance().setMusicVolume(30);
 		SoundManager::instance().playMusic("level", -1);
 	}
 	else if (godMode && currentScene == &scenePlayPractice && key == GLFW_KEY_0) {
@@ -54,6 +54,7 @@ void Game::keyPressed(int key)
 	}
 	else if (currentScene != &sceneFinalScreen && key == GLFW_KEY_I) {
 		currentScene = &sceneInstructions;
+		SoundManager::instance().playMusic("instructions", -1);
 	}
 	else if (key == GLFW_KEY_M) {
 		sceneFinalScreen.setWon(false);
@@ -62,6 +63,7 @@ void Game::keyPressed(int key)
 	}
 	else if (currentScene != &sceneFinalScreen && key == GLFW_KEY_C) {
 		currentScene = &sceneCredits;
+		SoundManager::instance().playMusic("credits", -1);
 	}
 	keys[key] = true;
 }
@@ -150,16 +152,16 @@ void Game::onPracticeLevelWon()
 	tries = 8;
 	currentScene = &scenePlayLevel;
 	scenePlayLevel.reStart();
-	SoundManager::instance().setMusicVolume(40);
-	SoundManager::instance().playSoundEffect("practiceWon", 0);
+	SoundManager::instance().setMusicVolume(30);
+	SoundManager::instance().playMusic("level", -1);
 }
 
 void Game::onLevelWon()
 {
 	sceneFinalScreen.setWon(true);
 	currentScene = &sceneFinalScreen;
-	SoundManager::instance().setMusicVolume(40);
-	SoundManager::instance().playSoundEffect("gameWin", 0);
+	SoundManager::instance().setMusicVolume(30);
+	SoundManager::instance().playMusic("gameOver", -1);
 }
 
 void Game::looseGame()
@@ -168,6 +170,8 @@ void Game::looseGame()
 	currentScene = &sceneFinalScreen;
 	SoundManager::instance().setMusicVolume(40);
 	SoundManager::instance().playSoundEffect("gameLose", 0);
+	SoundManager::instance().setMusicVolume(30);
+	SoundManager::instance().playMusic("gameOver", -1);
 }
 
 void Game::onPlayerKilledEnemy()

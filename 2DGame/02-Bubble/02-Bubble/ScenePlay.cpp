@@ -162,7 +162,10 @@ void ScenePlay::render() {
 	float offsetY = glm::linearRand(-shakeIntensity, shakeIntensity);
 	glm::mat4 projectionWithShake = glm::translate(projection, glm::vec3(offsetX, offsetY, 0.0f));
 	if (!winAnimScenePlay) {
-		simpleProgram.setUniform4f("color", 48 / 255.f, 188 / 255.f, 1.f, 0.9f);
+		if(!changeBg)
+			simpleProgram.setUniform4f("color", 48 / 255.f, 188 / 255.f, 1.f, 0.9f);
+		else
+			simpleProgram.setUniform4f("color", 59 / 255.f, 67 / 255.f, 183/255.f, 1.f);
 	}
 	else {
 		int rand = std::rand();

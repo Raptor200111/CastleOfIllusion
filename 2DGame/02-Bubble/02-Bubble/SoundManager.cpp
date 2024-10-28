@@ -17,7 +17,11 @@ bool SoundManager::init() {
     SoundManager::instance().loadMusic("menu", "sound/01-Title.mp3");
     SoundManager::instance().loadMusic("level", "sound/03-Stage1-1.mp3");
     SoundManager::instance().loadMusic("gameOver", "sound/26-Game Over.mp3");
-    SoundManager::instance().loadMusic("finalBoss", "sound/22-Final Boss.mp3");
+    SoundManager::instance().loadMusic("gameCompleted", "sound/10 - Stage Clear.mp3");
+    SoundManager::instance().loadMusic("levelCompleted", "sound/07_Level_Complete.mp3");
+    SoundManager::instance().loadMusic("finalBoss", "sound/08 - Boss.mp3");
+    SoundManager::instance().loadMusic("instructions", "sound/02 - Castle.mp3");
+    SoundManager::instance().loadMusic("credits", "sound/04 - Substage.mp3");
 
     SoundManager::instance().loadSoundEffect("gameLose", "sound/lose.wav");
     SoundManager::instance().loadSoundEffect("gameWin", "sound/gameWin0.wav");

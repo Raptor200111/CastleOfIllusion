@@ -117,6 +117,8 @@ void ScenePlayPractice::updateCollisionsWithBoss(int deltaTime) {
     if (player->getEntityState() == ALIVE) {
         if (CollisionManager::instance().checkCollisionObject(player, blockGem)) {
             blockGem->setEntityState(DYING);
+            SoundManager::instance().setMusicVolume(40);
+            SoundManager::instance().playSoundEffect("practiceWon", 0);
         }
     }
 }
@@ -136,8 +138,9 @@ void ScenePlayPractice::renderBoss() {
     EntityState gemState = blockGem->getEntityState();
     if (gemState == ALIVE)
         blockGem->render();
-    else if (gemState == DYING)
+    else if (gemState == DYING) {
         winAnimScenePlay = true;
+    }
     else {
         Game::instance().onPracticeLevelWon();
     }
