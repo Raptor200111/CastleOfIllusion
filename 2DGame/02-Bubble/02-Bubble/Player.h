@@ -37,6 +37,7 @@ public:
 
 	//Block* ThrownBlock() { return thrownBlock; }
 	Block* getPickedUpBlock() { return pickedUpBlock; }
+	void playerButtJump();
 
 private:
 	//Block* thrownBlock;
@@ -74,8 +75,6 @@ private:
 
 	bool checkJumpButton();
 	bool checkObjInteractionButton();
-
-	void playerButtJump();
 };
 
 #endif
