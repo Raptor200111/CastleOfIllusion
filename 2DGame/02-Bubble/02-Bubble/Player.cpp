@@ -418,6 +418,16 @@ bool Player::checkObjInteractionButton()
 	return false;
 }
 
+void Player::playerButtJump()
+{
+	if (oldState == BUTT_FALL || oldState == BUTT_JUMP)
+	{
+		oldState = BUTT_JUMP;
+		yAxisSpeed = BUTT_JUMP_SPEED;
+		newState = BUTT_JUMP;
+	}
+}
+
 void Player::leftMove()
 {
 	left = true;
@@ -587,8 +597,10 @@ void Player::buttJumpBehaviour()
 		newState = BUTT_JUMP;
 		// destruccion del objeto que devuelve
 		// delete b;
+		CollisionManager::instance().disAttachBlock(block);
+		CollisionManager::instance().attachBlock(block);
+		CollisionManager::instance().disAttachBlock(block);
 		block->explode();
-		//CollisionManager::instance().disAttachBlock(block);
 	}
 }
 

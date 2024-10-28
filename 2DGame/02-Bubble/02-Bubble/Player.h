@@ -73,6 +73,8 @@ private:
 
 	bool checkJumpButton();
 	bool checkObjInteractionButton();
+
+	void playerButtJump();
 };
 
 #endif
