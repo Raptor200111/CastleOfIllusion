@@ -13,6 +13,7 @@ void Game::init()
 	sceneInstructions.init();
 	sceneCredits.init();
 	sceneFinalScreen.init();
+	sceneFinalScreen.setWon(false);
 	scenePlayPractice.init();
 	scenePlayLevel.init();
 	currentScene = &sceneMenu;
@@ -93,7 +94,6 @@ bool Game::getKey(int key) const
 }
 
 void Game::onPlayerFallDownHole() {
-	if (godMode) return;
 	stars = INIT_STARS;
 	tries -= 1;
 	if (tries <= 0) {

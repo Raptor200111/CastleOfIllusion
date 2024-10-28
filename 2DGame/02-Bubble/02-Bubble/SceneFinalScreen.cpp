@@ -61,7 +61,7 @@ void SceneFinalScreen::render()
 	bgTexture.use();
 	bgQuad->render();
 
-	if (win) {
+	if (won) {
 		winTexture.use();
 		win->render();
 	}
