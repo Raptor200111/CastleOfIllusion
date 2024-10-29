@@ -133,7 +133,7 @@ void Game::onPlayerKilled()
 		SoundManager::instance().playSoundEffect("playRestart", 0);
 	}
 	else {
-		//SoundManager::instance().playSoundEffect("playerDamaged", 0);
+		SoundManager::instance().playSoundEffect("playerDamage", 0);
 	}
 	if (tries <= 0)
 	{
