@@ -304,7 +304,10 @@ void BossDragon::shoot(int deltaTime)
 	a = glm::radians(a);
 	glm::vec2 dir = glm::vec2(positionStartShoot.x + 350 * cos(a), positionStartShoot.y + 350 * sin(a));
 	shoots[indexAngleShoot]->setDirection(dir);
+
 	shoots[indexAngleShoot]->setEntityState(STILL);
+	SoundManager::instance().setMusicVolume(40);
+	SoundManager::instance().playSoundEffect("shoot", 0);
 }
 
 

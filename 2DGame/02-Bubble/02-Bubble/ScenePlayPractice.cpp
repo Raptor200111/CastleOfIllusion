@@ -88,26 +88,16 @@ void ScenePlayPractice::initZoneEnemyTree()
 }
 void ScenePlayPractice::initZoneEnemyBug()
 {
-    vector<ZoneEnemy> zones;
 
-    Zone limit = { 26.0f * map->getTileSize(), 30.0f * map->getTileSize(), 0, 12 };
-    glm::ivec2 initPos = glm::ivec2(26.f, 7.f);
-    ZoneEnemy zoneBug1 = { limit, initPos, false };
-    zones.push_back(zoneBug1);
-
-    limit = { 46.0f * map->getTileSize(), 54.0f * map->getTileSize(), 0, 12 };
-    initPos = glm::ivec2(53.0f, 7.0f);
+    Zone limit = { 46.0f * map->getTileSize(), 54.0f * map->getTileSize(), 0, 12 };
+    glm::ivec2 initPos = glm::ivec2(53.0f, 7.0f);
     ZoneEnemy zoneBug2 = { limit, initPos, false };
-    zones.push_back(zoneBug2);
 
-    for (const auto& zone : zones) {
-        EnemyBug* enemy = new EnemyBug();
-        enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone);
-        enemy->setPosition(glm::ivec2(zone.initPos.x * map->getTileSize(), zone.initPos.y * map->getTileSize()));
-        enemy->setTileMap(map);
-        allEnemies[0].push_back(enemy);
-
-    }
+    EnemyBug* enemy = new EnemyBug();
+    enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zoneBug2);
+    enemy->setPosition(glm::ivec2(zoneBug2.initPos.x * map->getTileSize(), zoneBug2.initPos.y * map->getTileSize()));
+    enemy->setTileMap(map);
+    allEnemies[0].push_back(enemy);
 }
 
 void ScenePlayPractice::updateCollisionsWithBoss(int deltaTime) {
@@ -117,6 +107,8 @@ void ScenePlayPractice::updateCollisionsWithBoss(int deltaTime) {
     if (player->getEntityState() == STILL) {
         if (CollisionManager::instance().checkCollisionObject(player, blockGem)) {
             blockGem->setEntityState(DYING);
+            SoundManager::instance().setMusicVolume(40);
+            SoundManager::instance().playSoundEffect("practiceWon", 0);
         }
     }
 }
@@ -136,8 +128,9 @@ void ScenePlayPractice::renderBoss() {
     EntityState gemState = blockGem->getEntityState();
     if (gemState == STILL)
         blockGem->render();
-    else if (gemState == DYING)
+    else if (gemState == DYING) {
         winAnimScenePlay = true;
+    }
     else {
         Game::instance().onPracticeLevelWon();
     }

@@ -123,6 +123,10 @@
     <ClInclude Include="SceneCredits.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+
+    <ClInclude Include="SceneFinalScreen.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
     <ClInclude Include="SceneInstructions.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
@@ -228,6 +232,9 @@
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
     <ClCompile Include="SceneCredits.cpp">
+      <Filter>Archivos de código fuente</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneFinalScreen.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
     <ClCompile Include="SceneInstructions.cpp">

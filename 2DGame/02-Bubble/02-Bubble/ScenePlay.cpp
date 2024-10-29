@@ -21,7 +21,7 @@ ScenePlay::ScenePlay()
 {
     map = NULL;
     player = NULL;
-    zoomLevel = 2.f;
+    zoomLevel = 1.5f;
     bgMap = NULL;
     bgQuad = NULL;
 	quad = NULL;
@@ -118,6 +118,8 @@ void ScenePlay::reStart()
 	screenBlocks.clear();
 	playrunMovBlocks.clear();
 	winAnimScenePlay = false;
+	insideBossRoom = false;
+	changeBg = false;
 	reStartLevelSpecific();
 }
 
@@ -167,7 +169,10 @@ void ScenePlay::render() {
 	float offsetY = glm::linearRand(-shakeIntensity, shakeIntensity);
 	glm::mat4 projectionWithShake = glm::translate(projection, glm::vec3(offsetX, offsetY, 0.0f));
 	if (!winAnimScenePlay) {
-		simpleProgram.setUniform4f("color", 48 / 255.f, 188 / 255.f, 1.f, 0.9f);
+		if(!changeBg)
+			simpleProgram.setUniform4f("color", 48 / 255.f, 188 / 255.f, 1.f, 0.9f);
+		else
+			simpleProgram.setUniform4f("color", 59 / 255.f, 67 / 255.f, 183/255.f, 1.f);
 	}
 	else {
 		int rand = std::rand();
@@ -205,9 +210,13 @@ void ScenePlay::render() {
 	{
 		for (const auto& screenEnemy : screenEnemies) {
 			if (insideScreen(screenEnemy.second->getPosition()))
+			{
 				screenEnemy.second->render();
-			else if(screenEnemy.second->getEnemyType() == EntityState::DEAD)
+			}
+			else if (screenEnemy.second->getEntityState() != EntityState::ALIVE)
+			{
 				screenEnemy.second->reLive();
+			}
 		}
 	}
 	for (const auto& screenBlock : screenBlocks)
@@ -267,9 +276,14 @@ void ScenePlay::insideScreenObj(int floorIndex)
 	insideBossRoom = checkIfInsideBossRoom();
 	if(!insideBossRoom) {
 		if (!screenEnemies.empty()) {
-			int enemyPosY = screenEnemies.begin()->second->getPosition().y;
+			int enemyPosY = screenEnemies.begin()->second->getPosition().y / map->getTileSize();
 			if (calcFloorIndex(enemyPosY) != floorIndex)
 			{
+				for (auto& itEnemy : screenEnemies)
+				{
+					if(itEnemy.second->getEntityState() != ALIVE)
+						itEnemy.second->reLive();
+				}
 				screenEnemies.clear();
 			}
 		}
@@ -283,7 +297,7 @@ void ScenePlay::insideScreenObj(int floorIndex)
 		}
 	}
 	if (!screenBlocks.empty()) {
-		int blocksPosY = screenBlocks.begin()->second->getPosition().y;
+		int blocksPosY = screenBlocks.begin()->second->getPosition().y / map->getTileSize();
 		if (calcFloorIndex(blocksPosY) != floorIndex)
 		{
 			screenBlocks.clear();
@@ -328,13 +342,14 @@ void ScenePlay::collisionsEnemies(int deltaTime)
 		bool reStarted = false;
 		itEnemy->second->update(deltaTime);
 		EnemyType enemyType = itEnemy->second->getEnemyType();
-		if (itEnemy->second->getEntityState() == EntityState::STILL && player->getEntityState() == EntityState::STILL
-			&& !Game::instance().isOnGodMode() && CollisionManager::instance().checkCollisionBlockVertical(player, itEnemy->second) == Down) {
+		if (itEnemy->second->getEntityState() == STILL && player->getEntityState() == STILL 
+			&& CollisionManager::instance().checkCollisionObject(player, itEnemy->second)) {
 			if (player->isAttacking()) {
 				Game::instance().onPlayerKilledEnemy();
 				itEnemy->second->Damaged();
+				player->playerButtJump();
 			}
-			else {
+			else if (!Game::instance().isOnGodMode()){
 				string idEnemy = itEnemy->first;
 				Game::instance().onPlayerKilled();
 				player->setEntityState(DYING);
@@ -380,7 +395,7 @@ void ScenePlay::collisionsEnemies(int deltaTime)
 				
 				if (itEnemy->second->getEntityState() == STILL && CollisionManager::instance().checkCollisionHorizontal(itEnemy->second) == Tile)
 				{					
-          itEnemy->second->collideHorizontal();
+					itEnemy->second->collideHorizontal();
 				}
 			}
 			++itEnemy;
@@ -445,7 +460,7 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 				}
 			}
 		}
-
+		
 		//check collision tilemap vertical
 		if (itMovBlock->second->getEntityState() == FALLING) {
 			CollisionType verticalCollision = CollisionManager::instance().checkCollisionVertical(itMovBlock->second);

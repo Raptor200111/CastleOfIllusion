@@ -32,6 +32,7 @@ public:
 	bool isAttacking() { return newState == BUTT_FALL; }
 
 	Block* getPickedUpBlock() { return pickedUpBlock; }
+	void playerButtJump();
 
 private:
 	Block* pickedUpBlock;
@@ -50,6 +51,7 @@ private:
 
 	void horizontalMove(bool left);
 	void changeToClimb();
+	void changeToDodge();
 	bool stopFallingCollision(Block*& block, CollisionType& colType);
 	bool stairCollision();
 
@@ -61,10 +63,9 @@ private:
 
 	void pickUpBlock();
 	void throwBlock();
+	void dropBlock();
 
 	bool checkJumpButton();
 	bool checkObjInteractionButton();
-
-	void playerButtJump();
 };
 #endif

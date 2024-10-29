@@ -3,58 +3,58 @@ TILEMAP
 16 16							-- Tile size & block size
 images/total.png 	-- Tilesheet
 4 6 								-- Number of tiles in tilesheet
-                                                                                               
-                                                                                               
-                                                                                               
-                                                                                               
-                                                                                               
-                                                                                               
-                                                     iiii                                      
-                                                   jjjjji                                      
-                                                   jjjjjj                                      
-                                                   jjjjjj                                      
-                                                                                               
-  iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
-  iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+                                                                                              i
+                                                                                              i
+                                                                                              i
+                                                                                              i
+                                                                              jjjjjjjj        i
+                                                                              jjjjjjjj        i
+                                                     iiiijj                   jjjjjjjjjj      i
+                                                   jjjjjijjj                jjjjjjjjjjjj      i
+                                                   jjjjjjjjjj               jjjjjjjjjjjj      i
+                                                   jjjjjjjjjjj              jjjjjjjjjjjj      i
+iiiiiiiiiiiiijjjjjjjjj                             jjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiiiii      i
+  iiiiiiiiiiiiiiiiiiii    iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+  iiiiiiiiiiiiiiiiiiii    iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
   iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
   iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
 iiiijjjjijjjijijijijiijjjijjjjiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
 iijjjijijjijjijijjjiijjjijiijiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
-ijjjijijjjjijiiiiiijijijijjjijiiiiiijiiiiiijjjiijjjjiiiijjiii   iijjijjjiiiiiiiiiiiijjjjiiiiiii
-jjjjjjjjjjjjj      ijjjjjjjijjjjijjijjjijjijjijjjijijijiijjji   ijjiiijjjjiiiiiiiiijjjijjjjjiii
- jjjjjjjiiijj      jjijjjjjjjjjjjjjijjjjjijjjjjjjjjjjjjijjiji   jjjjjjjjjjjjjjjjijjjjjjjjjjjjji
- jjjjjjj   jj      jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj   jjjjjjjjjjjjjjjjjjjjjjjjjjjjj  
- jjjjjjj   jj      jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj   jjjjjjjjjjjjjjjjjjjjjjjjjjjj   
- jjj  jj   jj      jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj   jjjj     jjjjjjjjjjjjjjjjjjjjjjjjjjj   
- jjj       jj         jjjjjjjj           jjjjjjjjjjjj   jjjj                jjjjjjjjjjjj       
-           jj                                        iii    iiiiiiiiii         iiiiiiiiiiiiiii 
-  iiii   iijji                                       iiiiiiiiiiiiiiiii   iiiiiiiiiiiiiiiiiiiiii
-iiii  iiiiiijiiiiiiii                iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii iiiiiiiijijijjijijijijii
-iiii  iiiiiijiiiiiiii                iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii iiiiiiiijijijjijijijijii
-iiii  iiiiiijiiiiiiii                iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii iiiiiiiijijijjijijijijii
- iijjiiiiijjjijjjijiii                       iiiiiiiiiiiiiiiiiiiiiiiii iiijijjijijijjijjjijjji 
- jjijjjiiijjijijjjijjii                      iijijjijijiiiiiiijjjjiijj jjiijijjjjiijjijjjjjijj 
- jjijjjijjjjjijijjjijji                     iijjjijjijijijjjjjijiijjjijjjjijjijjij    jjjjjjjj 
- ijjijijjjjjjjjjjjjjjiii                    iijiijiijjijjjjijijjjjjjjjjjjjjjjjjjjj       jjjjj 
- jjjjjjjjjjjjjjjjjjjjjiiiiiiiiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj       jjjjj 
- jjjjjjjjjjjjjjjjjjjjjjjiiiiiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj       jjjjj 
- jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj       jjjjj 
- jjjjjjjjj        jjjjjjjjjjjjjjjjijjjjjjjjjjjjjjjjj     jjjjjjjjjjjj                          
-      i         iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
-      ii        iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii 
-      ii        iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
-   iiijiiiiii                                                                                  
-  iiiijjjiiiiiii                                                                               
-  iijijjijjjjijj                                                                               
-  iijijjijjjjijj                                                                               
-  iijijjijjjjijj                                                                               
-  iijijjijjjjijj                                                                               
- ijijjijjjjijjjj                                                                               
- jjjjjjjjjjjjjjj                                                                               
- jjjjjjjjjjjjjjj                                                                               
- jjjjjjjjjjjjjjj                                                                               
- jjjjjjjjjjjjjjj                                                                               
- jjjjjjjjjjjjjjj                                                                               
- jjjjjjjjjjjjjjj                                                                               
- jjjjjjjjjjjjjjj                                                                               
+ijjjijijjjjijiiiiiijijijijjjijiiiiiijiiiiiijjjiijjjjiiiijjiiiiiiiijjijjjiiiiiiiiiiiijjjjiiiiiii
+jjjjjjjjjjjjjiiiiiiijjjjjjjijjjjijjijjjijjijjijjjijijijiijjjiiiiijjiiijjjjiiiiiiiiijjjijjjjjiii
+jjjjjjjjiiijjiiiiiijjijjjjjjjjjjjjjijjjjjijjjjjjjjjjjjjijjijiiiijjjjjjjjjjjjjjjjijjjjjjjjjjjjji
+jjjjjjjjjiijjiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
+jjjjjjjjjjijjiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
+jjjjjjjjjjjjjiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
+jjjjjjjjjjjjjiiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
+iiiiiiiiiiijjiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+iiiiiiiiiiijjiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+iiiiiiiiiiiijiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiijijijjijijijijii
+iiiiiiiiiiiijiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiijijijjijijijijii
+iiiiiiiiiiiijiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiijijijjijijijijii
+iiijjiiiiijjjijjjijiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiijijjijijijjijjjijjji
+ijjijjjiiijjijijjjijjiiiiiiiiiiiiiiiiiiiiiiiiiiijijjijijiiiiiiijjjjiijjijjiijijjjjiijjijjjjjijj
+ijjijjjijjjjjijijjjijjiiiiiiiiiiiiiiiiiiiiiiiijjjijjijijijjjjjijiijjjijjjjijjijjijjijjjjjjjjjjj 
+iijjijijjjjjjjjjjjjjjiiiiiiiiiiiiiiiiiiiiiiiiijiijiijjijjjjijijjjjjjjjjjjjjjjjjjjjiiiiiiijjjjji
+ijjjjjjjjjjjjjjjjjjjjjiiiiiiiiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiijjjjji
+ijjjjjjjjjjjjjjjjjjjjjjjiiiiiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiijjjjji
+ijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiijjjjji
+ijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiiiiiii
+iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+iiiiiiiiiiiiiiiiii                                                                             
+iiiiiijiiiiiiiii                                                                               
+iiiiiijjjiiiiiii                                                                               
+iiiijijjijjjjijj                                                                               
+iiiijijjijjjjijj                                                                               
+iiiijijjijjjjijj                                                                               
+iiiijijjijjjjijj                                                                               
+iijijjijjjjijjjj                                                                               
+ijjjjjjjjjjjjjjj                                                                               
+ijjjjjjjjjjjjjjj                                                                               
+ijjjjjjjjjjjjjjj                                                                               
+ijjjjjjjjjjjjjjj                                                                               
+ijjjjjjjjjjjjjjj                                                                               
+ijjjjjjjjjjjjjjj                                                                               
+ijjjjjjjjjjjjjjj                                                                               
                                                                                                
