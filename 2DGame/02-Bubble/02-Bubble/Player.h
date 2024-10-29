@@ -67,5 +67,7 @@ private:
 
 	bool checkJumpButton();
 	bool checkObjInteractionButton();
+
+	bool cakeCoinCollide(Block* b);
 };
 #endif

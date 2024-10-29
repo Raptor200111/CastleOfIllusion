@@ -213,7 +213,7 @@ void ScenePlay::render() {
 			{
 				screenEnemy.second->render();
 			}
-			else if (screenEnemy.second->getEntityState() != EntityState::ALIVE)
+			else if (screenEnemy.second->getEntityState() != EntityState::STILL)
 			{
 				screenEnemy.second->reLive();
 			}
@@ -281,7 +281,7 @@ void ScenePlay::insideScreenObj(int floorIndex)
 			{
 				for (auto& itEnemy : screenEnemies)
 				{
-					if(itEnemy.second->getEntityState() != ALIVE)
+					if(itEnemy.second->getEntityState() != STILL)
 						itEnemy.second->reLive();
 				}
 				screenEnemies.clear();
@@ -421,7 +421,7 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 			else
 			{
 				for (auto& screenEnemy : screenEnemies) {
-					if (screenEnemy.second->getEntityState() == FALLING &&
+					if (screenEnemy.second->getEntityState() == STILL &&
 						CollisionManager::instance().checkCollisionObject(screenEnemy.second, itMovBlock->second))
 					{
 						Game::instance().onPlayerKilledEnemy();
@@ -476,8 +476,13 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 		}
 
 		//block Dead == has stopped moving
-		if (itMovBlock->second->getEntityState() == DEAD) {
-			if (blockType == NonDestroyable) {
+		blockType = itMovBlock->second->getBlockType();
+		if (blockType == Cake || blockType == Coin || itMovBlock->second->getEntityState() == DEAD) {
+			if (blockType == Cake || blockType == Coin || blockType == NonDestroyable) {
+				if (blockType == Cake || blockType == Coin)
+				{
+					screenBlocks.insert(std::pair<string, Block*>(itMovBlock->first, itMovBlock->second));
+				}
 				itMovBlock->second->setEntityState(STILL);
 				int movBlockFloorIndex = calcFloorIndex(itMovBlock->second->getPosition().y / map->getTileSize());
 				playrunBlocks[movBlockFloorIndex].push_back(itMovBlock->second);

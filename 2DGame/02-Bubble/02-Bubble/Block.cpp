@@ -113,7 +113,7 @@ void Block::dropBlock(glm::ivec2 pos, glm::ivec2 size, bool left)
 		position = pos + size - glm::ivec2(0, sizeObject.y);
 
 	speed = glm::vec2(0, 0);
-	entityState = ALIVE;
+	entityState = STILL;
 }
 
 void Block::explode()

@@ -444,6 +444,25 @@ bool Player::checkObjInteractionButton()
 	return false;
 }
 
+bool Player::cakeCoinCollide(Block* b)
+{
+	if (b->getBlockType() == BlockType::Coin)
+	{
+		CollisionManager::instance().disAttachBlock(b);
+		Game::instance().onGetCoin();
+		b->explode();
+		return true;
+	}
+	else if (b->getBlockType() == BlockType::Cake)
+	{
+		CollisionManager::instance().disAttachBlock(b);
+		Game::instance().onGetCake();
+		b->explode();
+		return true;
+	}
+	return false;
+}
+
 void Player::playerButtJump()
 {
 	if (oldState == BUTT_FALL || oldState == BUTT_JUMP)
@@ -472,15 +491,7 @@ void Player::horizontalMove(bool left)
 	Block* b = CollisionManager::instance().collisionEntityBlockH(this);
 	if (b != nullptr)
 	{
-		if (b->getBlockType() == BlockType::Coin)
-		{
-			Game::instance().onGetCoin();
-		}
-		else if (b->getBlockType() == BlockType::Cake)
-		{
-			Game::instance().onGetCake();
-		}
-		else
+		if (!cakeCoinCollide(b))
 		{
 			position.x += direction * WALK_SPEED * -1;
 			if (oldState == WALK || oldState == READY_TO_PICK)
@@ -523,17 +534,7 @@ bool Player::stopFallingCollision(Block*& block, CollisionType& colType)
 		return true;
 	if (block != nullptr)
 	{
-		if (block->getBlockType() == BlockType::Coin)
-		{
-			Game::instance().onGetCoin();
-			return false;
-		}
-		else if (block->getBlockType() == BlockType::Cake)
-		{
-			Game::instance().onGetCake();
-			return false;
-		}
-		else
+		if (!cakeCoinCollide(block))
 			return true;
 	}
 	return false;
@@ -633,16 +634,8 @@ void Player::buttJumpBehaviour()
 		yAxisSpeed = BUTT_JUMP_SPEED;
 		newState = BUTT_JUMP;
 		
-		if (block->getBlockType() == BlockType::Cake)
-			Game::instance().onGetCake();
-		else if (block->getBlockType() == BlockType::Coin)
-			Game::instance().onGetCoin();
-		
-
-		CollisionManager::instance().disAttachBlock(block);
-		CollisionManager::instance().attachBlock(block);
-		CollisionManager::instance().disAttachBlock(block);
-		block->explode();
+		if (!cakeCoinCollide(block))
+			CollisionManager::instance().disAttachBlock(block);
 	}
 }
 
