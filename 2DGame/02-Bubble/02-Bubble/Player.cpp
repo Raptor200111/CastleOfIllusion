@@ -145,7 +145,7 @@ void Player::update(int deltaTime)
 		//int timeDyingAnim = 2000;
 		if (elapsedTime >= timeDyingAnim)
 		{
-			entityState = EntityState::ALIVE;
+			entityState = EntityState::STILL;
 			paint = true;
 			elapsedTime = 0;
 		}
@@ -560,7 +560,7 @@ bool Player::stopFallingCollision(Block*& block, CollisionType& colType)
 bool Player::stairCollision()
 {
 	auto oldPos = position;
-	auto colType = CollisionManager::instance().checkCollisionVertical(this);
+	colType = CollisionManager::instance().checkCollisionVertical(this);
 	position = oldPos;
 	if (colType == CollisionType::Stairs || colType == CollisionType::TileStairs)
 		return true;
@@ -626,8 +626,9 @@ void Player::climbBehaviour()
 			position.y += WALK_SPEED;
 			newState = CLIMB;
 		}
-		if (checkObjInteractionButton() && colType == CollisionType::Stairs) {
-			newState = FALL;
+		if (checkObjInteractionButton()) {
+			if (colType == CollisionType::Stairs)
+				newState = FALL;
 		}
 	}
 }
