@@ -309,8 +309,8 @@ void ScenePlay::insideScreenObj(int floorIndex)
 	if (screenBlocks.empty()) {
 		for (auto& playrunBlock : playrunBlocks[floorIndex])
 		{
-			glm::ivec2 posBlock = playrunBlock->getPosition();
-			string idBlock = std::to_string(posBlock.x) + " " + std::to_string(posBlock.y);
+			glm::ivec2 posBlock = playrunBlock->getOgPosition();
+			string idBlock = std::to_string(posBlock.x)  + std::to_string(posBlock.y);
 			screenBlocks.insert(std::pair<string, Block*>(idBlock, playrunBlock));
 		}
 	}
@@ -465,21 +465,27 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 			}
 		}
 
+		glm::ivec2 ogPosB = itMovBlock->second->getPosition();
+		glm::ivec2 posBNoSpeed = ogPosB - glm::ivec2(itMovBlock->second->getSpeed());
+		//check collision tilemap vertical
+		if (itMovBlock->second->getEntityState() == FALLING) {
+			CollisionType verticalCollision = CollisionManager::instance().checkCollisionVertical(itMovBlock->second);
+			if (verticalCollision != None) {
+				itMovBlock->second->collisionVertical(verticalCollision);
+			}
+		}
 
 		//check collision tilemap horizontal
 		if (itMovBlock->second->getEntityState() == FALLING) {
 			CollisionType horizontalCollision = CollisionManager::instance().checkCollisionHorizontal(itMovBlock->second);
-			if (horizontalCollision != None)
+			if (horizontalCollision != None) {
 				itMovBlock->second->collisionHorizontal(horizontalCollision);
+				//itMovBlock->second->setPosition();//posX correcta
+			}
 		}
 
-		//check collision tilemap vertical
-		if (itMovBlock->second->getEntityState() == FALLING) {
-			CollisionType verticalCollision = CollisionManager::instance().checkCollisionVertical(itMovBlock->second);
-			if (verticalCollision != None)
-				itMovBlock->second->collisionVertical(verticalCollision);
-		}
-
+		//posYtile = posY+ sizeY;
+		// if(tileType[posXblockCorrecta, posYtile])
 		//block Dead == has stopped moving
 		blockType = itMovBlock->second->getBlockType();
 		if (blockType == Cake || blockType == Coin || itMovBlock->second->getEntityState() == DEAD ||

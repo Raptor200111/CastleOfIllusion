@@ -288,7 +288,7 @@ Block* CollisionManager::collisionEntityBlockV(Entity* entity) {
 
 void CollisionManager::attachBlock(Block* b) 
 {
-	string idBlock = std::to_string(b->getPosition().x) + " " + std::to_string(b->getPosition().y);
+	string idBlock = std::to_string(b->getOgPosition().x) + std::to_string(b->getOgPosition().y);
 	auto it = screenBlocks.find(idBlock);
 	if (it == screenBlocks.end()) {
 		screenMovBlocks.insert(std::pair<string, Block*>(idBlock, b));
@@ -296,13 +296,8 @@ void CollisionManager::attachBlock(Block* b)
 }
 void CollisionManager::disAttachBlock(Block* b)
 {
-	for (auto it = playrunBlocks.begin(); it != playrunBlocks.end(); it++)
-	{
-		if (*it == b) {
-			//string idBlock = std::to_string(*it->getOgPosition().x) + " " + std::to_string(*it->getOgPosition().y);
-			//screenBlocks.erase(idBlock);
-			playrunBlocks.erase(it);
-			break;
-		}
-	}
+	glm::ivec2 posBlock = b->getOgPosition();
+	string idBlock = std::to_string(posBlock.x) + std::to_string(posBlock.y);
+	auto a = playrunBlocks.erase(std::remove(playrunBlocks.begin(), playrunBlocks.end(), b), playrunBlocks.end());
+	auto it = screenBlocks.erase(idBlock);
 }
