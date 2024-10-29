@@ -16,14 +16,22 @@ bool SoundManager::init() {
 
     SoundManager::instance().loadMusic("menu", "sound/01-Title.mp3");
     SoundManager::instance().loadMusic("level", "sound/03-Stage1-1.mp3");
-    SoundManager::instance().loadMusic("gameOver", "sound/26-GameOver.mp3");
-    SoundManager::instance().loadMusic("finalBoss", "sound/22-FinalBoss.mp3");
+    SoundManager::instance().loadMusic("gameOver", "sound/26-Game Over.mp3");
+    SoundManager::instance().loadMusic("gameCompleted", "sound/10 - Stage Clear.mp3");
+    SoundManager::instance().loadMusic("levelCompleted", "sound/07_Level_Complete.mp3");
+    SoundManager::instance().loadMusic("finalBoss", "sound/08 - Boss.mp3");
+    SoundManager::instance().loadMusic("instructions", "sound/02 - Castle.mp3");
+    SoundManager::instance().loadMusic("credits", "sound/04 - Substage.mp3");
 
-    SoundManager::instance().loadSoundEffect("lostLife", "sound/25-LostaLife.mp3");
-    SoundManager::instance().loadSoundEffect("levelComplete", "sound/07_Level_Complete.mp3");
-    //jump
-    //get coin/cake
-
+    SoundManager::instance().loadSoundEffect("gameLose", "sound/lose.wav");
+    SoundManager::instance().loadSoundEffect("gameWin", "sound/gameWin0.wav");
+    SoundManager::instance().loadSoundEffect("playRestart", "sound/levelRestart.wav");
+    SoundManager::instance().loadSoundEffect("playerJump", "sound/playerJump0.wav");
+    SoundManager::instance().loadSoundEffect("practiceWon", "sound/practiceWon0.wav");
+    SoundManager::instance().loadSoundEffect("playerCoin", "sound/playerCoin.wav");
+    SoundManager::instance().loadSoundEffect("playerCake", "sound/playerCake.wav");
+    SoundManager::instance().loadSoundEffect("break", "sound/break.wav");
+    SoundManager::instance().loadSoundEffect("shoot", "sound/shoot.wav");
 
 
     return true;

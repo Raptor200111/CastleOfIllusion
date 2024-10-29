@@ -163,6 +163,7 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 	int tileToCorrect = 0;
 	bool stairs = false;
 	bool tile = false;
+	bool hole = false;
 	// Check the tiles around the entity for collisions
 	for (int i = x0; i <= x1; ++i) {
 		for (int j = yUp; j <= yDown; j++) {
@@ -171,8 +172,9 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 				if (tileType == 9)
 					stairs = true;
 
-				if (tileType == 10)
-					return Hole;
+				if (tileType == 10) {
+					hole = true;
+				}
 				if (j == yDown && tileType != 9)
 				{
 					if (pos.y + size.y > tileSize * j)
@@ -205,6 +207,8 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 	}
 	if (correctRamp(entity))
 		tile = true;
+	if (hole && !Game::instance().isOnGodMode())
+		return Hole;
 	if (tile && stairs)
 		return TileStairs;
 	else if (tile)

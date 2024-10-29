@@ -26,6 +26,7 @@ public:
 	void collisionHorizontal(CollisionType horizontalCollision);
 
 	void throwBlock(glm::vec2 speed);
+	void dropBlock(glm::ivec2 pos, glm::ivec2 size, bool left);
 	void explode();
 
 private:

@@ -12,11 +12,13 @@ void Game::init()
 	sceneMenu.init();
 	sceneInstructions.init();
 	sceneCredits.init();
+	sceneFinalScreen.init();
+	sceneFinalScreen.setWon(false);
 	scenePlayPractice.init();
 	scenePlayLevel.init();
 	currentScene = &sceneMenu;
-	SoundManager::instance().setMusicVolume(40);
-	//SoundManager::instance().playMusic("menu", -1);
+	SoundManager::instance().setMusicVolume(30);
+	SoundManager::instance().playMusic("menu", -1);
 }
 
 bool Game::update(int deltaTime)
@@ -33,30 +35,35 @@ void Game::render()
 
 void Game::keyPressed(int key)
 {
+	SoundManager::instance().setMusicVolume(30);
 	if (key == GLFW_KEY_ESCAPE) // Escape code
 	{
 		bPlay = false;
 	}
-	else if (currentScene == &sceneMenu && key == GLFW_KEY_Z) {
+	else if (key == GLFW_KEY_Z) {
 		currentScene = &scenePlayPractice;
 		tries = 3;
 		scenePlayPractice.reStart();
-		SoundManager::instance().setMusicVolume(40);
-		//SoundManager::instance().playMusic("level", -1);
+		SoundManager::instance().playMusic("level", -1);
 	}
-	else if (currentScene == &scenePlayPractice && key == GLFW_KEY_0) {
+	else if (godMode && currentScene == &scenePlayPractice && key == GLFW_KEY_0) {
 		currentScene = &scenePlayLevel;
 		tries = 8;
 		scenePlayLevel.reStart();
+		SoundManager::instance().playMusic("level", -1);
 	}
-	else if (key == GLFW_KEY_I) {
+	else if (currentScene != &sceneFinalScreen && key == GLFW_KEY_I) {
 		currentScene = &sceneInstructions;
+		SoundManager::instance().playMusic("instructions", -1);
 	}
 	else if (key == GLFW_KEY_M) {
+		sceneFinalScreen.setWon(false);
 		currentScene = &sceneMenu;
+		SoundManager::instance().playMusic("menu", -1);
 	}
-	else if (key == GLFW_KEY_C) {
+	else if (currentScene != &sceneFinalScreen && key == GLFW_KEY_C) {
 		currentScene = &sceneCredits;
+		SoundManager::instance().playMusic("credits", -1);
 	}
 	keys[key] = true;
 }
@@ -91,7 +98,6 @@ bool Game::getKey(int key) const
 }
 
 void Game::onPlayerFallDownHole() {
-	if (godMode) return;
 	stars = INIT_STARS;
 	tries -= 1;
 	if (tries <= 0) {
@@ -102,12 +108,15 @@ void Game::onPlayerFallDownHole() {
 		if (playScene) {
 			playScene->reStart();
 		}
+		SoundManager::instance().setMusicVolume(40);
+		SoundManager::instance().playSoundEffect("playRestart", 0);
 	}
 }
 
 void Game::onPlayerKilled() 
 {
 	if (godMode) return;
+	SoundManager::instance().setMusicVolume(40);
 	if (stars > 0)
 	{
 		stars -= 1;
@@ -121,6 +130,10 @@ void Game::onPlayerKilled()
 		if (playScene) {
 			playScene->reStart();
 		}
+		SoundManager::instance().playSoundEffect("playRestart", 0);
+	}
+	else {
+		//SoundManager::instance().playSoundEffect("playerDamaged", 0);
 	}
 	if (tries <= 0)
 	{
@@ -139,18 +152,50 @@ void Game::onPracticeLevelWon()
 	tries = 8;
 	currentScene = &scenePlayLevel;
 	scenePlayLevel.reStart();
+	SoundManager::instance().setMusicVolume(30);
+	SoundManager::instance().playMusic("level", -1);
 }
 
 void Game::onLevelWon()
 {
-	currentScene = &sceneMenu;
-	SoundManager::instance().setMusicVolume(40);
-	//SoundManager::instance().playMusic("menu", -1);
+	sceneFinalScreen.setWon(true);
+	currentScene = &sceneFinalScreen;
+	SoundManager::instance().setMusicVolume(30);
+	SoundManager::instance().playMusic("gameOver", -1);
 }
 
 void Game::looseGame()
 {
-	currentScene = &sceneMenu;
+	sceneFinalScreen.setWon(false);
+	currentScene = &sceneFinalScreen;
 	SoundManager::instance().setMusicVolume(40);
-	//SoundManager::instance().playMusic("menu", -1);
+	SoundManager::instance().playSoundEffect("gameLose", 0);
+	SoundManager::instance().setMusicVolume(30);
+	SoundManager::instance().playMusic("gameOver", -1);
 }
+
+void Game::onPlayerKilledEnemy()
+{
+	score += ENEMY_POINTS;
+	SoundManager::instance().setMusicVolume(40);
+	SoundManager::instance().playSoundEffect("playerCoin", 0);
+}
+void Game::onGetCoin() {
+	score += COIN_POINTS;
+	SoundManager::instance().setMusicVolume(40);
+	SoundManager::instance().playSoundEffect("playerCoin", 0);
+}
+
+void Game::onGetCake() { 
+	if (stars < MAX_STARS) stars += 1; 
+	SoundManager::instance().setMusicVolume(40);
+	SoundManager::instance().playSoundEffect("playerCake", 0);
+}
+
+void Game::onHeal() { 
+	stars = INIT_STARS; 
+	SoundManager::instance().setMusicVolume(40);
+	SoundManager::instance().playSoundEffect("playerCake", 0);
+}
+
+

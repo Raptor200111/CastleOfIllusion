@@ -7,8 +7,10 @@
 #define JUMP_SPEED -9.f
 #define BUTT_JUMP_SPEED -12.f
 #define STANDART_SIZE glm::ivec2(24, 32)
-#define DODGE_SIZE glm::ivec2(24, 32)
+#define DODGE_SIZE glm::ivec2(24, 21)
+#define OFFSET glm::ivec2(4, 8)
 #define DAMAGE_TIME 200
+
 
 Player::~Player()
 {
@@ -43,8 +45,8 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	delete vec2Array;
 	//HASTA AQUI
 
-	setSize(glm::ivec2(24, 32));
-	setOffset(glm::ivec2(4, 8));
+	sizeObject = STANDART_SIZE;
+	offset = OFFSET;
 
 	spritesheet.loadFromFile("images/Mickey_Mouse.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(sizeSprite, glm::vec2(0.066, 0.098), &spritesheet, &shaderProgram);
@@ -230,7 +232,9 @@ void Player::update(int deltaTime)
 		case DODGE:
 		{
 			if (!Game::instance().getKey(GLFW_KEY_S)) {
-				setSize(STANDART_SIZE);
+				sizeObject = STANDART_SIZE;
+				offset = OFFSET;
+				position.y -= 11;
 				newState = IDLE;
 			}
 			if (stopFallingCollision(block, colType))
@@ -344,12 +348,11 @@ void Player::update(int deltaTime)
 	setPosition(position);
 	if (Game::instance().getKey(GLFW_KEY_P))
 		cout << position.x << " " << position.y << " - State: " << PlayerStates(oldState) << endl;
-	// TENEMOS QUE AÑADIR PARTICULAS CHULAS
 	
 	particleEfect->update(deltaTime);
 	if (pickedUpBlock != nullptr)
 	{
-		pickedUpBlock->update(deltaTime);//hacemos el update (hay que cambiarle la posicion)
+		pickedUpBlock->update(deltaTime);
 		if (oldState != B_PICK)
 		{
 			if (left)
@@ -388,6 +391,30 @@ void Player::throwBlock()
 	if (left)
 		dir.x *= -1;
 	pickedUpBlock->throwBlock(dir);
+	CollisionManager::instance().attachBlock(pickedUpBlock);
+	pickedUpBlock = nullptr;
+
+	switch (oldState)
+	{
+	case B_IDLE:
+		newState = IDLE;
+		break;
+	case B_WALK:
+		newState = WALK;
+		break;
+	case B_JUMP:
+		newState = JUMP;
+		break;
+	case B_FALL:
+		newState = FALL;
+		break;
+	}
+}
+
+void Player::dropBlock()
+{
+	//pickedUpBlock->throwBlock(glm::vec2(0, -10));
+	pickedUpBlock->dropBlock(position, sizeObject, left);
 	CollisionManager::instance().attachBlock(pickedUpBlock);
 	pickedUpBlock = nullptr;
 
@@ -500,6 +527,13 @@ void Player::changeToClimb()
 	//calcular posicion de la escalera
 }
 
+void Player::changeToDodge() {
+	newState = DODGE;
+	sizeObject = DODGE_SIZE;
+	offset = OFFSET + glm::ivec2(0, 11);
+	position.y += 11;
+}
+
 bool Player::stopFallingCollision(Block*& block, CollisionType& colType)
 {
 	auto originalPos = position;
@@ -511,9 +545,12 @@ bool Player::stopFallingCollision(Block*& block, CollisionType& colType)
 	if (originalPos != tileCorrectedPos && tileCorrectedPos != position)
 		position = tileCorrectedPos;
 
+	if (colType == CollisionType::Hole)
+		Game::instance().onPlayerFallDownHole();
+
 	if (colType == CollisionType::Tile || colType == CollisionType::TileStairs)
 		return true;
-	if (block != nullptr) 
+	if (block != nullptr)
 		return true;
 	return false;
 }
@@ -545,7 +582,7 @@ void Player::movementBehaviour()
 				return;
 			}
 			else {
-				newState = DODGE;
+				changeToDodge();
 				return;
 			}
 				
@@ -645,6 +682,10 @@ void Player::blockMovementBehaviour()
 		rightMove();
 	}
 	if (checkObjInteractionButton()) {
-		throwBlock();
+		if (Game::instance().getKey(GLFW_KEY_S)) {
+			dropBlock();
+		}
+		else
+			throwBlock();
 	}
 }

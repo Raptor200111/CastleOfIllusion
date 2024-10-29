@@ -10,8 +10,8 @@
 
 #include "CollisionManager.h"
 
-#define INIT_PLAYER_X_TILES 5//74// 4+20
-#define INIT_PLAYER_Y_TILES 51//44//+8+2 //20
+#define INIT_PLAYER_X_TILES 74//5//74// 4+20
+#define INIT_PLAYER_Y_TILES 8//51//44//+8+2 //20
 
 ScenePlayLevel::ScenePlayLevel()
 {
@@ -61,7 +61,7 @@ void ScenePlayLevel::init()
 	gameUI.setMaxTime(400 * 1000);
 
 	Zone limit = { 79.0f * tileSize, mapSize.x * tileSize, 0, 0 };
-	glm::ivec2 finalPosBoss = glm::ivec2(87.0f * tileSize, 45.0f * tileSize);
+	glm::ivec2 finalPosBoss = glm::ivec2(88.0f * tileSize, 45.0f * tileSize);
 	//Zone limit = { (mapSize.x - 19) * tileSize, mapSize.x * tileSize, 0, 0 };
 	//glm::ivec2 finalPosBoss = glm::ivec2((mapSize.x - 9) * tileSize, (mapSize.y-9) * tileSize);
 	ZoneEnemy zone1 = { limit, finalPosBoss, false };
@@ -148,7 +148,7 @@ void ScenePlayLevel::initZoneEnemyBug()
 	zones.push_back(zoneBug4);
 
 	limit = { 14.0f * tileSize, 24.0f * tileSize, 30.f * tileSize, 32.f * tileSize };
-	initPos = glm::ivec2(14.0f, 30.0f);
+	initPos = glm::ivec2(14.0f, 34.0f);
 	ZoneEnemy zoneBug5 = { limit, initPos, false };
 	zones.push_back(zoneBug5);
 
@@ -184,24 +184,55 @@ void ScenePlayLevel::initZoneEnemyBee()
 	ZoneEnemy zoneBee3 = { limit, initPos, true };
 	zones.push_back(zoneBee3);
 
-	//limit = { 15.0f * tileSize, 65.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
-	limit = { 15.0f * tileSize, 78.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
+	limit = { 15.0f * tileSize, 65.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
+	//limit = { 15.0f * tileSize, 78.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
 	initPos = glm::ivec2(65.0f, 45.0f);
 	ZoneEnemy zoneBee4 = { limit, initPos, true };
 	zones.push_back(zoneBee4);
 
-	//limit = { 15.0f * tileSize, 78.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
 	limit = { 15.0f * tileSize, 78.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
+	//limit = { 15.0f * tileSize, 78.0f * tileSize, 50.f * tileSize, 45.f * tileSize };
 	initPos = glm::ivec2(78.0f, 43.0f);
 	ZoneEnemy zoneBee5 = { limit, initPos, true };
 	zones.push_back(zoneBee5);
+
+	limit = { 59.0f * tileSize, 77.0f * tileSize, 0, 12.f * tileSize };
+	initPos = glm::ivec2(76.0f, 5.0f);
+	ZoneEnemy zoneBee00 = { limit, initPos, true };
+	zones.push_back(zoneBee00);
+
+	limit = { 19.0f * tileSize, 37.0f * tileSize, 16.f * tileSize, 26.f * tileSize };
+	initPos = glm::ivec2(19.0f, 18.0f);
+	ZoneEnemy zoneBee10 = { limit, initPos, false };
+	zones.push_back(zoneBee10); 
+	
+	limit = { 38.0f * tileSize, 60.0f * tileSize, 16.f * tileSize, 26.f * tileSize };
+	initPos = glm::ivec2(45.0f, 19.0f);
+	ZoneEnemy zoneBee11 = { limit, initPos, false };
+	zones.push_back(zoneBee11);
+
+	limit = { 64.0f * tileSize, 92.0f * tileSize, 16.f * tileSize, 26.f * tileSize };
+	initPos = glm::ivec2(64.0f, 18.0f);
+	ZoneEnemy zoneBee12 = { limit, initPos, true };
+	zones.push_back(zoneBee12);
+
+	limit = { 44.0f * tileSize, 81.0f * tileSize, 26.f * tileSize, 39.f * tileSize };
+	initPos = glm::ivec2(48.0f, 32.0f);
+	ZoneEnemy zoneBee20 = { limit, initPos, false };
+	zones.push_back(zoneBee20);
+
+	limit = { 1.0f * map->getTileSize(), 21.0f * map->getTileSize(), 27, 39 };
+	initPos = glm::ivec2(1.0f, 30.0f);
+	ZoneEnemy zoneBee21 = { limit, initPos, false };
+	zones.push_back(zoneBee21);
 
 	for (const auto& zone : zones) {
 		EnemyBee* enemy = new EnemyBee();
 		enemy->initMov(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, zone);
 		enemy->setPosition(glm::ivec2(zone.initPos.x * tileSize, zone.initPos.y * tileSize));
 		enemy->setTileMap(map);
-		allEnemies[3].push_back(enemy);
+		int floorIndex = calcFloorIndex(zone.initPos.y);
+		allEnemies[floorIndex].push_back(enemy);
 	}
 }
 
@@ -210,6 +241,12 @@ bool ScenePlayLevel::checkIfInsideBossRoom() {
 	glm::ivec2 posP = player->getPosition();
 	if (bossRoom.left <= posP.x && posP.x < bossRoom.right && bossRoom.top < posP.y && posP.y < bossRoom.bottom) {
 		inside = true;
+		changeBg = true;
+		if (insideBossRoom != inside)
+		{
+			SoundManager::instance().setMusicVolume(30);
+			SoundManager::instance().playMusic("finalBoss", -1);
+		}
 		if (!boss.getActive())
 		{
 			boss.appear();
@@ -274,6 +311,8 @@ void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 		if (player->getEntityState() == ALIVE && CollisionManager::instance().checkCollisionObject(player, blockGem))
 		{
 			blockGem->setEntityState(DYING);
+			SoundManager::instance().setMusicVolume(40);
+			SoundManager::instance().playSoundEffect("gameWin", 0);
 		}
 	}
 

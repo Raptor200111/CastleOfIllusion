@@ -37,6 +37,7 @@ public:
 
 	//Block* ThrownBlock() { return thrownBlock; }
 	Block* getPickedUpBlock() { return pickedUpBlock; }
+	void playerButtJump();
 
 private:
 	//Block* thrownBlock;
@@ -60,6 +61,7 @@ private:
 	void leftMove();
 	void rightMove();
 	void changeToClimb();
+	void changeToDodge();
 	bool stopFallingCollision(Block*& block, CollisionType& colType);
 	bool stairCollision();
 
@@ -71,11 +73,10 @@ private:
 
 	void pickUpBlock();
 	void throwBlock();
+	void dropBlock();
 
 	bool checkJumpButton();
 	bool checkObjInteractionButton();
-
-	void playerButtJump();
 };
 
 #endif
