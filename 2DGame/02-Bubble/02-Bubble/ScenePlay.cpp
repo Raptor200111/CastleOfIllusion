@@ -7,8 +7,8 @@
 #include "EnemyTree.h"
 #include "EnemyBug.h"
 
-#include "BlockChestCake.h"
-#include "BlockChestCoin.h"
+#include "BlockCake.h"
+#include "BlockCoin.h"
 #include "BlockDestroyable.h"
 #include "BlockNonDestroyable.h"
 
@@ -82,13 +82,13 @@ vector<vector<Block*>> ScenePlay::initBlocks()
 		Block* b;
 		switch (block.type) {
 		case 1:
-			b = new BlockChestCake(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+			b = new BlockCake(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 			break;
 		case 3:
 			b = new BlockDestroyable(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 			break;
 		case 4:
-			b = new BlockChestCoin(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+			b = new BlockCoin(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 		break; 
 		default:
 			b = new BlockNonDestroyable(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);

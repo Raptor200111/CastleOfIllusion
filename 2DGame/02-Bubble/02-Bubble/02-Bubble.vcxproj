@@ -12,8 +12,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimKeyframes.h" />
-    <ClInclude Include="BlockChestCake.h" />
-    <ClInclude Include="BlockChestCoin.h" />
+    <ClInclude Include="BlockChest.h" />
+    <ClInclude Include="BlockCake.h" />
+    <ClInclude Include="BlockCoin.h" />
     <ClInclude Include="BlockDestroyable.h" />
     <ClInclude Include="BlockGem.h" />
     <ClInclude Include="BlockNonDestroyable.h" />
@@ -50,8 +51,9 @@
     <ClInclude Include="TileMap.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BlockChestCake.cpp" />
-    <ClCompile Include="BlockChestCoin.cpp" />
+    <ClCompile Include="BlockChest.cpp" />
+    <ClCompile Include="BlockCake.cpp" />
+    <ClCompile Include="BlockCoin.cpp" />
     <ClCompile Include="BlockDestroyable.cpp" />
     <ClCompile Include="BlockGem.cpp" />
     <ClCompile Include="BlockNonDestroyable.cpp" />
