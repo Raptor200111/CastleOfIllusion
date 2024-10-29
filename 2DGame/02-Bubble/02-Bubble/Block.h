@@ -3,6 +3,8 @@
 #include "Entity.h"
 #include <cmath>
 #include "ParticleEfect.h"
+#include "SoundManager.h"
+
 
 class Block : public Entity
 {
@@ -23,8 +25,9 @@ public:
 
 	void throwBlock(glm::vec2 speed);
 
-	virtual void explode();
+	virtual void explode() = 0;
 	void dropBlock(glm::ivec2 pos, glm::ivec2 size, bool left);
+	glm::vec2 getSpeed() { return speed; };
 
 protected:
 	BlockType blockType;

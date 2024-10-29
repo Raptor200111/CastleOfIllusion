@@ -60,6 +60,10 @@ VColType CollisionManager::checkCollisionBlockVertical(Entity* objectA, Entity* 
 	if (size1.x <= pos2.x || pos1.x >= size2.x || size1.y <= pos2.y || pos1.y >= size2.y)
 		return NoVcol;
 
+	if (objectB->getEntityState() == DEAD || objectB->getEntityState() == DYING)
+	{
+		return NoVcol;
+	}
 	// From here we know there is a collision, now we check the direction of the horizontal collision
 
 	// Check if the player's bottom side is colliding with the block's top side
@@ -89,6 +93,10 @@ HColType CollisionManager::checkCollisionBlockHorizontal(Entity* objectA, Entity
 	if (size1.x <= pos2.x || pos1.x >= size2.x || size1.y <= pos2.y || pos1.y >= size2.y)
 		return NoHcol;
 
+	if (objectB->getEntityState() == DEAD || objectB->getEntityState() == DYING)
+	{
+		return NoHcol;
+	}
 	// From here we know there is a collision, now we check the direction of the horizontal collision
 
 	// Check if the player's right side is colliding with the block's left side
@@ -269,11 +277,11 @@ Block* CollisionManager::collisionEntityBlockH(Entity* entity) {
 
 Block* CollisionManager::collisionEntityBlockV(Entity* entity) {
 	for (auto& it = screenBlocks.begin(); it != screenBlocks.end(); ++it) {
-		VColType vColType = checkCollisionBlockVertical(entity, it->second);
-		if (vColType != NoVcol) {
-			return it->second;
-			break;
-		}
+			VColType vColType = checkCollisionBlockVertical(entity, it->second);
+			if (vColType != NoVcol) {
+				return it->second;
+				break;
+			}
 	}
 	return NULL;
 }
@@ -288,12 +296,13 @@ void CollisionManager::attachBlock(Block* b)
 }
 void CollisionManager::disAttachBlock(Block* b)
 {
-	string idBlock = std::to_string(b->getPosition().x) + " " + std::to_string(b->getPosition().y);
-	auto it = screenBlocks.find(idBlock);
-	if (it != screenBlocks.end())
+	for (auto it = playrunBlocks.begin(); it != playrunBlocks.end(); it++)
 	{
-		screenBlocks.erase(it);
-		playrunBlocks.erase(std::remove(playrunBlocks.begin(), playrunBlocks.end(), b), playrunBlocks.end());
-
+		if (*it == b) {
+			//string idBlock = std::to_string(*it->getOgPosition().x) + " " + std::to_string(*it->getOgPosition().y);
+			//screenBlocks.erase(idBlock);
+			playrunBlocks.erase(it);
+			break;
+		}
 	}
 }

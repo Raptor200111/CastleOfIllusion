@@ -248,7 +248,10 @@ void ScenePlay::updateCamera()
 
 	// Center camera on player but with some offset leading the player when moving right
 	cameraPosition.x = playerPos.x - halfScreenWidth + 100; // Adjust the '100' for horizontal leading effect
-	cameraPosition.y = playerPos.y - halfScreenHeight;
+	if (!player->isCrouching())
+		cameraPosition.y = playerPos.y - halfScreenHeight;
+	else
+		cameraPosition.y = playerPos.y-11 - halfScreenHeight;
 
 	// Constrain the camera within the map boundaries
 	float maxCameraX = map->getMapSize().x * map->getTileSize() - zoomScreenWidth;
@@ -434,6 +437,7 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 			}
 		}
 
+
 		//check collisions with other blocks
 		if (itMovBlock->second->getEntityState() == FALLING) {
 			int countBlockCollisions = 0;
@@ -460,13 +464,7 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 				}
 			}
 		}
-		
-		//check collision tilemap vertical
-		if (itMovBlock->second->getEntityState() == FALLING) {
-			CollisionType verticalCollision = CollisionManager::instance().checkCollisionVertical(itMovBlock->second);
-			if (verticalCollision != None)
-				itMovBlock->second->collisionVertical(verticalCollision);
-		}
+
 
 		//check collision tilemap horizontal
 		if (itMovBlock->second->getEntityState() == FALLING) {
@@ -475,14 +473,20 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 				itMovBlock->second->collisionHorizontal(horizontalCollision);
 		}
 
+		//check collision tilemap vertical
+		if (itMovBlock->second->getEntityState() == FALLING) {
+			CollisionType verticalCollision = CollisionManager::instance().checkCollisionVertical(itMovBlock->second);
+			if (verticalCollision != None)
+				itMovBlock->second->collisionVertical(verticalCollision);
+		}
+
 		//block Dead == has stopped moving
 		blockType = itMovBlock->second->getBlockType();
-		if (blockType == Cake || blockType == Coin || itMovBlock->second->getEntityState() == DEAD) {
+		if (blockType == Cake || blockType == Coin || itMovBlock->second->getEntityState() == DEAD ||
+			(blockType == NonDestroyable && itMovBlock->second->getEntityState() == STILL)) {
+//		if (itMovBlock->second->getEntityState() != FALLING) {
 			if (blockType == Cake || blockType == Coin || blockType == NonDestroyable) {
-				if (blockType == Cake || blockType == Coin)
-				{
-					screenBlocks.insert(std::pair<string, Block*>(itMovBlock->first, itMovBlock->second));
-				}
+				screenBlocks.insert(std::pair<string, Block*>(itMovBlock->first, itMovBlock->second));
 				itMovBlock->second->setEntityState(STILL);
 				int movBlockFloorIndex = calcFloorIndex(itMovBlock->second->getPosition().y / map->getTileSize());
 				playrunBlocks[movBlockFloorIndex].push_back(itMovBlock->second);

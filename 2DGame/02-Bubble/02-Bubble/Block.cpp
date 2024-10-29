@@ -32,6 +32,7 @@ void Block::update(int deltaTime)
 			if (blockType != Gem) {
 				speed.y += 0.5;
 				position += speed;
+				position.y++;
 			}
 			break;
 		}
@@ -114,13 +115,4 @@ void Block::dropBlock(glm::ivec2 pos, glm::ivec2 size, bool left)
 
 	speed = glm::vec2(0, 0);
 	entityState = STILL;
-}
-
-void Block::explode()
-{
-	entityState = DYING;
-	speed = glm::vec2(0, 0);
-	SoundManager::instance().setMusicVolume(40);
-	SoundManager::instance().playSoundEffect("break", 0);
-	explosionEfect->play(position + (getSize()/2) - glm::ivec2(16, 18), 0);
 }

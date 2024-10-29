@@ -454,16 +454,12 @@ bool Player::cakeCoinCollide(Block* b)
 {
 	if (b->getBlockType() == BlockType::Coin)
 	{
-		CollisionManager::instance().disAttachBlock(b);
 		Game::instance().onGetCoin();
-		b->explode();
 		return true;
 	}
 	else if (b->getBlockType() == BlockType::Cake)
 	{
-		CollisionManager::instance().disAttachBlock(b);
 		Game::instance().onGetCake();
-		b->explode();
 		return true;
 	}
 	return false;
@@ -506,6 +502,10 @@ void Player::horizontalMove(bool left)
 				readyToPickBlock = b;
 			}
 		}
+		else {
+			b->explode();
+			CollisionManager::instance().disAttachBlock(b);
+		}
 	}
 }
 
@@ -542,6 +542,10 @@ bool Player::stopFallingCollision(Block*& block, CollisionType& colType)
 	{
 		if (!cakeCoinCollide(block))
 			return true;
+		else {
+			block->explode();
+			CollisionManager::instance().disAttachBlock(block);
+		}
 	}
 	return false;
 }
@@ -640,8 +644,9 @@ void Player::buttJumpBehaviour()
 		yAxisSpeed = BUTT_JUMP_SPEED;
 		newState = BUTT_JUMP;
 		
-		if (!cakeCoinCollide(block))
-			CollisionManager::instance().disAttachBlock(block);
+		//cakeCoinCollide(block);
+		block->explode();
+		//CollisionManager::instance().disAttachBlock(block);
 	}
 }
 

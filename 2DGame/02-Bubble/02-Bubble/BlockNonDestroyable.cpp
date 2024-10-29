@@ -1,4 +1,5 @@
 #include "BlockNonDestroyable.h"
+#include "CollisionManager.h"
 
 BlockNonDestroyable::BlockNonDestroyable(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) : Block(tileMapPos, shaderProgram)
 {
@@ -19,9 +20,16 @@ BlockNonDestroyable::BlockNonDestroyable(const glm::ivec2& tileMapPos, ShaderPro
 
 void BlockNonDestroyable::explode()
 {
-	//entityState = DYING;
+	entityState = STILL;
+	
+	/*
+	while (CollisionManager::instance().checkCollisionHorizontal(this) != None)
+	{
+		position.x -= speed.x/abs(speed.x);
+	}
+	*/
 	speed = glm::vec2(0, 0);
-	//explosionEfect->play(position + (getSize() / 2) - glm::ivec2(16, 18), 0);
+	
 }
 
 
