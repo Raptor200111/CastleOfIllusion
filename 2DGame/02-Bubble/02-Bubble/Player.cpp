@@ -270,7 +270,13 @@ void Player::update(int deltaTime)
 				newState = B_IDLE;
 			if (keyframe.x > 0)
 			{
-				pickedUpBlock->setPosition(pickedUpBlock->getPosition() + glm::ivec2(0, 12));
+				int y = position.y + sizeObject.y / 2 - pickedUpBlock->getSize().y / 2;
+				int x;
+				if (left)
+					x = position.x - pickedUpBlock->getSize().x;
+				else
+					x = position.x + sizeObject.x;
+				pickedUpBlock->setPosition(glm::ivec2(x, y));
 			}
 			break;
 		}
@@ -361,9 +367,9 @@ void Player::render()
 
 void Player::pickUpBlock()
 {
-	CollisionManager::instance().disAttachBlock(readyToPickBlock);
 	pickedUpBlock = readyToPickBlock;
 	readyToPickBlock = nullptr;
+	CollisionManager::instance().disAttachBlock(pickedUpBlock);
 	newState = B_PICK;
 }
 
