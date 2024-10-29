@@ -394,6 +394,30 @@ void Player::throwBlock()
 	}
 }
 
+void Player::dropBlock()
+{
+	//pickedUpBlock->throwBlock(glm::vec2(0, -10));
+	pickedUpBlock->dropBlock(position, sizeObject, left);
+	CollisionManager::instance().attachBlock(pickedUpBlock);
+	pickedUpBlock = nullptr;
+
+	switch (oldState)
+	{
+	case B_IDLE:
+		newState = IDLE;
+		break;
+	case B_WALK:
+		newState = WALK;
+		break;
+	case B_JUMP:
+		newState = JUMP;
+		break;
+	case B_FALL:
+		newState = FALL;
+		break;
+	}
+}
+
 bool Player::checkJumpButton()
 {
 	if ((Game::instance().getKey(GLFW_KEY_K) || Game::instance().getKey(GLFW_KEY_W)) && jumpAvailable)
@@ -504,7 +528,7 @@ bool Player::stopFallingCollision(Block*& block, CollisionType& colType)
 	if (originalPos != tileCorrectedPos && tileCorrectedPos != position)
 		position = tileCorrectedPos;
 
-	if (colType == CollisionType::Hole && Game::instance().isOnGodMode())
+	if (colType == CollisionType::Hole)
 		Game::instance().onPlayerFallDownHole();
 
 	if (colType == CollisionType::Tile || colType == CollisionType::TileStairs)
@@ -641,6 +665,10 @@ void Player::blockMovementBehaviour()
 		rightMove();
 	}
 	if (checkObjInteractionButton()) {
-		throwBlock();
+		if (Game::instance().getKey(GLFW_KEY_S)) {
+			dropBlock();
+		}
+		else
+			throwBlock();
 	}
 }
