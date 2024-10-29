@@ -36,7 +36,7 @@ public:
 
 	void resetDragon();
 	bool getActive() { return active; }
-	void appear() { active = true; entityState = ALIVE; }
+	void appear() { active = true; entityState = STILL; }
 
 	vector<BossShoot*> getShoots() { return shoots; }
 

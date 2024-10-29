@@ -166,7 +166,7 @@ void Player::update(int deltaTime)
 		if (elapsedTime >= timeDyingAnim) {
 			elapsedTime = 0;
 			if (Game::instance().getStars() > 0)
-				entityState = ALIVE;
+				entityState = STILL;
 			else
 				entityState = DEAD;
 		}
@@ -188,10 +188,10 @@ void Player::update(int deltaTime)
 		case JUMP:
 		{
 			if (Game::instance().getKey(GLFW_KEY_A)) {
-				leftMove();
+				horizontalMove(true);
 			}
 			if (Game::instance().getKey(GLFW_KEY_D)) {
-				rightMove();
+				horizontalMove(false);
 			}
 			if (Game::instance().getKey(GLFW_KEY_S)) {
 				newState = BUTT_FALL;
@@ -210,10 +210,10 @@ void Player::update(int deltaTime)
 		case FALL:
 		{
 			if (Game::instance().getKey(GLFW_KEY_A)) {
-				leftMove();
+				horizontalMove(true);
 			}
 			if (Game::instance().getKey(GLFW_KEY_D)) {
-				rightMove();
+				horizontalMove(false);
 			}
 			if (Game::instance().getKey(GLFW_KEY_S)) {
 				newState = BUTT_FALL;
@@ -304,10 +304,10 @@ void Player::update(int deltaTime)
 		case B_JUMP:
 		{
 			if (Game::instance().getKey(GLFW_KEY_A)) {
-				leftMove();
+				horizontalMove(true);
 			}
 			if (Game::instance().getKey(GLFW_KEY_D)) {
-				rightMove();
+				horizontalMove(false);
 			}
 			if (checkObjInteractionButton()) {
 				throwBlock();
@@ -322,10 +322,10 @@ void Player::update(int deltaTime)
 		case B_FALL:
 		{
 			if (Game::instance().getKey(GLFW_KEY_A)) {
-				leftMove();
+				horizontalMove(true);
 			}
 			if (Game::instance().getKey(GLFW_KEY_D)) {
-				rightMove();
+				horizontalMove(false);
 			}
 			if (checkObjInteractionButton()) {
 				//newState = BUTT_FALL;
@@ -461,6 +461,25 @@ bool Player::checkObjInteractionButton()
 	return false;
 }
 
+bool Player::cakeCoinCollide(Block* b)
+{
+	if (b->getBlockType() == BlockType::Coin)
+	{
+		CollisionManager::instance().disAttachBlock(b);
+		Game::instance().onGetCoin();
+		b->explode();
+		return true;
+	}
+	else if (b->getBlockType() == BlockType::Cake)
+	{
+		CollisionManager::instance().disAttachBlock(b);
+		Game::instance().onGetCake();
+		b->explode();
+		return true;
+	}
+	return false;
+}
+
 void Player::playerButtJump()
 {
 	if (oldState == BUTT_FALL || oldState == BUTT_JUMP)
@@ -471,53 +490,33 @@ void Player::playerButtJump()
 	}
 }
 
-void Player::leftMove()
+void Player::horizontalMove(bool left)
 {
-	left = true;
+	this->left = left;
 	sprite->setLeft(left);
-
-	position.x -= WALK_SPEED;
+	int direction = 1;
+	if (left)
+		direction = -1;
+	position.x += direction * WALK_SPEED;
 
 	CollisionType colType = CollisionManager::instance().checkCollisionHorizontal(this);
 	if (colType == CollisionType::Tile)
-		position.x += WALK_SPEED;
-	else if ((colType == CollisionType::Stairs || colType == CollisionType::TileStairs) && Game::instance().getKey(GLFW_KEY_W))
-		changeToClimb();
-	
-	Block* b = CollisionManager::instance().collisionEntityBlockH(this);
-	if (b != nullptr)
-	{
-		position.x += WALK_SPEED;
-		if (oldState == WALK || oldState == READY_TO_PICK)
-		{
-			newState = READY_TO_PICK;
-			readyToPickBlock = b;
-		}
-	}
-}
-
-void Player::rightMove()
-{
-	left = false;
-	sprite->setLeft(left);
-	position.x += WALK_SPEED;
-
-	CollisionType colType = CollisionManager::instance().checkCollisionHorizontal(this);
-	if (colType == CollisionType::Tile)
-		position.x -= WALK_SPEED;
+		position.x += direction * WALK_SPEED * -1;
 	else if ((colType == CollisionType::Stairs || colType == CollisionType::TileStairs) && Game::instance().getKey(GLFW_KEY_W))
 		changeToClimb();
 
 	Block* b = CollisionManager::instance().collisionEntityBlockH(this);
-	if (b != nullptr)
+	if (b != nullptr && b->getEntityState() != EntityState::DEAD)
 	{
-		position.x -= WALK_SPEED;
-		if (oldState == WALK || oldState == READY_TO_PICK)
+		if (!cakeCoinCollide(b))
 		{
-			newState = READY_TO_PICK;
-			readyToPickBlock = b;
+			position.x += direction * WALK_SPEED * -1;
+			if (oldState == WALK || oldState == READY_TO_PICK)
+			{
+				newState = READY_TO_PICK;
+				readyToPickBlock = b;
+			}
 		}
-			
 	}
 }
 
@@ -550,8 +549,11 @@ bool Player::stopFallingCollision(Block*& block, CollisionType& colType)
 
 	if (colType == CollisionType::Tile || colType == CollisionType::TileStairs)
 		return true;
-	if (block != nullptr)
-		return true;
+	if (block != nullptr && block->getEntityState() != EntityState::DEAD)
+	{
+		if (!cakeCoinCollide(block))
+			return true;
+	}
 	return false;
 }
 
@@ -596,11 +598,11 @@ void Player::movementBehaviour()
 	}
 	if (Game::instance().getKey(GLFW_KEY_A)) {
 		newState = WALK;
-		leftMove();
+		horizontalMove(true);
 	}
 	if (Game::instance().getKey(GLFW_KEY_D)) {
 		newState = WALK;
-		rightMove();
+		horizontalMove(false);
 	}
 }
 
@@ -633,10 +635,10 @@ void Player::climbBehaviour()
 void Player::buttJumpBehaviour()
 {
 	if (Game::instance().getKey(GLFW_KEY_A)) {
-		leftMove();
+		horizontalMove(true);
 	}
 	if (Game::instance().getKey(GLFW_KEY_D)) {
-		rightMove();
+		horizontalMove(false);
 	}
 	if (stopFallingCollision(block, colType))
 	{
@@ -644,16 +646,13 @@ void Player::buttJumpBehaviour()
 			newState = IDLE;
 		yAxisSpeed = 0;
 	}
-	if (block != nullptr)
+	if (block != nullptr && block->getEntityState() != EntityState::DEAD)
 	{
 		yAxisSpeed = BUTT_JUMP_SPEED;
 		newState = BUTT_JUMP;
-		// destruccion del objeto que devuelve
-		// delete b;
-		CollisionManager::instance().disAttachBlock(block);
-		CollisionManager::instance().attachBlock(block);
-		CollisionManager::instance().disAttachBlock(block);
-		block->explode();
+		
+		if (!cakeCoinCollide(block))
+			CollisionManager::instance().disAttachBlock(block);
 	}
 }
 
@@ -675,11 +674,11 @@ void Player::blockMovementBehaviour()
 	}
 	if (Game::instance().getKey(GLFW_KEY_A)) {
 		newState = B_WALK;
-		leftMove();
+		horizontalMove(true);
 	}
 	if (Game::instance().getKey(GLFW_KEY_D)) {
 		newState = B_WALK;
-		rightMove();
+		horizontalMove(false);
 	}
 	if (checkObjInteractionButton()) {
 		if (Game::instance().getKey(GLFW_KEY_S)) {

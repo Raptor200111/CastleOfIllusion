@@ -148,6 +148,11 @@ void ScenePlay::update(int deltaTime) {
 		collisionsEnemies(deltaTime);
 	}
 
+	for (const auto& screenBlock : screenBlocks)
+	{
+		screenBlock.second->update(deltaTime);
+	}
+
 	collisionsMovingBlocks(deltaTime);
 
 	gameUI.update(deltaTime);
@@ -208,7 +213,7 @@ void ScenePlay::render() {
 			{
 				screenEnemy.second->render();
 			}
-			else if (screenEnemy.second->getEntityState() != EntityState::ALIVE)
+			else if (screenEnemy.second->getEntityState() != EntityState::STILL)
 			{
 				screenEnemy.second->reLive();
 			}
@@ -276,7 +281,7 @@ void ScenePlay::insideScreenObj(int floorIndex)
 			{
 				for (auto& itEnemy : screenEnemies)
 				{
-					if(itEnemy.second->getEntityState() != ALIVE)
+					if(itEnemy.second->getEntityState() != STILL)
 						itEnemy.second->reLive();
 				}
 				screenEnemies.clear();
@@ -337,7 +342,7 @@ void ScenePlay::collisionsEnemies(int deltaTime)
 		bool reStarted = false;
 		itEnemy->second->update(deltaTime);
 		EnemyType enemyType = itEnemy->second->getEnemyType();
-		if (itEnemy->second->getEntityState() == ALIVE && player->getEntityState() == ALIVE 
+		if (itEnemy->second->getEntityState() == STILL && player->getEntityState() == STILL 
 			&& CollisionManager::instance().checkCollisionObject(player, itEnemy->second)) {
 			if (player->isAttacking()) {
 				Game::instance().onPlayerKilledEnemy();
@@ -356,12 +361,12 @@ void ScenePlay::collisionsEnemies(int deltaTime)
 		}
 		if (!reStarted) {
 			if (enemyType != Bee) {
-				if (itEnemy->second->getEntityState() == ALIVE && CollisionManager::instance().checkCollisionVertical(itEnemy->second) == Tile)
+				if (itEnemy->second->getEntityState() == STILL && CollisionManager::instance().checkCollisionVertical(itEnemy->second) == Tile)
 				{
 					itEnemy->second->collideVertical();
 				}
 
-				if (itEnemy->second->getEntityState() == ALIVE) {
+				if (itEnemy->second->getEntityState() == STILL) {
 					int countBlockCollisions = 0;
 					for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
 					{
@@ -388,7 +393,7 @@ void ScenePlay::collisionsEnemies(int deltaTime)
 				}
 
 				
-				if (itEnemy->second->getEntityState() == ALIVE && CollisionManager::instance().checkCollisionHorizontal(itEnemy->second) == Tile)
+				if (itEnemy->second->getEntityState() == STILL && CollisionManager::instance().checkCollisionHorizontal(itEnemy->second) == Tile)
 				{					
 					itEnemy->second->collideHorizontal();
 				}
@@ -409,14 +414,14 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 		//block alive === moving
 
 		//check collisions with enemies
-		if (itMovBlock->second->getEntityState() == ALIVE) {
+		if (itMovBlock->second->getEntityState() == FALLING) {
 			if (insideBossRoom) {
 				collisionMovBlockInsideBossRoom(itMovBlock->second);
 			}
 			else
 			{
 				for (auto& screenEnemy : screenEnemies) {
-					if (screenEnemy.second->getEntityState() == ALIVE && 
+					if (screenEnemy.second->getEntityState() == STILL &&
 						CollisionManager::instance().checkCollisionObject(screenEnemy.second, itMovBlock->second))
 					{
 						Game::instance().onPlayerKilledEnemy();
@@ -430,7 +435,7 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 		}
 
 		//check collisions with other blocks
-		if (itMovBlock->second->getEntityState() == ALIVE) {
+		if (itMovBlock->second->getEntityState() == FALLING) {
 			int countBlockCollisions = 0;
 			for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
 			{
@@ -457,23 +462,28 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 		}
 		
 		//check collision tilemap vertical
-		if (itMovBlock->second->getEntityState() == ALIVE) {
+		if (itMovBlock->second->getEntityState() == FALLING) {
 			CollisionType verticalCollision = CollisionManager::instance().checkCollisionVertical(itMovBlock->second);
 			if (verticalCollision != None)
 				itMovBlock->second->collisionVertical(verticalCollision);
 		}
 
 		//check collision tilemap horizontal
-		if (itMovBlock->second->getEntityState() == ALIVE) {
+		if (itMovBlock->second->getEntityState() == FALLING) {
 			CollisionType horizontalCollision = CollisionManager::instance().checkCollisionHorizontal(itMovBlock->second);
 			if (horizontalCollision != None)
 				itMovBlock->second->collisionHorizontal(horizontalCollision);
 		}
 
 		//block Dead == has stopped moving
-		if (itMovBlock->second->getEntityState() == DEAD) {
-			if (blockType == NonDestroyable) {
-				itMovBlock->second->setEntityState(ALIVE);
+		blockType = itMovBlock->second->getBlockType();
+		if (blockType == Cake || blockType == Coin || itMovBlock->second->getEntityState() == DEAD) {
+			if (blockType == Cake || blockType == Coin || blockType == NonDestroyable) {
+				if (blockType == Cake || blockType == Coin)
+				{
+					screenBlocks.insert(std::pair<string, Block*>(itMovBlock->first, itMovBlock->second));
+				}
+				itMovBlock->second->setEntityState(STILL);
 				int movBlockFloorIndex = calcFloorIndex(itMovBlock->second->getPosition().y / map->getTileSize());
 				playrunBlocks[movBlockFloorIndex].push_back(itMovBlock->second);
 			}

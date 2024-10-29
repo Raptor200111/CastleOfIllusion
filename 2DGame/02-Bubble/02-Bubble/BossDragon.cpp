@@ -143,7 +143,7 @@ void BossDragon::update(int deltaTime)
 			entityState = DEAD;
 		}
 	}
-	else if (active && entityState == ALIVE) {
+	else if (active && entityState == STILL) {
 		glm::vec2 aux = sprite->updateDiffSize(deltaTime);
 		if (aux != glm::vec2(0.f))
 			sizeObjHead = aux;
@@ -304,7 +304,8 @@ void BossDragon::shoot(int deltaTime)
 	a = glm::radians(a);
 	glm::vec2 dir = glm::vec2(positionStartShoot.x + 350 * cos(a), positionStartShoot.y + 350 * sin(a));
 	shoots[indexAngleShoot]->setDirection(dir);
-	shoots[indexAngleShoot]->setEntityState(ALIVE);
+
+	shoots[indexAngleShoot]->setEntityState(STILL);
 	SoundManager::instance().setMusicVolume(40);
 	SoundManager::instance().playSoundEffect("shoot", 0);
 }
@@ -320,7 +321,7 @@ void BossDragon::Damaged()
 void BossDragon::resetDragon() 
 { 
 	active = false; 
-	entityState = ALIVE; 
+	entityState = STILL; 
 	actualLives = MAX_LIVES_BOSS;
 	for (auto& shoot : shoots)
 		shoot->setEntityState(DEAD);

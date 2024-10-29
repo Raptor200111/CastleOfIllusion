@@ -26,7 +26,7 @@ public:
 	void setEntityState(EntityState s) { entityState = s; }
 
 protected:
-	EntityState entityState = ALIVE;
+	EntityState entityState = STILL;
 	bool left = false;
 	Texture spritesheet;
 	Sprite* sprite;

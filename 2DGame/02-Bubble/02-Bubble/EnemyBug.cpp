@@ -62,7 +62,7 @@ void EnemyBug::update(int deltaTime)
 		}
 	}
 	//!dying=animDying ended && !dead=alive
-	else if (entityState == ALIVE) {
+	else if (entityState == STILL) {
 		elapsedTime = 0;
 		int min_x_attack = position.x - attackDistance;
 		int max_x_attack = position.x + attackDistance;
@@ -139,7 +139,7 @@ void EnemyBug::Damaged()
 
 void EnemyBug::reLive()
 {
-	entityState = EntityState::ALIVE;
+	entityState = EntityState::STILL;
 	left = initParams.left;
 	position = initParams.initPos * map->getTileSize();
 	sprite->setLeft(left);

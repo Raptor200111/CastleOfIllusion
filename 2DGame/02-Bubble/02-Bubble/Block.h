@@ -4,10 +4,6 @@
 #include <cmath>
 #include "ParticleEfect.h"
 
-enum BlockStatus {
-	ITEM_STATUS, CHEST_STATUS, DISAPPEAR
-};
-
 class Block : public Entity
 {
 public:
@@ -26,18 +22,15 @@ public:
 	void collisionHorizontal(CollisionType horizontalCollision);
 
 	void throwBlock(glm::vec2 speed);
+
+	virtual void explode();
 	void dropBlock(glm::ivec2 pos, glm::ivec2 size, bool left);
-	void explode();
 
-private:
-	glm::vec2 speed = glm::vec2(0, 0);
-	ParticleEfect* explosionEfect;
-
-	
 protected:
 	BlockType blockType;
-	BlockStatus blockStatus;
 	glm::ivec2 ogPosition;
 	int elapsedTime = 0;
 	int timeDyingAnim = 6 * 1000/15;
+	glm::vec2 speed = glm::vec2(0, 0);
+	ParticleEfect* explosionEfect;
 };

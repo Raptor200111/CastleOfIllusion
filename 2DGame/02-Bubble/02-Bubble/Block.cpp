@@ -27,16 +27,12 @@ void Block::update(int deltaTime)
 {	
 	switch (entityState)
 	{
-		case ALIVE:
+		case FALLING:
 		{
 			if (blockType != Gem) {
 				speed.y += 0.5;
 				position += speed;
 			}
-			break;
-		}
-		case DEAD:
-		{
 			break;
 		}
 		case DYING:
@@ -49,6 +45,8 @@ void Block::update(int deltaTime)
 			}
 			break;
 		}
+		default:
+			break;
 	}
 	setPosition(position);
 	sprite->update(deltaTime);
@@ -60,41 +58,42 @@ void Block::update(int deltaTime)
 
 void Block::render()
 {
-	sprite->render();
+	if (entityState != DEAD)
+		sprite->render();
 	explosionEfect->render();
 }
 
 void Block::collisionEnemy(const glm::ivec2& posEnemy)
 {
-	if (entityState == ALIVE)
+	if (entityState == FALLING)
 	{
 		explode();
 	}
 }
 void Block::collisionBlockHorizontal(HColType hBlockCollision, const Block*& b)
 {
-	if (entityState == ALIVE)
+	if (entityState == FALLING)
 	{
 		explode();
 	}
 }
 void Block::collisionBlockVertical(VColType vBlockCollision, const Block*& b)
 {
-	if (entityState == ALIVE)
+	if (entityState == FALLING)
 	{
 		explode();
 	}
 }
 void Block::collisionVertical(CollisionType verticalCollision)
 {
-	if (entityState == ALIVE)
+	if (entityState == FALLING)
 	{
 		explode();
 	}
 }
 void Block::collisionHorizontal(CollisionType horizontalCollision)
 {
-	if (entityState == ALIVE)
+	if (entityState == FALLING)
 	{
 		explode();
 	}
@@ -103,7 +102,7 @@ void Block::collisionHorizontal(CollisionType horizontalCollision)
 void Block::throwBlock(glm::vec2 speed)
 {
 	this->speed = speed;
-	entityState = ALIVE;
+	entityState = FALLING;
 }
 
 void Block::dropBlock(glm::ivec2 pos, glm::ivec2 size, bool left)
@@ -114,7 +113,7 @@ void Block::dropBlock(glm::ivec2 pos, glm::ivec2 size, bool left)
 		position = pos + size - glm::ivec2(0, sizeObject.y);
 
 	speed = glm::vec2(0, 0);
-	entityState = ALIVE;
+	entityState = STILL;
 }
 
 void Block::explode()

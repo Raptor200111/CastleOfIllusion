@@ -25,7 +25,7 @@ void BossShoot::update(int deltaTime) {
 			entityState = DEAD;
 		}
 	}
-	else if (entityState == ALIVE) {
+	else if (entityState == STILL) {
 		shootState = BOSS_SHOOT_START;
 		float deltaSeconds = deltaTime / 1000.0f;
 		glm::vec2 direction = glm::vec2(endDirection - glm::vec2(position));
