@@ -82,6 +82,7 @@ void Block::collisionBlockVertical(VColType vBlockCollision, const Block*& b)
 {
 	if (entityState == FALLING)
 	{
+		entityState = STILL;
 		explode();
 	}
 }
@@ -89,6 +90,7 @@ void Block::collisionVertical(CollisionType verticalCollision)
 {
 	if (entityState == FALLING)
 	{
+		entityState = STILL;
 		explode();
 	}
 }

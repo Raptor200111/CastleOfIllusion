@@ -20,7 +20,7 @@ BlockNonDestroyable::BlockNonDestroyable(const glm::ivec2& tileMapPos, ShaderPro
 
 void BlockNonDestroyable::explode()
 {
-	entityState = STILL;
+//	entityState = STILL;
 	
 	/*
 	while (CollisionManager::instance().checkCollisionHorizontal(this) != None)
@@ -31,5 +31,4 @@ void BlockNonDestroyable::explode()
 	speed = glm::vec2(0, 0);
 	
 }
-
 
