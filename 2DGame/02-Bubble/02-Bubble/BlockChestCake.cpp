@@ -36,3 +36,13 @@ void BlockChestCake::explode()
 		speed = glm::vec2(0, 0);
 	}
 }
+
+void BlockChestCake::collisionVertical(CollisionType verticalCollision)
+{
+	if (entityState == FALLING)
+	{
+		entityState = STILL;
+		if (blockType != Cake)
+			explode();
+	}
+}

@@ -91,8 +91,7 @@ void Block::collisionVertical(CollisionType verticalCollision)
 	if (entityState == FALLING)
 	{
 		entityState = STILL;
-		if(blockType != Cake && blockType != Coin)
-			explode();
+		explode();
 	}
 }
 void Block::collisionHorizontal(CollisionType horizontalCollision)

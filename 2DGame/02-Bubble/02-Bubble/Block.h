@@ -17,11 +17,11 @@ public:
 	BlockType getBlockType() { return blockType; }
 	void setOgPosition(const glm::vec2& pos) { ogPosition = pos; }
 	glm::ivec2 getOgPosition() { return ogPosition; }
-	void collisionEnemy(const glm::ivec2& posEnemy);
-	void collisionBlockHorizontal(HColType hBlockCollision, const Block*& b);
-	void collisionBlockVertical(VColType vBlockCollision, const Block*& b);
-	void collisionVertical(CollisionType verticalCollision);
-	void collisionHorizontal(CollisionType horizontalCollision);
+	virtual void collisionEnemy(const glm::ivec2& posEnemy);
+	virtual void collisionBlockHorizontal(HColType hBlockCollision, const Block*& b);
+	virtual void collisionBlockVertical(VColType vBlockCollision, const Block*& b);
+	virtual void collisionVertical(CollisionType verticalCollision);
+	virtual void collisionHorizontal(CollisionType horizontalCollision);
 
 	void throwBlock(glm::vec2 speed);
 

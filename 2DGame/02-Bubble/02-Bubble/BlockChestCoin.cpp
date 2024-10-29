@@ -36,3 +36,13 @@ void BlockChestCoin::explode()
 		speed = glm::vec2(0, 0);
 	}
 }
+
+void BlockChestCoin::collisionVertical(CollisionType verticalCollision)
+{
+	if (entityState == FALLING)
+	{
+		entityState = STILL;
+		if (blockType != Coin)
+			explode();
+	}
+}
