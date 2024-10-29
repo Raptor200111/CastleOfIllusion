@@ -16,3 +16,12 @@ BlockDestroyable::BlockDestroyable(const glm::ivec2& tileMapPos, ShaderProgram& 
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }
+
+void BlockDestroyable::explode()
+{
+	entityState = DYING;
+	speed = glm::vec2(0, 0);
+	SoundManager::instance().setMusicVolume(40);
+	SoundManager::instance().playSoundEffect("break", 0);
+	explosionEfect->play(position + (getSize() / 2) - glm::ivec2(16, 18), 0);
+}

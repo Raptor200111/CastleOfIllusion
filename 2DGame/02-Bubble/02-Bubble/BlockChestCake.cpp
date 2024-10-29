@@ -28,11 +28,21 @@ void BlockChestCake::explode()
 		blockType = BlockType::Cake;
 		explosionEfect->play(position + (getSize() / 2) - glm::ivec2(16, 18), 0);
 		sprite->changeAnimation(1);
-		entityState = STILL;
+		//entityState = STILL;
 	}
 	else if (blockType == BlockType::Cake)
 	{
 		entityState = DEAD;
 		speed = glm::vec2(0, 0);
+	}
+}
+
+void BlockChestCake::collisionVertical(CollisionType verticalCollision)
+{
+	if (entityState == FALLING)
+	{
+		entityState = STILL;
+		if (blockType != Cake)
+			explode();
 	}
 }

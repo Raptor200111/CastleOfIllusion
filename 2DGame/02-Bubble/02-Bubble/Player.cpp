@@ -286,7 +286,13 @@ void Player::update(int deltaTime)
 				newState = B_IDLE;
 			if (keyframe.x > 0)
 			{
-				pickedUpBlock->setPosition(pickedUpBlock->getPosition() + glm::ivec2(0, 12));
+				int y = position.y + sizeObject.y / 2 - pickedUpBlock->getSize().y / 2;
+				int x;
+				if (left)
+					x = position.x - pickedUpBlock->getSize().x;
+				else
+					x = position.x + sizeObject.x;
+				pickedUpBlock->setPosition(glm::ivec2(x, y));
 			}
 			break;
 		}
@@ -378,9 +384,9 @@ void Player::render()
 
 void Player::pickUpBlock()
 {
-	CollisionManager::instance().disAttachBlock(readyToPickBlock);
 	pickedUpBlock = readyToPickBlock;
 	readyToPickBlock = nullptr;
+	CollisionManager::instance().disAttachBlock(pickedUpBlock);
 	newState = B_PICK;
 }
 
@@ -465,16 +471,12 @@ bool Player::cakeCoinCollide(Block* b)
 {
 	if (b->getBlockType() == BlockType::Coin)
 	{
-		CollisionManager::instance().disAttachBlock(b);
 		Game::instance().onGetCoin();
-		b->explode();
 		return true;
 	}
 	else if (b->getBlockType() == BlockType::Cake)
 	{
-		CollisionManager::instance().disAttachBlock(b);
 		Game::instance().onGetCake();
-		b->explode();
 		return true;
 	}
 	return false;
@@ -517,6 +519,10 @@ void Player::horizontalMove(bool left)
 				readyToPickBlock = b;
 			}
 		}
+		else {
+			b->explode();
+			CollisionManager::instance().disAttachBlock(b);
+		}
 	}
 }
 
@@ -553,6 +559,10 @@ bool Player::stopFallingCollision(Block*& block, CollisionType& colType)
 	{
 		if (!cakeCoinCollide(block))
 			return true;
+		else {
+			block->explode();
+			CollisionManager::instance().disAttachBlock(block);
+		}
 	}
 	return false;
 }
@@ -652,8 +662,9 @@ void Player::buttJumpBehaviour()
 		yAxisSpeed = BUTT_JUMP_SPEED;
 		newState = BUTT_JUMP;
 		
-		if (!cakeCoinCollide(block))
-			CollisionManager::instance().disAttachBlock(block);
+		//cakeCoinCollide(block);
+		block->explode();
+		//CollisionManager::instance().disAttachBlock(block);
 	}
 }
 

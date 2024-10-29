@@ -29,7 +29,8 @@ public:
 	void render();
 
 	void reStartStatePlayer();
-	bool isAttacking() { return newState == BUTT_FALL; }
+	bool isAttacking() { return oldState == BUTT_FALL; }
+	bool isCrouching() { return oldState == DODGE; }
 
 	Block* getPickedUpBlock() { return pickedUpBlock; }
 	void playerButtJump();

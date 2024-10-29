@@ -30,6 +30,7 @@ bool SoundManager::init() {
     SoundManager::instance().loadSoundEffect("practiceWon", "sound/practiceWon0.wav");
     SoundManager::instance().loadSoundEffect("playerCoin", "sound/playerCoin.wav");
     SoundManager::instance().loadSoundEffect("playerCake", "sound/playerCake.wav");
+    SoundManager::instance().loadSoundEffect("playerDamage", "sound/playerDamage.wav");
     SoundManager::instance().loadSoundEffect("break", "sound/break.wav");
     SoundManager::instance().loadSoundEffect("shoot", "sound/shoot.wav");
 

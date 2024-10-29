@@ -52,7 +52,7 @@ void Game::keyPressed(int key)
 		scenePlayLevel.reStart();
 		SoundManager::instance().playMusic("level", -1);
 	}
-	else if (currentScene != &sceneFinalScreen && key == GLFW_KEY_I) {
+	else if (currentScene == &sceneMenu && key == GLFW_KEY_I) {
 		currentScene = &sceneInstructions;
 		SoundManager::instance().playMusic("instructions", -1);
 	}
@@ -61,7 +61,7 @@ void Game::keyPressed(int key)
 		currentScene = &sceneMenu;
 		SoundManager::instance().playMusic("menu", -1);
 	}
-	else if (currentScene != &sceneFinalScreen && key == GLFW_KEY_C) {
+	else if (currentScene == &sceneMenu && key == GLFW_KEY_C) {
 		currentScene = &sceneCredits;
 		SoundManager::instance().playMusic("credits", -1);
 	}
@@ -133,7 +133,7 @@ void Game::onPlayerKilled()
 		SoundManager::instance().playSoundEffect("playRestart", 0);
 	}
 	else {
-		//SoundManager::instance().playSoundEffect("playerDamaged", 0);
+		SoundManager::instance().playSoundEffect("playerDamage", 0);
 	}
 	if (tries <= 0)
 	{
