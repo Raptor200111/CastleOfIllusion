@@ -114,7 +114,7 @@ void ScenePlayPractice::updateCollisionsWithBoss(int deltaTime) {
     if (blockGem->getEntityState() != DEAD)
         blockGem->update(deltaTime);
 
-    if (player->getEntityState() == ALIVE) {
+    if (player->getEntityState() == STILL) {
         if (CollisionManager::instance().checkCollisionObject(player, blockGem)) {
             blockGem->setEntityState(DYING);
         }
@@ -134,7 +134,7 @@ void ScenePlayPractice::collisionMovBlockInsideBossRoom(Block* movBlock)
 
 void ScenePlayPractice::renderBoss() {
     EntityState gemState = blockGem->getEntityState();
-    if (gemState == ALIVE)
+    if (gemState == STILL)
         blockGem->render();
     else if (gemState == DYING)
         winAnimScenePlay = true;

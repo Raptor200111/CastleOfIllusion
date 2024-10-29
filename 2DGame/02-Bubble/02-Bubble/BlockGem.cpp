@@ -17,3 +17,9 @@ BlockGem::BlockGem(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) :
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + position.x), float(tileMapDispl.y + position.y)));
 }
+
+void BlockGem::explode()
+{
+	entityState = DYING;
+	speed = glm::vec2(0, 0);
+}

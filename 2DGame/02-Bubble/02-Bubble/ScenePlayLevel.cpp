@@ -232,7 +232,7 @@ void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 
 	if (boss.getEntityState() != DEAD) {
 
-		if (boss.getEntityState() == ALIVE && player->getEntityState() == ALIVE && 
+		if (boss.getEntityState() == STILL && player->getEntityState() == STILL && 
 			CollisionManager::instance().checkCollisionObject(player, &boss))
 		{
 			boss.Damaged();
@@ -242,20 +242,20 @@ void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 		for (auto shoot : boss.getShoots())
 		{
 			shoot->update(deltaTime);
-			if (shoot->getEntityState() == ALIVE && !Game::instance().isOnGodMode()) {
+			if (shoot->getEntityState() == STILL && !Game::instance().isOnGodMode()) {
 				if (CollisionManager::instance().checkCollisionObject(player, shoot)) {
 					Game::instance().onPlayerKilled();
 					shoot->setEntityState(DYING);
 				}
 			}
 
-			if (shoot->getEntityState() == ALIVE) {
+			if (shoot->getEntityState() == STILL) {
 				glm::ivec2 posShoot = shoot->getPosition();
 				if (CollisionManager::instance().checkCollisionVertical(shoot) != None || CollisionManager::instance().checkCollisionHorizontal(shoot) != None)
 					shoot->setEntityState(DYING);
 			}
 
-			if (shoot->getEntityState() == ALIVE) {
+			if (shoot->getEntityState() == STILL) {
 				for (auto& itBlock = screenBlocks.begin(); itBlock != screenBlocks.end(); ++itBlock)
 				{
 					VColType vBlockCollision = CollisionManager::instance().checkCollisionBlockVertical(shoot, itBlock->second);
@@ -271,7 +271,7 @@ void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 	else {
 		if (blockGem->getEntityState() != DEAD)
 			blockGem->update(deltaTime);
-		if (player->getEntityState() == ALIVE && CollisionManager::instance().checkCollisionObject(player, blockGem))
+		if (player->getEntityState() == STILL && CollisionManager::instance().checkCollisionObject(player, blockGem))
 		{
 			blockGem->setEntityState(DYING);
 		}
@@ -283,7 +283,7 @@ void ScenePlayLevel::collisionMovBlockInsideBossRoom(Block* movBlock)
 {
 	if (boss.getEntityState() != DEAD) {
 
-		if (movBlock->getEntityState() == ALIVE && CollisionManager::instance().checkCollisionObject(movBlock, &boss))
+		if (movBlock->getEntityState() == STILL && CollisionManager::instance().checkCollisionObject(movBlock, &boss))
 		{
 			boss.Damaged();
 			Game::instance().onPlayerKilledEnemy();
@@ -306,7 +306,7 @@ void ScenePlayLevel::renderBoss() {
 	else
 	{
 		EntityState gemState = blockGem->getEntityState();
-		if (gemState == ALIVE)
+		if (gemState == STILL)
 			blockGem->render();
 		else if (gemState == DYING)
 			winAnimScenePlay = true;

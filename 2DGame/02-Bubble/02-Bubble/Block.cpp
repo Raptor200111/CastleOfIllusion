@@ -27,14 +27,10 @@ void Block::update(int deltaTime)
 {	
 	switch (entityState)
 	{
-		case ALIVE:
+		case FALLING:
 		{
 			speed.y += 0.5;
 			position += speed;
-			break;
-		}
-		case DEAD:
-		{
 			break;
 		}
 		case DYING:
@@ -47,6 +43,8 @@ void Block::update(int deltaTime)
 			}
 			break;
 		}
+		default:
+			break;
 	}
 	setPosition(position);
 	sprite->update(deltaTime);
@@ -58,41 +56,42 @@ void Block::update(int deltaTime)
 
 void Block::render()
 {
-	sprite->render();
+	if (entityState != DEAD)
+		sprite->render();
 	explosionEfect->render();
 }
 
 void Block::collisionEnemy(const glm::ivec2& posEnemy)
 {
-	if (entityState == ALIVE)
+	if (entityState == FALLING)
 	{
 		explode();
 	}
 }
 void Block::collisionBlockHorizontal(HColType hBlockCollision, const Block*& b)
 {
-	if (entityState == ALIVE)
+	if (entityState == FALLING)
 	{
 		explode();
 	}
 }
 void Block::collisionBlockVertical(VColType vBlockCollision, const Block*& b)
 {
-	if (entityState == ALIVE)
+	if (entityState == FALLING)
 	{
 		explode();
 	}
 }
 void Block::collisionVertical(CollisionType verticalCollision)
 {
-	if (entityState == ALIVE)
+	if (entityState == FALLING)
 	{
 		explode();
 	}
 }
 void Block::collisionHorizontal(CollisionType horizontalCollision)
 {
-	if (entityState == ALIVE)
+	if (entityState == FALLING)
 	{
 		explode();
 	}
@@ -101,7 +100,7 @@ void Block::collisionHorizontal(CollisionType horizontalCollision)
 void Block::throwBlock(glm::vec2 speed)
 {
 	this->speed = speed;
-	entityState = ALIVE;
+	entityState = FALLING;
 }
 
 void Block::explode()
