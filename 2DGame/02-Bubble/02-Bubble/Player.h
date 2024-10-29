@@ -47,7 +47,9 @@ private:
 	Block* block = nullptr;
 
 	int elapsedTime = 0;
-	int timeDyingAnim = 2000;
+	int timeDyingAnim = 3000;
+	bool paint = true;
+
 
 	void horizontalMove(bool left);
 	void changeToClimb();

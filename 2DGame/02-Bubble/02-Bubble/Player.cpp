@@ -9,6 +9,8 @@
 #define STANDART_SIZE glm::ivec2(24, 32)
 #define DODGE_SIZE glm::ivec2(24, 21)
 #define OFFSET glm::ivec2(4, 8)
+#define DAMAGE_TIME 200
+
 
 Player::~Player()
 {
@@ -137,6 +139,20 @@ void Player::reStartStatePlayer()
 
 void Player::update(int deltaTime)
 {
+	if (entityState == EntityState::DYING)
+	{
+		elapsedTime += deltaTime;
+		//int timeDyingAnim = 2000;
+		if (elapsedTime >= timeDyingAnim)
+		{
+			entityState = EntityState::STILL;
+			paint = true;
+			elapsedTime = 0;
+		}
+		else
+			paint = (elapsedTime / DAMAGE_TIME) % 2;
+	}
+
 	sprite->update(deltaTime);
 
 	yAxisSpeed += GRAVITY;
@@ -355,7 +371,8 @@ void Player::render()
 {
 	if (pickedUpBlock != nullptr)
 		pickedUpBlock->render();
-	sprite->render();
+	if (paint)
+		sprite->render();
 	particleEfect->render();
 }
 
@@ -543,7 +560,7 @@ bool Player::stopFallingCollision(Block*& block, CollisionType& colType)
 bool Player::stairCollision()
 {
 	auto oldPos = position;
-	auto colType = CollisionManager::instance().checkCollisionVertical(this);
+	colType = CollisionManager::instance().checkCollisionVertical(this);
 	position = oldPos;
 	if (colType == CollisionType::Stairs || colType == CollisionType::TileStairs)
 		return true;
@@ -609,8 +626,9 @@ void Player::climbBehaviour()
 			position.y += WALK_SPEED;
 			newState = CLIMB;
 		}
-		if (checkObjInteractionButton() && colType == CollisionType::Stairs) {
-			newState = FALL;
+		if (checkObjInteractionButton()) {
+			if (colType == CollisionType::Stairs)
+				newState = FALL;
 		}
 	}
 }
