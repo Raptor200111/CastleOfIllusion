@@ -8,6 +8,7 @@
 #define BUTT_JUMP_SPEED -12.f
 #define STANDART_SIZE glm::ivec2(24, 32)
 #define DODGE_SIZE glm::ivec2(24, 32)
+#define DAMAGE_TIME 200
 
 Player::~Player()
 {
@@ -136,6 +137,20 @@ void Player::reStartStatePlayer()
 
 void Player::update(int deltaTime)
 {
+	if (entityState == EntityState::DYING)
+	{
+		elapsedTime += deltaTime;
+		//int timeDyingAnim = 2000;
+		if (elapsedTime >= timeDyingAnim)
+		{
+			entityState = EntityState::ALIVE;
+			paint = true;
+			elapsedTime = 0;
+		}
+		else
+			paint = (elapsedTime / DAMAGE_TIME) % 2;
+	}
+
 	sprite->update(deltaTime);
 
 	yAxisSpeed += GRAVITY;
@@ -353,7 +368,8 @@ void Player::render()
 {
 	if (pickedUpBlock != nullptr)
 		pickedUpBlock->render();
-	sprite->render();
+	if (paint)
+		sprite->render();
 	particleEfect->render();
 }
 

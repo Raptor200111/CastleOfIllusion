@@ -53,7 +53,8 @@ private:
 
 	//----fet per liliu: check if ok
 	int elapsedTime = 0;
-	int timeDyingAnim = 2000;
+	int timeDyingAnim = 3000;
+	bool paint = true;
 	//----
 
 	void leftMove();
