@@ -419,7 +419,7 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 		//block alive === moving
 
 		//check collisions with enemies
-		if (itMovBlock->second->getEntityState() == FALLING) {
+		if (itMovBlock->second->getEntityState() == FALLING && blockType != Cake && blockType != Coin) {
 			if (insideBossRoom) {
 				collisionMovBlockInsideBossRoom(itMovBlock->second);
 			}
@@ -502,11 +502,12 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 
 		//block Dead == has stopped moving
 		blockType = itMovBlock->second->getBlockType();
-		if (blockType == Cake || blockType == Coin || itMovBlock->second->getEntityState() == DEAD ||
+		bool b = blockType == Cake || blockType == Coin;
+		if ((b && itMovBlock->second->getEntityState() == STILL) || itMovBlock->second->getEntityState() == DEAD ||
 			(blockType == NonDestroyable && itMovBlock->second->getEntityState() == STILL)) {
 			if (blockType == Cake || blockType == Coin || blockType == NonDestroyable) {
 				screenBlocks.insert(std::pair<string, Block*>(itMovBlock->first, itMovBlock->second));
-				itMovBlock->second->setEntityState(STILL);
+				//itMovBlock->second->setEntityState(STILL);
 				int movBlockFloorIndex = calcFloorIndex(itMovBlock->second->getPosition().y / map->getTileSize());
 				playrunBlocks[movBlockFloorIndex].push_back(itMovBlock->second);
 			}
