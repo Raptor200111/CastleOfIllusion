@@ -11,7 +11,6 @@
 #include "CollisionManager.h"
 #include "Block.h"
 
-
 enum PlayerStates
 {
 	IDLE, WALK, JUMP, FALL, DODGE, BUTT_FALL, BUTT_JUMP, READY_TO_PICK, CLIMB_IDLE, CLIMB, B_PICK, B_IDLE, B_WALK, B_JUMP, B_FALL, TOTAL //Importante que TOTAL este al final
@@ -29,18 +28,13 @@ public:
 	void update(int deltaTime);
 	void render();
 
-	//----fet per liliu: check if ok
 	void reStartStatePlayer();
-	//return if player is attacking
 	bool isAttacking() { return newState == BUTT_FALL; }
-	//----
 
-	//Block* ThrownBlock() { return thrownBlock; }
 	Block* getPickedUpBlock() { return pickedUpBlock; }
 	void playerButtJump();
 
 private:
-	//Block* thrownBlock;
 	Block* pickedUpBlock;
 	Block* readyToPickBlock;
 
@@ -52,13 +46,10 @@ private:
 	CollisionType colType = CollisionType::None;
 	Block* block = nullptr;
 
-	//----fet per liliu: check if ok
 	int elapsedTime = 0;
 	int timeDyingAnim = 2000;
-	//----
 
-	void leftMove();
-	void rightMove();
+	void horizontalMove(bool left);
 	void changeToClimb();
 	void changeToDodge();
 	bool stopFallingCollision(Block*& block, CollisionType& colType);
@@ -76,8 +67,7 @@ private:
 
 	bool checkJumpButton();
 	bool checkObjInteractionButton();
+
+	bool cakeCoinCollide(Block* b);
 };
-
 #endif
-
-

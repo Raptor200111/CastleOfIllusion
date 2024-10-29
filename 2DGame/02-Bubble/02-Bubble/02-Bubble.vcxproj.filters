@@ -123,6 +123,7 @@
     <ClInclude Include="SceneCredits.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+
     <ClInclude Include="SceneFinalScreen.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>

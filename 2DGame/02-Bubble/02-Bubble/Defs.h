@@ -31,9 +31,10 @@ enum EnemyType
 
 enum EntityState
 {
-	ALIVE,
+	STILL,
 	DEAD,
-	DYING
+	DYING,
+	FALLING
 };
 
 enum BlockType

@@ -72,7 +72,7 @@ void EnemyTree::update(int deltaTime)
 	else if (entityState == DEAD) {
 		if (elapsedTime >= timeToRegenerate)
 		{
-			entityState = ALIVE;
+			entityState = STILL;
 			elapsedTime = 0;
 			position = initParams.initPos * map->getTileSize();
 			left = initParams.left;
@@ -136,7 +136,7 @@ void EnemyTree::Damaged()
 
 void EnemyTree::reLive()
 {
-	entityState = EntityState::ALIVE;
+	entityState = EntityState::STILL;
 	left = initParams.left;
 	position = initParams.initPos * map->getTileSize();
 	sprite->setLeft(left);

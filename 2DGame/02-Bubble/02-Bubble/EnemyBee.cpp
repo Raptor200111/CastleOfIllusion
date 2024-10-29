@@ -57,7 +57,7 @@ void EnemyBee::update(int deltaTime)
 		}
 	}
 	//!dying=animDying ended && !dead=alive
-	else if (entityState == ALIVE) {
+	else if (entityState == STILL) {
 		elapsedTime = 0;
 		int min_x_attack = position.x - attackDistance;
 		int max_x_attack = position.x + attackDistance;
@@ -138,7 +138,7 @@ void EnemyBee::Damaged()
 void EnemyBee::reLive()
 {
 	enemyBeeState = BEE_FLY_RIGHT;
-	entityState = EntityState::ALIVE;
+	entityState = EntityState::STILL;
 	left = initParams.left;
 	if (left)
 		position = glm::ivec2(initParams.limit.max_x, initParams.initPos.y * map->getTileSize());
