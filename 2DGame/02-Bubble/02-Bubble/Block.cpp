@@ -106,6 +106,17 @@ void Block::throwBlock(glm::vec2 speed)
 	entityState = ALIVE;
 }
 
+void Block::dropBlock(glm::ivec2 pos, glm::ivec2 size, bool left)
+{
+	if(left)
+		position = pos + glm::ivec2(0, size.y) - sizeObject;
+	else
+		position = pos + size - glm::ivec2(0, sizeObject.y);
+
+	speed = glm::vec2(0, 0);
+	entityState = ALIVE;
+}
+
 void Block::explode()
 {
 	entityState = DYING;

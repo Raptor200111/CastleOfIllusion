@@ -72,6 +72,7 @@ private:
 
 	void pickUpBlock();
 	void throwBlock();
+	void dropBlock();
 
 	bool checkJumpButton();
 	bool checkObjInteractionButton();
