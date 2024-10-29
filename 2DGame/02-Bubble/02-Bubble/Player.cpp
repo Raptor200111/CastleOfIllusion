@@ -489,7 +489,7 @@ void Player::horizontalMove(bool left)
 		changeToClimb();
 
 	Block* b = CollisionManager::instance().collisionEntityBlockH(this);
-	if (b != nullptr)
+	if (b != nullptr && b->getEntityState() != EntityState::DEAD)
 	{
 		if (!cakeCoinCollide(b))
 		{
@@ -532,7 +532,7 @@ bool Player::stopFallingCollision(Block*& block, CollisionType& colType)
 
 	if (colType == CollisionType::Tile || colType == CollisionType::TileStairs)
 		return true;
-	if (block != nullptr)
+	if (block != nullptr && block->getEntityState() != EntityState::DEAD)
 	{
 		if (!cakeCoinCollide(block))
 			return true;
@@ -629,7 +629,7 @@ void Player::buttJumpBehaviour()
 			newState = IDLE;
 		yAxisSpeed = 0;
 	}
-	if (block != nullptr)
+	if (block != nullptr && block->getEntityState() != EntityState::DEAD)
 	{
 		yAxisSpeed = BUTT_JUMP_SPEED;
 		newState = BUTT_JUMP;

@@ -32,7 +32,7 @@ void BlockChestCoin::explode()
 	}
 	else if (blockType == BlockType::Coin)
 	{
-		entityState = DYING;
+		entityState = DEAD;
 		speed = glm::vec2(0, 0);
 	}
 }
