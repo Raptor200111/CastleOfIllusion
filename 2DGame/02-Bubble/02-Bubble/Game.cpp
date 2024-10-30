@@ -36,7 +36,7 @@ void Game::render()
 void Game::keyPressed(int key)
 {
 	SoundManager::instance().setMusicVolume(30);
-	if (key == GLFW_KEY_ESCAPE) // Escape code
+	if (currentScene == &sceneMenu && key == GLFW_KEY_ESCAPE) // Escape code
 	{
 		if (currentScene != &sceneMenu) {
 			sceneFinalScreen.setWon(false);
@@ -52,21 +52,6 @@ void Game::keyPressed(int key)
 		scenePlayLevel.reStart();
 		SoundManager::instance().playMusic("level", -1);
 	}
-	/*
-	* else if (currentScene == &sceneMenu && key == GLFW_KEY_J) {
-		currentScene = &scenePlayPractice;
-		tries = 3;
-		scenePlayPractice.reStart();
-		SoundManager::instance().playMusic("level", -1);
-	}
-	else if (currentScene == &sceneMenu && key == GLFW_KEY_I) {
-		currentScene = &sceneInstructions;
-		SoundManager::instance().playMusic("instructions", -1);
-	}
-	else if (currentScene == &sceneMenu && key == GLFW_KEY_C) {
-		currentScene = &sceneCredits;
-		SoundManager::instance().playMusic("credits", -1);
-	}*/
 	keys[key] = true;
 }
 
