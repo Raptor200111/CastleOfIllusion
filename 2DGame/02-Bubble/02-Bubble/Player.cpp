@@ -20,8 +20,8 @@ Player::~Player()
 
 void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
-	jumpAvailable = true;
-	objInteractionAvailable = true;
+	jumpAvailable = false;
+	objInteractionAvailable = false;
 	yAxisSpeed = 0.f;
 	oldState = newState = IDLE;
 
@@ -121,8 +121,8 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
 void Player::reStartStatePlayer()
 {
-	jumpAvailable = true;
-	objInteractionAvailable = true;
+	jumpAvailable = false;
+	objInteractionAvailable = false;
 	yAxisSpeed = 0.f;
 	oldState = newState = IDLE;
 

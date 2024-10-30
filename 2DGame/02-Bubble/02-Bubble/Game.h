@@ -20,6 +20,7 @@
 enum GameState {
 	MENU,
 	INSTRUCTIONS,
+	CREDITS,
 	PLAY_LEVEL,
 	PLAY_PRACTICE
 };
@@ -66,6 +67,8 @@ public:
 	void onExceededTimeLimit();
 	void onHeal();
 	bool isOnGodMode() { return godMode; }
+	void setScene(GameState gs);
+	void exitGame() { bPlay = false; }
 
 private:
 	void looseGame();
