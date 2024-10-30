@@ -195,7 +195,7 @@ void Game::setScene(GameState gs)
 		currentScene = &sceneInstructions;
 		break;
 	case CREDITS:
-		//falta
+		currentScene = &sceneCredits;
 		break;
 	case PLAY_LEVEL:
 		currentScene = &scenePlayLevel;
