@@ -90,6 +90,7 @@ void ScenePlayLevel::reStartLevelSpecific()
 	gameUI.resetTime();
 	boss.setBossPosition(initPosBoss);
 	boss.resetDragon();
+	blockGem->setEntityState(STILL);
 }
 void ScenePlayLevel::initZoneEnemyTree()
 {

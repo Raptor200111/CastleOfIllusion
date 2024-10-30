@@ -57,6 +57,8 @@ void ScenePlayPractice::reStartLevelSpecific()
     player->setTileMap(map);
     updateCamera();
     gameUI.resetTime();
+    blockGem->setEntityState(STILL);
+
 }
 
 void ScenePlayPractice::initZoneEnemyTree()

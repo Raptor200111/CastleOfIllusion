@@ -301,5 +301,10 @@ void CollisionManager::disAttachBlock(Block* b)
 	glm::ivec2 posBlock = b->getOgPosition();
 	string idBlock = std::to_string(posBlock.x) + std::to_string(posBlock.y);
 	auto a = playrunBlocks.erase(std::remove(playrunBlocks.begin(), playrunBlocks.end(), b), playrunBlocks.end());
-	auto it = screenBlocks.erase(idBlock);
+	auto it = screenBlocks.find(idBlock);
+	if (it != screenBlocks.end())
+	{
+		it->second = NULL;
+		auto ita = screenBlocks.erase(idBlock);
+	}
 }

@@ -112,6 +112,7 @@ void ScenePlay::reStart()
 		for (auto& b : row) {
 			glm::ivec2 ogPosB = b->getOgPosition();
 			b->setPosition(ogPosB);
+			b->setEntityState(STILL);
 		}
 	}
 	screenEnemies.clear();
@@ -125,7 +126,7 @@ void ScenePlay::reStart()
 
 void ScenePlay::update(int deltaTime) {
 	//update screenBlocks and screenEnemies
-	
+
 	int floorIndex = calcFloorIndex(player->getPosition().y/map->getTileSize());
 	insideScreenObj(floorIndex);
 
