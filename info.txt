@@ -21,10 +21,10 @@ Funcionalitats implementades:
     
     Per passar les pantalles de jugar el jugador ha d'obtenir una gema. 
     El jugador pot matar els enemics a atacant-los amb butAttack. Per a fer butAttack el jugador ha de saltar i a continuacio apretar tecla S
-    El jugador quan esta al terra es mou a l'esquerra amb la tecla A, a la dreta amb la tecla D, salta amb la tecla W i s'ajup amb la tecla S.
+    El jugador quan esta al terra es mou a l'esquerra amb la tecla A, a la dreta amb la tecla D, salta amb la tecla W/K i s'ajup amb la tecla S.
     El jugador pot escalar escales. Quan es troba una escala unicament pot anar cap amunt amb la tecla W i cap avall amb la tecla S.
     El jugador pot agafar objectes amb la tecla L i un cop agafats els pot llencar tornant a polsar la tecla L.
-    Si el jugador cau en un forat, aquest mort instantaniament perdent un intent i reiniciant la pantalla de jugar actual.
+    Si el jugador cau en un forat, aquest mor instantaniament perdent un intent i reiniciant la pantalla de jugar actual.
 
     Hi ha 3 tipus d'enemics: Tree, Bug, Bee.
     Tree: es mou horitzontalment pel terra en una unica direccio. Si es troba  un block pel cami salta per sobre. Es regenera constantment. 
@@ -51,6 +51,27 @@ Funcionalitats implementades:
     Prement la tecla H el jugador recupera totes les seves vides. 
 
 Instruccions del joc:
+
+    	Introduction:
+	Castle of Illusion is a 2D platform game, where the rules you have to follow are those of the imaginary world where Mickey Mouse is. After Minnie is kidnapped, Mickey 	decides to go save her, daring himself to go on the adventure alone. It is in this story that Mickey will have to overcome the challenges of the imaginary world in 	which he is in order to complete the adventure and thus save his lover.
+
+	Basic Commands:
+	W/A/S/D: Up/Left/Down/Right Movement
+	W/K: Jump
+	S: Dodge/ButtJump
+	L: Take/Throw Object
+	Esc: Go back
+	G: GodMode
+	H: Full Heal
+
+	Objects:
+	There are 3 tipes of objects that can be lifted and thrown, or Butt Jump over them, which makes Mickey jump even higher:
+		- Non Destroyable Objects: This type of object can be thrown away as many times as one pleases, and can be used to jump to higher places.
+		- Destroyable Objects: This type of object can be thrown away only once, exploding upon impact.
+		- Chests: This type of object can be thrown away once, and spawns either a coin or a cake once it's destroyed.
+	
+
+
 
 
 
