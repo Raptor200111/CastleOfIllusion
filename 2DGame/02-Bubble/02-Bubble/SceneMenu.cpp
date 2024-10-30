@@ -105,7 +105,7 @@ void SceneMenu::render()
 	{
 		int size = 30;
 		int x = 320 - (texts[i].size() / 2 * size / 2);
-		int y = 240 - size * 2 + (i * size);
+		int y = 320 - size * 2 + (i * size);
 		
 		if (i == selectedOption)
 			optionsText[i].render("> " + texts[i] + " <", glm::vec2(x - size, y), size, glm::vec4(1, 1, 1, 1));

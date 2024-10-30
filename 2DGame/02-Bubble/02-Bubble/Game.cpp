@@ -36,13 +36,10 @@ void Game::render()
 void Game::keyPressed(int key)
 {
 	SoundManager::instance().setMusicVolume(30);
-	if (currentScene == &sceneMenu && key == GLFW_KEY_ESCAPE) // Escape code
+	if (key == GLFW_KEY_ESCAPE) // Escape code
 	{
-		if (currentScene != &sceneMenu) {
-			sceneFinalScreen.setWon(false);
-			currentScene = &sceneMenu;
-			SoundManager::instance().playMusic("menu", -1);
-		}
+		if (currentScene != &sceneMenu) 
+			setScene(MENU);
 		else
 			bPlay = false;
 	}
@@ -190,7 +187,9 @@ void Game::setScene(GameState gs)
 	switch (gs)
 	{
 	case MENU:
+		sceneFinalScreen.setWon(false);
 		currentScene = &sceneMenu;
+		SoundManager::instance().playMusic("menu", -1);
 		break;
 	case INSTRUCTIONS:
 		currentScene = &sceneInstructions;
