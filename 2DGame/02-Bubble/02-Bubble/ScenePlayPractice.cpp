@@ -104,7 +104,7 @@ void ScenePlayPractice::updateCollisionsWithBoss(int deltaTime) {
     if (blockGem->getEntityState() != DEAD)
         blockGem->update(deltaTime);
 
-    if (player->getEntityState() == STILL) {
+    if (blockGem->getEntityState()== STILL && player->getEntityState() == STILL) {
         if (CollisionManager::instance().checkCollisionObject(player, blockGem)) {
             blockGem->setEntityState(DYING);
             SoundManager::instance().setMusicVolume(40);

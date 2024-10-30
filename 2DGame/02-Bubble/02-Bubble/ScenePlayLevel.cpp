@@ -272,15 +272,16 @@ void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 		if (boss.getEntityState() == STILL && player->getEntityState() == STILL && 
 			CollisionManager::instance().checkCollisionObject(player, &boss))
 		{
-			boss.Damaged();
-			Game::instance().onPlayerKilledEnemy();
+			player->setEntityState(DYING);
+			Game::instance().onPlayerKilled();
 		}
 
 		for (auto shoot : boss.getShoots())
 		{
 			shoot->update(deltaTime);
 			if (shoot->getEntityState() == STILL && !Game::instance().isOnGodMode()) {
-				if (CollisionManager::instance().checkCollisionObject(player, shoot)) {
+				if (player->getEntityState() == STILL && CollisionManager::instance().checkCollisionObject(player, shoot)) {
+					player->setEntityState(DYING);
 					Game::instance().onPlayerKilled();
 					shoot->setEntityState(DYING);
 				}
@@ -308,7 +309,8 @@ void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 	else {
 		if (blockGem->getEntityState() != DEAD)
 			blockGem->update(deltaTime);
-		if (player->getEntityState() == STILL && CollisionManager::instance().checkCollisionObject(player, blockGem))
+		if (blockGem->getEntityState() == STILL && player->getEntityState() == STILL &&
+			CollisionManager::instance().checkCollisionObject(player, blockGem))
 		{
 			blockGem->setEntityState(DYING);
 			SoundManager::instance().setMusicVolume(40);
@@ -322,7 +324,7 @@ void ScenePlayLevel::collisionMovBlockInsideBossRoom(Block* movBlock)
 {
 	if (boss.getEntityState() != DEAD) {
 
-		if (movBlock->getEntityState() == STILL && CollisionManager::instance().checkCollisionObject(movBlock, &boss))
+		if (CollisionManager::instance().checkCollisionObject(movBlock, &boss))
 		{
 			boss.Damaged();
 			Game::instance().onPlayerKilledEnemy();
