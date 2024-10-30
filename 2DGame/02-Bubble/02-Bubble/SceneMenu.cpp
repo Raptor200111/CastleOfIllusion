@@ -19,14 +19,72 @@ SceneMenu::~SceneMenu()
 void SceneMenu::init()
 { 
 	initShaders();
-    menuTexture.loadFromFile("images/portada.png", TEXTURE_PIXEL_FORMAT_RGBA);
+    menuTexture.loadFromFile("images/portada_clean.png", TEXTURE_PIXEL_FORMAT_RGBA);
     menuQuad = Sprite::createSprite(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1.f, 1.f), &menuTexture, &texProgram);
     projection = glm::ortho(0.f, float(SCREEN_WIDTH), float(SCREEN_HEIGHT), 0.f);
+	
+	//optionsText = { Text(), Text(), Text(), Text() };
+	optionsText = vector<Text>(4);
+	
+	for (int i = 0; i < optionsText.size(); i++)
+	{
+		//optionsText.push_back(Text());
+		optionsText[i].init("fonts/OpenSans-Regular.ttf");
+	}
 }
 
 void SceneMenu::update(int deltaTime)
 {
-    // You can handle any specific menu logic here.
+	if (Game::instance().getKey(GLFW_KEY_W))
+	{
+		if (!buttonPressed[0])
+		{
+			selectedOption--;
+			if (selectedOption < 0)
+				selectedOption = 3;
+			buttonPressed[0] = true;
+		}
+	}
+	else
+		buttonPressed[0] = false;
+
+	if (Game::instance().getKey(GLFW_KEY_S))
+	{
+		if (!buttonPressed[1])
+		{
+			selectedOption++;
+			if (selectedOption > 3)
+				selectedOption = 0;
+			buttonPressed[1] = true;
+		}
+	}
+	else
+		buttonPressed[1] = false;
+
+	if (Game::instance().getKey(GLFW_KEY_K))
+	{
+		if (!buttonPressed[2])
+		{
+			switch (selectedOption)
+			{
+			case 0:
+				Game::instance().setScene(GameState::PLAY_PRACTICE);
+				break;
+			case 1:
+				Game::instance().setScene(GameState::INSTRUCTIONS);
+				break;
+			case 2:
+				Game::instance().setScene(GameState::CREDITS);
+				break;
+			case 3:
+				Game::instance().exitGame();
+				break;
+			}
+			buttonPressed[2] = true;
+		}
+	}
+	else
+		buttonPressed[2] = false;
 }
 
 void SceneMenu::render()
@@ -42,6 +100,18 @@ void SceneMenu::render()
 	//menu
 	menuTexture.use();
 	menuQuad->render();
+
+	for (int i = 0; i < optionsText.size(); i++)
+	{
+		int size = 30;
+		int x = 320 - (texts[i].size() / 2 * size / 2);
+		int y = 240 - size * 2 + (i * size);
+		
+		if (i == selectedOption)
+			optionsText[i].render("> " + texts[i] + " <", glm::vec2(x - size, y), size, glm::vec4(1, 1, 1, 1));
+		else
+			optionsText[i].render(texts[i], glm::vec2(x,y), size, glm::vec4(1, 1, 1, 1));
+	}
 }
 
 void SceneMenu::initShaders()

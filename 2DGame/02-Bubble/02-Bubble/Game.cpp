@@ -38,32 +38,19 @@ void Game::keyPressed(int key)
 	SoundManager::instance().setMusicVolume(30);
 	if (currentScene == &sceneMenu && key == GLFW_KEY_ESCAPE) // Escape code
 	{
-		bPlay = false;
+		if (currentScene != &sceneMenu) {
+			sceneFinalScreen.setWon(false);
+			currentScene = &sceneMenu;
+			SoundManager::instance().playMusic("menu", -1);
+		}
+		else
+			bPlay = false;
 	}
-	else if (currentScene == &sceneMenu && key == GLFW_KEY_J) {
-		currentScene = &scenePlayPractice;
-		tries = 3;
-		scenePlayPractice.reStart();
-		SoundManager::instance().playMusic("level", -1);
-	}
-	else if (godMode && currentScene == &scenePlayPractice && key == GLFW_KEY_S) {
+	else if (godMode && currentScene == &scenePlayPractice && key == GLFW_KEY_0) {
 		currentScene = &scenePlayLevel;
 		tries = 8;
 		scenePlayLevel.reStart();
 		SoundManager::instance().playMusic("level", -1);
-	}
-	else if (currentScene == &sceneMenu && key == GLFW_KEY_I) {
-		currentScene = &sceneInstructions;
-		SoundManager::instance().playMusic("instructions", -1);
-	}
-	else if (key == GLFW_KEY_ESCAPE || key == GLFW_KEY_M) {
-		sceneFinalScreen.setWon(false);
-		currentScene = &sceneMenu;
-		SoundManager::instance().playMusic("menu", -1);
-	}
-	else if (currentScene == &sceneMenu && key == GLFW_KEY_C) {
-		currentScene = &sceneCredits;
-		SoundManager::instance().playMusic("credits", -1);
 	}
 	keys[key] = true;
 }
@@ -196,6 +183,31 @@ void Game::onHeal() {
 	stars = INIT_STARS; 
 	SoundManager::instance().setMusicVolume(40);
 	SoundManager::instance().playSoundEffect("playerCake", 0);
+}
+
+void Game::setScene(GameState gs)
+{
+	switch (gs)
+	{
+	case MENU:
+		currentScene = &sceneMenu;
+		break;
+	case INSTRUCTIONS:
+		currentScene = &sceneInstructions;
+		break;
+	case CREDITS:
+		//falta
+		break;
+	case PLAY_LEVEL:
+		currentScene = &scenePlayLevel;
+		break;
+	case PLAY_PRACTICE:
+		currentScene = &scenePlayPractice;
+		tries = 3;
+		scenePlayPractice.reStart();
+		SoundManager::instance().playMusic("level", -1);
+		break;
+	}
 }
 
 
