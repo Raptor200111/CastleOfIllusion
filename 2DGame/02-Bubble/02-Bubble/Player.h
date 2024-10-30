@@ -48,7 +48,7 @@ private:
 	Block* block = nullptr;
 
 	int elapsedTime = 0;
-	int timeDyingAnim = 3000;
+	int timeDyingAnim = 2000;
 	bool paint = true;
 
 

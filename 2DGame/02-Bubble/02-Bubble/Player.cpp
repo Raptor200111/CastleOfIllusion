@@ -142,10 +142,12 @@ void Player::update(int deltaTime)
 	if (entityState == EntityState::DYING)
 	{
 		elapsedTime += deltaTime;
-		//int timeDyingAnim = 2000;
 		if (elapsedTime >= timeDyingAnim)
 		{
-			entityState = EntityState::STILL;
+			if (Game::instance().getStars() > 0)
+				entityState = EntityState::STILL;
+			else
+				entityState = EntityState::DEAD;
 			paint = true;
 			elapsedTime = 0;
 		}
@@ -160,17 +162,6 @@ void Player::update(int deltaTime)
 
 	colType = CollisionType::None;
 	block = nullptr;
-
-	if (entityState == DYING) {
-		elapsedTime += deltaTime;
-		if (elapsedTime >= timeDyingAnim) {
-			elapsedTime = 0;
-			if (Game::instance().getStars() > 0)
-				entityState = STILL;
-			else
-				entityState = DEAD;
-		}
-	}
 
 	switch (oldState)
 	{
