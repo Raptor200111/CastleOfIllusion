@@ -412,12 +412,13 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 	for (auto& itMovBlock = playrunMovBlocks.begin(); itMovBlock != playrunMovBlocks.end();)
 	{
 		bool elementErased = false;
+		bool colisionHole = false;
 		glm::ivec2 ogBlockPos = itMovBlock->second->getPosition();
 		itMovBlock->second->update(deltaTime);
 		glm::ivec2 updateBlockPos = itMovBlock->second->getPosition();
 		BlockType blockType = itMovBlock->second->getBlockType();
 		//block alive === moving
-
+		
 		//check collisions with enemies
 		if (itMovBlock->second->getEntityState() == FALLING && blockType != Cake && blockType != Coin) {
 			if (insideBossRoom) {
@@ -476,6 +477,8 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 				itMovBlock->second->collisionVertical(verticalCollision);
 				correctedBlockY = itMovBlock->second->getPosition().y;
 			}
+			if (verticalCollision == Hole)
+				colisionHole = true;
 		}
 		itMovBlock->second->setPosition(glm::ivec2(updateBlockPos.x, correctedBlockY));
 		int correctedBlockX = 0;
@@ -503,13 +506,18 @@ void ScenePlay::collisionsMovingBlocks(int deltaTime)
 		//block Dead == has stopped moving
 		blockType = itMovBlock->second->getBlockType();
 		bool b = blockType == Cake || blockType == Coin;
-		if ((b && itMovBlock->second->getEntityState() == STILL) || itMovBlock->second->getEntityState() == DEAD ||
+		if ((b && itMovBlock->second->getEntityState() == STILL) || 
+			itMovBlock->second->getEntityState() == DEAD || colisionHole ||
 			(blockType == NonDestroyable && itMovBlock->second->getEntityState() == STILL)) {
 			if (blockType == Cake || blockType == Coin || blockType == NonDestroyable) {
 				screenBlocks.insert(std::pair<string, Block*>(itMovBlock->first, itMovBlock->second));
 				//itMovBlock->second->setEntityState(STILL);
 				int movBlockFloorIndex = calcFloorIndex(itMovBlock->second->getPosition().y / map->getTileSize());
 				playrunBlocks[movBlockFloorIndex].push_back(itMovBlock->second);
+			}
+			if (colisionHole)
+			{
+				itMovBlock->second->setEntityState(DEAD);
 			}
 			elementErased = true;
 			itMovBlock->second = NULL;

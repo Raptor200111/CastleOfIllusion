@@ -213,9 +213,11 @@ CollisionType CollisionManager::checkCollisionVertical(Entity* entity)
 	else if (stairs) {
 		entity->setPosition(pos);
 	}
+
+	Block* p = dynamic_cast<Block*>(entity);
 	if (correctRamp(entity))
 		tile = true;
-	if (hole && !Game::instance().isOnGodMode())
+	if (hole && (!Game::instance().isOnGodMode() || p))
 		return Hole;
 	if (tile && stairs)
 		return TileStairs;
