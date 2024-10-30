@@ -126,6 +126,7 @@ void Player::reStartStatePlayer()
 	yAxisSpeed = 0.f;
 	oldState = newState = IDLE;
 
+	entityState = STILL;
 	paint = true;
 	elapsedTime = 0;
 	pickedUpBlock = nullptr;
