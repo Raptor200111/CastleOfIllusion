@@ -21,7 +21,7 @@ ScenePlay::ScenePlay()
 {
     map = NULL;
     player = NULL;
-    zoomLevel = 1.5f;
+    zoomLevel = 2.f;
     bgMap = NULL;
     bgQuad = NULL;
 	quad = NULL;
