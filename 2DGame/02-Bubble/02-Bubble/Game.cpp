@@ -40,13 +40,13 @@ void Game::keyPressed(int key)
 	{
 		bPlay = false;
 	}
-	else if (key == GLFW_KEY_Z) {
+	else if (currentScene == &sceneMenu && key == GLFW_KEY_J) {
 		currentScene = &scenePlayPractice;
 		tries = 3;
 		scenePlayPractice.reStart();
 		SoundManager::instance().playMusic("level", -1);
 	}
-	else if (godMode && currentScene == &scenePlayPractice && key == GLFW_KEY_0) {
+	else if (godMode && currentScene == &scenePlayPractice && key == GLFW_KEY_S) {
 		currentScene = &scenePlayLevel;
 		tries = 8;
 		scenePlayLevel.reStart();
