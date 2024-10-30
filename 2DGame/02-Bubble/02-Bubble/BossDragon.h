@@ -77,6 +77,7 @@ private:
 	int indexAngleShoot, indexQuadrantShoot = 0;
 	int MaxShoots = 3;
 	int actualLives = MAX_LIVES_BOSS;
+	bool paint = true;
 
 
 	BossDragonStates bossDragonState = BossDragonStates::BOSS_LEFT;

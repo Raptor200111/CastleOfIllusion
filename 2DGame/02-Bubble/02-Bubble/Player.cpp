@@ -126,6 +126,8 @@ void Player::reStartStatePlayer()
 	yAxisSpeed = 0.f;
 	oldState = newState = IDLE;
 
+	paint = true;
+	elapsedTime = 0;
 	pickedUpBlock = nullptr;
 	readyToPickBlock = nullptr;
 	block = nullptr;

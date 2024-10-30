@@ -50,7 +50,7 @@ void BossDragon::initMov(const glm::ivec2& tileMapPos, ShaderProgram& shaderProg
 	}
 
 	bodySprite->setPosition(glm::vec2(float(tileMapDispl.x + posBody.x), float(tileMapDispl.y + posBody.y)));
-
+	paint = true;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posHead.x), float(tileMapDispl.y + posHead.y)));
 
 }
@@ -82,7 +82,6 @@ void BossDragon::setBodyAnimations(ShaderProgram& shaderProgram)
 	sizeSpriteSheet = glm::vec2(sizeObjBody.x / totalSizeSpriteSheet.x, 1);
 	frame = glm::vec2(148.f / totalSizeSpriteSheet.x, 0.f);
 	bodySprite->addKeyframeDiffSize(BOSS_BODY_IDLE, frame, sizeObjBody, sizeSpriteSheet);
-
 
 	glm::vec2 aux = bodySprite->changeAnimationDiffSize(bossBodyState);
 	if (aux != glm::vec2(0.f))
@@ -135,15 +134,29 @@ void BossDragon::update(int deltaTime)
 	if (!active || entityState == DEAD) return;
 
 	else if (entityState == DYING) {
+		paint = true;
 		elapsedTime += deltaTime;
-		posBody.y += 1;
-		if (elapsedTime >= timeDyingAnim)
-		{
-			elapsedTime = 0;
-			entityState = DEAD;
+		if (actualLives <= 0) {
+			posBody.y += 1;
+			if (elapsedTime >= timeDyingAnim)
+			{
+				elapsedTime = 0;
+				entityState = DEAD;
+				paint = true;
+			}
+		}
+		else {
+			paint = (elapsedTime / 200) % 2 == 1;
+			if (elapsedTime >= 1000)
+			{
+				elapsedTime = 0;
+				entityState = STILL;
+				paint = true;
+			}
 		}
 	}
 	else if (active && entityState == STILL) {
+		paint = true;
 		glm::vec2 aux = sprite->updateDiffSize(deltaTime);
 		if (aux != glm::vec2(0.f))
 			sizeObjHead = aux;
@@ -208,8 +221,10 @@ void BossDragon::update(int deltaTime)
 void BossDragon::render()
 {
 	if (!active || entityState == DEAD) return;
-	bodySprite->render();
-	sprite->render();
+	if (paint) {
+		bodySprite->render();
+		sprite->render();
+	}
 }
 
 void BossDragon::setHeadSpritePos()
@@ -314,7 +329,6 @@ void BossDragon::shoot(int deltaTime)
 void BossDragon::Damaged()
 {
 	actualLives -= 1;
-	if(actualLives <= 0)
 		entityState = DYING;
 }
 
