@@ -8,7 +8,7 @@ using namespace std;
 #define INIT_STARS 3
 #define ENEMY_POINTS 50
 #define COIN_POINTS 100
-#define MAX_LIVES_BOSS 2
+#define MAX_LIVES_BOSS 5
 #define BOSS_POINTS 10000
 #define MAX_HEIGHT_F0 14
 #define MAX_HEIGHT_F1 26

@@ -322,7 +322,7 @@ void ScenePlayLevel::updateCollisionsWithBoss(int deltaTime) {
 
 void ScenePlayLevel::collisionMovBlockInsideBossRoom(Block* movBlock)
 {
-	if (boss.getEntityState() != DEAD) {
+	if (boss.getEntityState() == STILL) {
 
 		if (CollisionManager::instance().checkCollisionObject(movBlock, &boss))
 		{
